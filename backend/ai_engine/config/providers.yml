@@ -1,0 +1,126 @@
+# AI Configuration
+# Prices are not kept here: the genai-prices library prices every call (see
+# ai_engine/usage_meter.py). A model listed here that the library doesn't know
+# can't be used — the startup check and create_llm refuse it.
+#
+# Each model must set `timeout` (seconds per call) and `max_tokens` (the OUTPUT
+# token cap); create_llm passes both to the client and the startup check
+# refuses a role whose model lacks them. Retries: one by default
+# (llm_utils.DEFAULT_MAX_RETRIES), so a stuck call costs at most 2 × timeout;
+# a model may set `max_retries` to change it.
+providers:
+  openai:
+    enabled: true
+    api_key_env: OPENAI_API_KEY
+    models:
+      gpt-4o-mini:
+        max_tokens: 16000
+        temperature: 0.7
+        timeout: 60
+      gpt-4o:
+        max_tokens: 16384
+        temperature: 0.7
+        timeout: 120
+      # GPT-5.4 family — all accept temperature=0 (verified 2026-07-03), so they
+      # drop into create_llm's existing OpenAI path with no code change. Their
+      # max_tokens also counts hidden reasoning, so draft/expert get headroom.
+      gpt-5.4-nano:
+        max_tokens: 16000
+        temperature: 0.7
+        timeout: 60
+      gpt-5.4-mini:
+        max_tokens: 32000
+        temperature: 0.7
+        timeout: 90
+      gpt-5.4:
+        max_tokens: 32000
+        temperature: 0.7
+        timeout: 180
+  
+  anthropic:
+    enabled: true
+    api_key_env: ANTHROPIC_API_KEY
+    models:
+      claude-haiku-4-5:
+        max_tokens: 8192
+        temperature: 0.7
+        timeout: 60
+      claude-sonnet-4-6:
+        max_tokens: 16000
+        temperature: 0.7
+        timeout: 120
+      claude-opus-4-8:
+        max_tokens: 16000
+        temperature: 0.7
+        timeout: 180
+
+# Role to model mapping — the ONLY place to retier models.
+# Any role can point at any provider/model pair above; create_llm
+# (ai_engine/llm_utils.py) picks the right client from `provider`.
+# e.g. to test Claude on deep-critique work:
+#   expert: { provider: anthropic, model: claude-opus-4-8 }
+# `fallbacks:` is an ordered list of backups (wrt-71, docs/decisions/
+# 2026-10-ai-backup-provider.md): when the main model is down, refuses our key
+# or rate-limits us, create_llm tries the next pair in order. Add more pairs to
+# lengthen the chain.
+# Keys are optional: a pair whose api_key_env is unset is left out, so ONE
+# provider's key runs every role (each role lists both providers). With no
+# key at all, AI features answer HTTP 503 `ai_not_configured`.
+# The startup check (backend/projects/checks.py) refuses to boot unless every
+# role and fallback names a listed model the price library knows and each role
+# has a `profiles:` entry; missing keys are only a warning. No silent defaults.
+roles:
+  # The official ladder (decided 2026-10-03): every role uses the OpenAI
+  # gpt-5.4 family, with the Claude model of the same tier as its backup.
+  small:
+    provider: openai
+    model: gpt-5.4-nano
+    fallbacks:
+      - { provider: anthropic, model: claude-haiku-4-5 }
+    use_case: "Fast classification, compression, simple verdicts"
+
+  draft:
+    provider: openai
+    model: gpt-5.4-mini
+    fallbacks:
+      - { provider: anthropic, model: claude-sonnet-4-6 }
+    use_case: "General drafting and continuation (incl. Night Eyes chat)"
+
+  expert:
+    provider: openai
+    model: gpt-5.4
+    fallbacks:
+      - { provider: anthropic, model: claude-opus-4-8 }
+    use_case: "Deep critique, complex reasoning, outline alignment"
+
+# Night Eyes chat-agent behaviour per role (agentic core). tool_budget caps how
+# many `bound` chat tools are pre-bound per turn (999 ≈ all of them); `prompt`
+# picks the system-prompt variant (trimmed | standard | full); compact_after is
+# the message-count compaction trigger.
+#
+# NOTE (2026-07-03): there are ~26 `bound`-exposure chat capabilities today, so
+# tool_budget only actually bites for `small` (14). `draft` (32) and `expert`
+# (999) both bind the full set — intentional: the draft and expert models handle
+# ~29 tools fine, and cutting them would force needless find_tools hops. The number on
+# draft is headroom for when the bound pool grows past it; today draft and
+# expert differ by model / prompt-variant-slot / recursion / compaction, not by
+# tool count. Everything off-budget stays reachable via find_tools.
+# recursion_limit assumes 2 graph steps per tool call; night_eyes/graph.py
+# `graph_step_limit` scales it for the compaction hook's extra step.
+profiles:
+  small:  { tool_budget: 14,  prompt: trimmed,  recursion_limit: 8,  compact_after: 20 }
+  draft:  { tool_budget: 32,  prompt: standard, recursion_limit: 12, compact_after: 40 }
+  expert: { tool_budget: 999, prompt: full,     recursion_limit: 16, compact_after: 60 }
+
+# Image generation — character portraits (gpt-image-1 returns a transparent PNG
+# natively via `background: transparent`, so the foreground character comes back
+# with no scenery and no separate background-removal step). Reuses the OpenAI key.
+images:
+  provider: openai
+  model: gpt-image-1
+  # Tall (portrait) canvas so a standing figure fits head-to-feet with headroom
+  # instead of getting cropped at the top in a square frame. The UI slot sizes
+  # itself to whatever aspect ratio comes back.
+  size: "1024x1536"
+  quality: medium
+  background: transparent
