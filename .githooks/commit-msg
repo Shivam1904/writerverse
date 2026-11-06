@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Commit-message check: Conventional Commits, `type(scope): subject`.
+#   fix(editor): keep the cursor in place after autosave
+# Types: feat fix refactor docs test chore ci perf style. Scope is optional,
+# lowercase kebab-case (night-eyes). Merge, Revert, fixup!/squash!/amend! pass.
+# Enable once per clone:  make hooks   (sets core.hooksPath=.githooks)
+
+set -euo pipefail
+
+# First line that is not a comment (git strips "#" lines later).
+subject="$(grep -v '^#' "$1" | head -n 1 || true)"
+
+case "$subject" in
+  "Merge "* | "Revert "* | "fixup! "* | "squash! "* | "amend! "*) exit 0 ;;
+esac
+
+pattern='^(feat|fix|refactor|docs|test|chore|ci|perf|style)(\([a-z0-9]+(-[a-z0-9]+)*\))?!?: [^ ].*$'
+if ! printf '%s\n' "$subject" | grep -Eq "$pattern"; then
+  cat >&2 <<EOF
+✗ commit message does not follow Conventional Commits:
+    $subject
+  Use:  type(scope): subject     e.g.  fix(editor): keep the cursor after save
+  type:  feat fix refactor docs test chore ci perf style
+  scope: optional, lowercase kebab-case (editor, ideas, night-eyes, outline)
+  See CONTRIBUTING.md. Edit and retry (your message is in .git/COMMIT_EDITMSG).
+EOF
+  exit 1
+fi
+
+if [ "${#subject}" -gt 72 ]; then
+  echo "⚠ commit subject is ${#subject} characters; please keep it to 72 or fewer." >&2
+fi
