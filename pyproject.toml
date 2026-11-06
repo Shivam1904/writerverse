@@ -1,0 +1,147 @@
+[project]
+name = "writerverse"
+version = "0.1.0"
+package-mode = false  # Not a distributable package — uv handles this natively
+description = "AI Writing Assistant with Integrated Consistency Checking"
+authors = [
+    {name = "WriterVerse contributors"}
+]
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+dependencies = [
+    # ── Django core ──
+    "django>=5.2,<6.0",
+    "djangorestframework>=3.16,<4.0",
+    "djangorestframework-simplejwt>=5.5,<6.0",
+    "drf-spectacular>=0.29,<1.0",
+    "python-decouple>=3.8,<4.0",
+    "django-cors-headers>=4.9,<5.0",
+    "django-json-widget>=2.1,<3.0",
+    "django-unfold>=0.98,<1.0",
+    "django-extensions>=4.1,<5.0",
+    # ── AI/LLM ──
+    "langchain-openai>=1.1,<2.0",
+    "langchain-anthropic>=1.3,<2.0",
+    "langchain-core>=1.3,<2.0",
+    "langgraph>=1.1,<2.0",
+    "langgraph-checkpoint-postgres>=3.1,<4.0",
+    # ── Database ──
+    "psycopg[binary]>=3.3,<4.0",
+    "psycopg-pool>=3.3,<4.0",
+    "dj-database-url>=2.3,<3.0",
+    # ── Other ──
+    "bleach>=6.3,<7.0",
+    "tiktoken>=0.12,<1.0",
+    "pyyaml>=6.0,<7.0",
+    "pydantic>=2.12,<3.0",
+    "adrf>=0.1,<1.0",
+    "langsmith>=0.8,<1.0",
+    "whitenoise>=6.9,<7.0",
+    "gunicorn>=24.0,<25.0",
+    "django-axes>=8.0,<9.0",
+    "django-storages[s3]>=1.14.6",
+    "genai-prices>=0.1.13,<0.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4,<10.0",
+    "pytest-django>=4.11,<5.0",
+    "ruff>=0.14,<1.0",
+    "factory-boy>=3.3,<4.0",
+    # Lets Django's --parallel runner pickle tracebacks; without it a parallel
+    # failure prints "cannot pickle 'traceback' object" instead of the error.
+    "tblib>=3.0,<4.0",
+    "coverage>=7.16.2",
+    "moto[s3]>=5.2.3",
+    "import-linter>=2.15",
+    # Request profiler, local only: loaded when DEBUG and SILK_ENABLED are both on.
+    "django-silky>=1.3,<2.0",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+exclude = [
+    "**/migrations/**",
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "C4", "UP"]
+ignore = [
+    "E501",  # line too long
+    "E402",  # module level import not at top of file (common in Django)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["config"]
+
+[tool.pytest.ini_options]
+python_files = ["test_*.py", "smoke_*.py"]
+markers = [
+    "smoke: Night Eyes E2E pipeline — live LLM + seeded DB. Run with 'make night-eyes-smoke'.",
+]
+addopts = "-m 'not smoke'"
+
+[tool.coverage.run]
+source = ["."]   # run from backend/ (see `make coverage`)
+omit = ["*/migrations/*", "*/tests/*", "*/test_*.py", "*/tests_*.py", "manage.py", "config/*"]
+
+[tool.coverage.report]
+skip_empty = true
+
+# import-linter: run from backend/ (`cd backend && uv run lint-imports --config ../pyproject.toml`).
+# Target layering, top to bottom. A higher layer may import a lower one, never
+# the reverse. `ignore_imports` below is the baseline of today's violations;
+# delete lines as code moves so they never come back.
+[tool.importlinter]
+root_packages = [
+    "night_eyes",
+    "characters", "worldbuilding", "braindumps", "outline", "gauges",
+    "actions",
+    "projects",
+    "accounts", "notifications", "activity",
+    "usage",
+    "common", "ai_engine",
+]
+include_external_packages = false
+
+[[tool.importlinter.contracts]]
+id = "layers"
+name = "Backend layers"
+type = "layers"
+layers = [
+    "night_eyes",
+    "characters : worldbuilding : braindumps : outline : gauges : projects",
+    "actions",
+    "accounts | notifications | activity",
+    # The AI policy seam: an edition's policy (WRITERVERSE_AI_POLICY) plugs in here.
+    "usage",
+    "common | ai_engine",
+]
+ignore_imports = [
+    # Tests and migrations may import anything.
+    "**.tests.** -> **",
+    "**.migrations.** -> **",
+    # Project is the tenant root: the kernel scopes every action to it and takes
+    # its row lock for writes, and leaf apps check ownership through it.
+    "** -> projects.models",
+    "** -> projects.scoping",
+    "** -> projects.signals",
+    # Known exceptions. Follow-up: each domain registers its own stamp function,
+    # so the stale-accept guard stops importing domain modules.
+    "actions.capabilities.stamps -> characters.fields",
+    "actions.capabilities.stamps -> projects.meta_fields",
+    "actions.awareness.signals -> characters.models",
+    "actions.capabilities.stamps -> characters.models",
+    "actions.capabilities.stamps -> outline.models",
+    "actions.capabilities.stamps -> outline.store",
+    "actions.capabilities.stamps -> worldbuilding.models",
+]
