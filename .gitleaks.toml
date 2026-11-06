@@ -1,0 +1,8 @@
+# gitleaks settings (run `gitleaks dir .` before a release).
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Known non-secrets: empty keys in the pre-push hook, test idempotency keys"
+regexTarget = "line"
+regexes = ['''(OPENAI|ANTHROPIC)_API_KEY=""''', '''idempotency_key=.a-[0-9]+''']

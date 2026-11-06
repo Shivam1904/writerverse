@@ -1,0 +1,159 @@
+# ─── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.ruff_cache/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv
+
+# ─── Node.js ──────────────────────────────────────────────
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+.npm
+.eslintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+.node_repl_history
+*.tgz
+.yarn-integrity
+jspm_packages/
+
+# ─── React / Vite ─────────────────────────────────────────
+dist/
+dist-ssr/
+*.local
+
+# ─── Environment variables ────────────────────────────────
+.env
+.env.dev
+.env.prod
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env*
+!backend/.env.example
+frontend/.env
+frontend/.env.production
+openai_key.txt
+
+# ─── Databases ────────────────────────────────────────────
+db/
+local_settings.py
+media/
+staticfiles/
+
+# Stray SQLite files from dev server / parallel test runs
+backend/default_*.sqlite3
+backend/*.sqlite3
+
+# ─── Logs ─────────────────────────────────────────────────
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ─── Test coverage ────────────────────────────────────────
+coverage/
+*.lcov
+.nyc_output
+.coverage
+htmlcov/
+
+# ─── IDE ──────────────────────────────────────────────────
+.vscode/
+.braindump/
+*.swp
+*.swo
+*~
+
+# ─── OS ───────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ─── AI / Agent local state ───────────────────────────────
+.claude/
+.crush/
+.mcp.json
+memory/
+.playwright-mcp/
+
+# ─── Temporary / scratch ──────────────────────────────────
+tmp/
+temp/
+*.ipynb_checkpoints
+competitor_analysis/
+
+# ─── Design scratch screenshots ───────────────────────────
+design-*.png
+*design*.png
+
+# ─── Project-specific ignores ─────────────────────────────
+# Don't ignore frontend lib directory (for internal libraries)
+!frontend/src/lib/
+!frontend/src/app/lib/
+!frontend/public/
+
+# Don't ignore public/ unless it's Gatsby root
+public
+
+# Root SPRINT.md is a symlink — ignore the pointer
+/SPRINT.md
+
+# findings/: ignore derived dev trackers
+findings/SPRINT-*.md
+findings/SPRINT-PLAN-*.md
+findings/ROADMAP-*.md
+
+# Brainstorm visual-companion artifacts
+.superpowers/
+.vercel
+
+# ─── Local-only archive of old docs (never pushed; contains security notes) ───
+archive/
+
+# Playwright e2e output
+frontend/test-results/
+frontend/playwright-report/
+
+# Local database backups (pg_dump)
+backups/

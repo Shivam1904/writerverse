@@ -1,0 +1,21 @@
+services:
+  db:
+    # Official pgvector image. Postgres 15 on purpose: it matches the data
+    # already in the postgres_data_v2 volume (the old ankane/pgvector image was
+    # Postgres 15), so an existing local database keeps working. Moving to a
+    # newer major means wiping the volume (`docker compose down -v`).
+    image: pgvector/pgvector:pg15
+    container_name: writerverse-db
+    ports:
+      # Local machine only: never reachable from the network.
+      - "127.0.0.1:5432:5432"
+    environment:
+      # Local-only throwaway credentials (match backend/.env.example).
+      POSTGRES_DB: writerverse
+      POSTGRES_USER: writerverse_user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data_v2:/var/lib/postgresql/data
+
+volumes:
+  postgres_data_v2:
