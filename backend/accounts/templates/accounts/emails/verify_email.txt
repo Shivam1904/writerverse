@@ -1,0 +1,5 @@
+{% extends "accounts/emails/base.txt" %}{% block content %}Thanks for signing up for WriterVerse. Please confirm your email so we know it's really you:
+
+{{ link }}
+
+This link works for {{ hours }} hours. If you didn't sign up, you can ignore this email.{% endblock %}

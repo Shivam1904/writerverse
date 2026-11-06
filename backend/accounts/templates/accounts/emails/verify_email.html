@@ -1,0 +1,9 @@
+{% extends "accounts/emails/base.html" %}
+{% block preheader %}Confirm your email to start writing.{% endblock %}
+{% block hero_title %}One quick step.{% endblock %}
+{% block hero_accent %}Confirm it's you.{% endblock %}
+{% block content %}
+<p style="margin:0 0 18px 0;">Thanks for signing up for WriterVerse. Please confirm your email so we know it's really you.</p>
+{% include "accounts/emails/_button.html" with url=link label="Confirm my email" show_url=True %}
+<p style="margin:0 0 18px 0;">This link works for {{ hours }} hours. If you didn't sign up, you can ignore this email.</p>
+{% endblock %}

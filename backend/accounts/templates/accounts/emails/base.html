@@ -1,0 +1,100 @@
+{% comment %}
+The one layout for every account email. Same look as the landing site's
+waitlist email (sent from the separate landing site), so all our mail is one family.
+Email clients ignore <style> and web fonts, so: tables, inline styles, Georgia + system fonts.
+Blocks a child fills: preheader, hero_title, hero_accent, content, notice (optional,
+use _notice.html), after_notice (optional), footer (optional).
+{% endcomment %}<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>WriterVerse</title>
+<!--[if mso]><style>table,td,p,h1,a{font-family:Arial,sans-serif !important;}</style><![endif]-->
+</head>
+<body style="margin:0; padding:0; background-color:#f4f3f0; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+<!-- Preheader: the preview line in the inbox list, hidden in the email. -->
+<div style="display:none; max-height:0; overflow:hidden; mso-hide:all;">{% block preheader %}{% endblock %}&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f4f3f0;">
+  <tr>
+    <td align="center" style="padding:48px 16px;">
+
+      <!-- Card -->
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px; width:100%; background-color:#ffffff; border-radius:16px; overflow:hidden;">
+
+        <!-- Gold accent bar (solid colour for Outlook, which ignores gradients) -->
+        <tr>
+          <td bgcolor="#c4956a" style="height:4px; background-color:#c4956a; background-image:linear-gradient(to right,#c4956a,#d4a97a,#c4956a); font-size:0; line-height:0;">&nbsp;</td>
+        </tr>
+
+        <!-- Logo + wordmark -->
+        <tr>
+          <td style="padding:32px 48px 0 48px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td style="padding:0 12px 0 0; vertical-align:middle;">
+                  <a href="{{ frontend_url }}" target="_blank"><img src="https://writerverse.info/logo.png" width="48" height="32" alt="WriterVerse" style="display:block; width:48px; height:32px; border:0; outline:none; text-decoration:none;"></a>
+                </td>
+                <td style="vertical-align:middle; font-family:Georgia,'Times New Roman',Times,serif; font-size:13px; letter-spacing:0.18em; text-transform:uppercase; color:#8a94aa;">
+                  WriterVerse
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Hero -->
+        <tr>
+          <td style="padding:32px 48px 0 48px;">
+            <h1 style="margin:0; font-family:Georgia,'Times New Roman',Times,serif; font-size:30px; font-weight:normal; line-height:1.3; color:#1d242e;">{% block hero_title %}{% endblock %}</h1>
+            <p style="margin:6px 0 0 0; font-family:Georgia,'Times New Roman',Times,serif; font-size:30px; font-style:italic; line-height:1.3; color:#c4956a;">{% block hero_accent %}{% endblock %}</p>
+          </td>
+        </tr>
+
+        <!-- Divider -->
+        <tr>
+          <td style="padding:28px 48px 0 48px;">
+            <table role="presentation" width="40" cellpadding="0" cellspacing="0" border="0">
+              <tr><td bgcolor="#e8e4dc" style="height:2px; background-color:#e8e4dc; font-size:0; line-height:0;">&nbsp;</td></tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:28px 48px 0 48px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:1.8; color:#3a4050;">
+            <p style="margin:0 0 18px 0;">Hi {{ first_name|default:"there" }},</p>
+            {% block content %}{% endblock %}
+            {% block notice %}{% endblock %}
+            {% block after_notice %}{% endblock %}
+          </td>
+        </tr>
+
+        <!-- Sign-off -->
+        <tr>
+          <td style="padding:14px 48px 44px 48px;">
+            <p style="margin:0; font-family:Georgia,'Times New Roman',Times,serif; font-size:15px; font-style:italic; color:#6e7a94;">&mdash; The WriterVerse team</p>
+          </td>
+        </tr>
+
+      </table>
+      <!-- /Card -->
+
+      <!-- Footer -->
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="max-width:560px; width:100%;">
+        <tr>
+          <td align="center" style="padding:28px 48px 0 48px; text-align:center; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+            <p style="margin:0; font-size:11px; line-height:1.6; color:#8a94aa;">{% block footer %}You're getting this because you have a WriterVerse account. Questions? Just reply.{% endblock %}</p>
+            <p style="margin:6px 0 0 0; font-size:11px; line-height:1.6; color:#aab0bc;">&copy; 2026 WriterVerse</p>
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+</body>
+</html>

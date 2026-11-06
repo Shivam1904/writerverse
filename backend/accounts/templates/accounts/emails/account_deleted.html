@@ -1,0 +1,10 @@
+{% extends "accounts/emails/base.html" %}
+{% block preheader %}Your account and everything in it is deleted.{% endblock %}
+{% block hero_title %}Your account is closed.{% endblock %}
+{% block hero_accent %}Thank you for writing with us.{% endblock %}
+{% block content %}
+<p style="margin:0 0 18px 0;">Your WriterVerse account is deleted, along with everything in it: your books, notes and AI usage history. This can't be undone.</p>
+<p style="margin:0 0 18px 0;">Thanks for giving WriterVerse a try. If you have a minute, reply and tell us what didn't work for you. We read every message.</p>
+{% endblock %}
+{% block notice %}{% include "accounts/emails/_notice.html" with lead="If you didn't delete your account," body="reply to this email right away." %}{% endblock %}
+{% block footer %}You're getting this because you had a WriterVerse account. Questions? Just reply.{% endblock %}

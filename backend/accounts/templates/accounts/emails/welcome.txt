@@ -1,0 +1,13 @@
+{% extends "accounts/emails/base.txt" %}{% block content %}Your email is confirmed and your account is ready.
+
+WriterVerse keeps your story in one place: your ideas, characters, world and outline. Night Eyes, our AI helper, is there when you want a second pair of eyes. Every creative call stays yours.
+
+Where to start:
+1. Ideas: empty your head.
+2. Characters & World: the people and places.
+3. Outline: shape it into a book.
+
+Start your first book:
+{{ link }}
+
+We're a small team and we read every reply. If something feels off, or you just want to tell us about your story, reply to this email.{% endblock %}

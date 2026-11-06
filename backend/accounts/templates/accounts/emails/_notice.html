@@ -1,0 +1,8 @@
+{% comment %}Soft notice box for the "if this wasn't you" part of a security email.
+Use: {% include "accounts/emails/_notice.html" with lead="If this wasn't you," body="..." %}{% endcomment %}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 18px 0;">
+  <tr>
+    <td bgcolor="#faf6ef" style="background-color:#faf6ef; border-left:3px solid #c4956a; border-radius:6px; padding:16px 20px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:14px; line-height:1.7; color:#3a4050;">
+      <strong style="color:#1d242e;">{{ lead }}</strong> {{ body }}
+    </td>
+  </tr>
+</table>
