@@ -1,0 +1,397 @@
+# Thread Scaffolds — beginner-facing starter templates for storylines (plot threads).
+#
+# A "thread" in WriterVerse is one storyline: the whole-story spine, a character's
+# arc, a relationship, a mystery. A scaffold is a reusable skeleton you stamp onto a
+# new thread so a writer who doesn't know craft still lands the beats that matter.
+#
+# Shape:
+#   scaffolds:
+#     <id>:
+#       name        display name
+#       suggested   offer this one first (only the default is true)
+#       scope_fit   which thread scopes this shape suits (story / character /
+#                   relationship / theme) — see THREAD_SCOPE_TYPES (threads/data.ts)
+#       summary:
+#         about     what this thread IS — the plain explanation
+#         using     read before you start: what it's for, how to handle it, how to fill it
+#         judging   prompt context for the AI critic. Given the FINAL chapter text (and
+#                   the headings, but NOT the placeholders), judge whether every heading
+#                   actually lands on the page — flag any beat a reader couldn't locate.
+#                   Says what each shape must deliver and how it typically fails to land.
+#       beats       ordered list of HEADINGS, each owning its PLACEHOLDERS
+#
+# Beats come in two kinds:
+#   • heading      an essential beat of this scaffold, in order. Headings ARE the
+#                  focus — they're the load-bearing topics; skip one and the story
+#                  suffers.
+#   • placeholder  an open prompt under a heading, worded to invite the writer to
+#                  fill that beat in from their own imagination. A heading usually
+#                  has one; it may have more. Prompts, never prescriptions.
+#
+# When a scaffold is stamped onto a thread it flattens into the thread's beat array:
+# each heading -> {kind: heading, text}, each placeholder -> {kind: placeholder, text}
+# (a dashed "gap" the writer turns into a real beat).
+#
+# The beat lists were rebuilt against real story craft (the maintainers' writing-craft notes),
+# not transcribed — every heading is a genuinely essential beat of that shape.
+
+scaffolds:
+
+  three_act:
+    name: "An Adventure"
+    suggested: true
+    scope_fit: [story]
+    summary:
+      about: "The backbone most stories rest on: a beginning that sets the stage, a long middle of mounting conflict, and an ending that pays it all off."
+      using: "Use it for your whole story's shape — or for one character's arc across the book. Cover each heading in order; they're the load-bearing turns, and if the midpoint or 'all is lost' is missing, the middle will sag."
+      judging: "Judge the draft by its dramatic shape, not its chapter count: a heading holds only if a reader could point to where it lands. Watch for a hollow middle — a missing midpoint turn or an 'all is lost' with no weight — and an inciting incident buried so late the story never starts; flag any turn whose effect never reaches the page."
+    beats:
+      - heading: "The ordinary world"
+        placeholders:
+          - "Open in the life they live before any of this begins — the normal they'll soon lose or outgrow. What does an ordinary day look like?"
+      - heading: "The inciting incident"
+        placeholders:
+          - "Crack the routine open with the one event that won't let them go back. What happens?"
+      - heading: "The choice to act"
+        placeholders:
+          - "Reach the moment they stop watching and commit to the story. What finally pushes them in?"
+      - heading: "Rising obstacles"
+        placeholders:
+          - "Pile on trials through the long middle, each costing a little more than the last. What keeps getting in their way?"
+      - heading: "The midpoint reversal"
+        placeholders:
+          - "Flip what they (and we) believed halfway through — a twist, a win that's secretly a loss, a raised stake. What changes everything?"
+      - heading: "All is lost"
+        placeholders:
+          - "Sink them to their lowest point, where the goal looks impossible and the old self runs out of road. What do they lose?"
+      - heading: "The climax"
+        placeholders:
+          - "Stage the head-on confrontation the whole story was driving toward. What's the final test?"
+      - heading: "The new normal"
+        placeholders:
+          - "Show who they've become and the world they've made. How is this ending different from where we started?"
+
+  hero_journey:
+    name: "Hero's Journey"
+    suggested: false
+    scope_fit: [character]
+    summary:
+      about: "A timeless adventure shape: an ordinary person is called away from home, tested in a strange new world, faces their darkest trial, and returns changed — carrying something the old world needed."
+      using: "Best for a story of transformation through adventure. Walk the beats in order; you can soften the smaller ones, but the call, the ordeal, and the return are the spine — lose them and it stops being a journey."
+      judging: "Judge whether the prose actually walks the journey, not just names its parts — the call, the crossing, the ordeal, and the changed return must be felt. The smaller beats may be light, but flag any a reader couldn't locate, especially a 'return with the elixir' where the character comes home unchanged."
+    beats:
+      - heading: "The ordinary world"
+        placeholders:
+          - "Show the hero at home, before the adventure finds them. What's their normal, and what's quietly missing from it?"
+      - heading: "The call to adventure"
+        placeholders:
+          - "Sound the summons that disrupts everything. What problem, quest, or invitation lands at their feet?"
+      - heading: "Refusal of the call"
+        placeholders:
+          - "Let them hesitate, or flat-out refuse. What fear or duty makes them want to stay home?"
+      - heading: "Meeting the mentor"
+        placeholders:
+          - "Bring in the guide who gives them what they need to begin — a lesson, a tool, a push. Who is it?"
+      - heading: "Crossing the threshold"
+        placeholders:
+          - "Take the step out of the known world into the unknown. What's the moment they can't take back?"
+      - heading: "Tests, allies, and enemies"
+        placeholders:
+          - "Throw them into the new world's challenges. Who helps, who hinders, and what's the first real test?"
+      - heading: "Approach to the inmost cave"
+        placeholders:
+          - "Lead them to the edge of the biggest danger yet. How do they prepare for the thing they fear most?"
+      - heading: "The ordeal"
+        placeholders:
+          - "Drop them into the darkest trial — a brush with death or their deepest fear. What must they survive?"
+      - heading: "The reward"
+        placeholders:
+          - "Hand them what they came for, hard-won. What do they seize, and what did it cost?"
+      - heading: "The road back"
+        placeholders:
+          - "Begin the journey home, often with danger still chasing. What's the cost of leaving the new world behind?"
+      - heading: "The resurrection"
+        placeholders:
+          - "Force one final, hardest test that proves the change is real. How are they reborn under pressure?"
+      - heading: "Return with the elixir"
+        placeholders:
+          - "Bring them home carrying something the old world needed. What do they return with, and how are they different?"
+
+  mysterious_past:
+    name: "Mysterious Past Unfolds"
+    suggested: false
+    scope_fit: [character]
+    summary:
+      about: "A character carries a buried history. Across the story it surfaces in pieces — hints, fractures, finally the whole truth — until they have to reckon with who they really are."
+      using: "Use it for a character whose hidden past drives the intrigue. Plant small wrongnesses early and pay them off late — the pleasure is the slow reveal, so resist telling everything at once."
+      judging: "Judge whether the reveal is earned in the text: the early wrongness and fracture must be genuinely on the page, and the truth must reframe what came before. Flag a past dumped all at once with no setup, a 'revelation' that lands flat because the groundwork was missing, or a character who never visibly reckons with it."
+    beats:
+      - heading: "A hint something's off"
+        placeholders:
+          - "Plant a small wrongness — a reaction that doesn't fit, a gap in their story. What does the reader half-notice?"
+      - heading: "The first fracture"
+        placeholders:
+          - "Open a crack where their version of themselves doesn't hold up. What slips through the mask?"
+      - heading: "The past intrudes"
+        placeholders:
+          - "Let the buried history reach into the present — a face, a place, a debt arriving uninvited. What refuses to stay gone?"
+      - heading: "A revelation reframes them"
+        placeholders:
+          - "Drop the fact that makes us re-read everything we thought we knew. What's the turn?"
+      - heading: "The cost surfaces"
+        placeholders:
+          - "Show what the secret has been protecting, and what it now threatens to take. What's on the line?"
+      - heading: "The full truth"
+        placeholders:
+          - "Lay it all bare, no more hiding. What is the whole of it?"
+      - heading: "They reckon with it"
+        placeholders:
+          - "Let them face what it means — accept it, be undone by it, or finally move past it. Where do they land?"
+
+  tragic_fall:
+    name: "Tragic Fall"
+    suggested: false
+    scope_fit: [character]
+    summary:
+      about: "A capable person undone by their own flaw. The reader sees the fall coming before the character does — and that dread is the point."
+      using: "Use it for a downfall that feels earned, not unlucky. The flaw must drive every step; if outside forces do the work it's misfortune, not tragedy. Make each choice feel justified from the inside."
+      judging: "Judge whether the fall is driven by the character's own flaw, not bad luck — the reader should sense it coming. Flag a flaw that never causes a visible choice, a missing point of no return, or a ruin that arrives without the character's too-late recognition."
+    beats:
+      - heading: "The height"
+        placeholders:
+          - "Show them at their peak — admired, powerful, with the most to lose. The higher they stand, the harder the fall lands."
+      - heading: "The flaw shows"
+        placeholders:
+          - "Reveal the weakness that will undo them — pride, blindness, a hunger they can't admit. They don't see it yet."
+      - heading: "The fatal choice"
+        placeholders:
+          - "Stage the decision that starts the slide — one that feels right to them in the moment. What do they choose?"
+      - heading: "The point of no return"
+        placeholders:
+          - "Cross a line that can't be uncrossed. Even if they wanted to stop now, the consequences are already moving. What's the line?"
+      - heading: "The unraveling"
+        placeholders:
+          - "Let everything they built turn against them, one loss pulling the next — and have them double down instead of retreat. How does it come apart?"
+      - heading: "The fall"
+        placeholders:
+          - "Arrive at the ruin. What's the final loss, the bottom they hit?"
+      - heading: "The recognition"
+        placeholders:
+          - "Give them the moment, too late, when they finally understand what they did. What do they see at the end?"
+
+  supporting_role:
+    name: "Supporting Role"
+    suggested: false
+    scope_fit: [character, relationship]
+    summary:
+      about: "A character whose arc orbits the hero's. They enter to serve the story's center, offer something the hero can't supply alone, and are changed — or cost something — by standing beside them."
+      using: "Use it for a strong secondary — a best friend, mentor, partner. Keep their arc tied to the hero's, but give them a want and a cost of their own so they never feel like furniture."
+      judging: "Judge whether this character earns their place beside the lead: they should offer something the lead lacks, pay a real cost for standing by, and end somewhere of their own. Flag a figure who only reacts, never wants anything, or simply vanishes — mere furniture."
+    beats:
+      - heading: "Why they enter"
+        placeholders:
+          - "Bring them in for a reason tied to the hero. What role do they fill the moment they arrive?"
+      - heading: "What they offer"
+        placeholders:
+          - "Give them something the hero lacks — a skill, a truth, a kind of courage. What do they bring to the table?"
+      - heading: "Tested by the hero's choices"
+        placeholders:
+          - "Put them through the hero's decisions — loyalty, doubt, disagreement. How do those choices land on them?"
+      - heading: "A cost of standing by"
+        placeholders:
+          - "Make them pay for staying close. What does this story take from them?"
+      - heading: "Their own turning point"
+        placeholders:
+          - "Give them one moment that's theirs alone, not the hero's. What do they decide or risk for themselves?"
+      - heading: "Where they land"
+        placeholders:
+          - "Resolve their arc — changed, lost, freed, or steadfast. Where do they end up when the hero's story closes?"
+
+  love_story:
+    name: "Love Story"
+    suggested: false
+    scope_fit: [story, relationship]
+    summary:
+      about: "Two people drawn together, pulled apart, and forced to choose. The arc lives in the push-and-pull — the closer they get, the more there is to lose."
+      using: "Use it for a romance — the whole relationship, or one person's side of it. The break is non-negotiable; without a real rupture the reunion means nothing. Make both want it and fear it."
+      judging: "Judge the relationship by its push-and-pull on the page; the break is load-bearing, and a reunion must be a choice, not a drift. Flag a romance where the spark, the rupture, or the resolution is asserted but never dramatized."
+    beats:
+      - heading: "First meeting"
+        placeholders:
+          - "Throw them into each other's path. How do they first cross paths?"
+      - heading: "The spark"
+        placeholders:
+          - "Catch the charged moment that says this one's different. What lights it?"
+      - heading: "Growing closer"
+        placeholders:
+          - "Build the small moments that turn attraction into something real. What pulls them in despite themselves?"
+      - heading: "The turning point"
+        placeholders:
+          - "Cross into real intimacy or commitment — the first kiss, the confession, the point of no return for the heart. What changes between them?"
+      - heading: "The first doubt"
+        placeholders:
+          - "Seed the fear or obstacle that will test them. What makes one of them hesitate?"
+      - heading: "The break"
+        placeholders:
+          - "Drive them apart with a betrayal, a fear, a truth that surfaces. What's the rupture, and why does it cut deep?"
+      - heading: "Time apart"
+        placeholders:
+          - "Sit in the aftermath where each faces what they lost. What do they realize apart that they couldn't together?"
+      - heading: "Reunion or farewell"
+        placeholders:
+          - "Bring them back together — or let them go for good. Either way, make it a choice, not an accident. How does it resolve?"
+
+  antagonist_arc:
+    name: "Antagonist Arc"
+    suggested: false
+    scope_fit: [character]
+    summary:
+      about: "The opposing force's own through-line. A strong antagonist escalates pressure on the hero, nearly wins, overreaches, and shows one crack that makes them human — and beatable."
+      using: "Use it to make your opposition more than an obstacle. Give them a goal that attacks the hero's weakness, and let them genuinely threaten to win — the hero's victory is only as big as the danger was real."
+      judging: "Judge whether the opposition is a force the reader takes seriously: pressure should escalate, the antagonist should land a real setback and overreach, and a crack of humanity should show. Flag a flat obstacle that never threatens the hero or never becomes more than a villain."
+    beats:
+      - heading: "First pressure on the hero"
+        placeholders:
+          - "Make the antagonist's presence felt and force the hero to react. What's their opening move?"
+      - heading: "Escalation"
+        placeholders:
+          - "Raise the threat so each move is harder to answer than the last. How do the stakes climb?"
+      - heading: "The hero's setback"
+        placeholders:
+          - "Deal the hero a real defeat — a moment the antagonist clearly wins. What do they take from the hero?"
+      - heading: "Overreach"
+        placeholders:
+          - "Push them into the ambition or arrogance that seeds their undoing. Where do they go too far?"
+      - heading: "A crack in the armor"
+        placeholders:
+          - "Show a wound, a fear, a sliver of humanity that makes them more than a villain. What's underneath?"
+      - heading: "The final clash"
+        placeholders:
+          - "Bring antagonist and hero head to head. What's the confrontation everything was building toward?"
+      - heading: "Defeat or victory"
+        placeholders:
+          - "End their arc — broken, redeemed, or triumphant. How does it land, and what does it cost the hero either way?"
+
+  love_interest:
+    name: "Love Interest"
+    suggested: false
+    scope_fit: [character]
+    summary:
+      about: "The arc of the one being loved — their own wanting, hesitation, and choice. Not a prize to be won, but a person deciding whether to risk it."
+      using: "Use it to give a love interest agency. Track their inner pull-and-resist, not just the hero's pursuit. Their 'yes' should be a decision with a cost, not a reward handed over."
+      judging: "Judge whether the loved one has agency of their own — visible desire, doubt, and a choice made with something at stake. Flag a character who simply says yes as a reward, with no inner pull-and-resist on the page."
+    beats:
+      - heading: "Desire"
+        placeholders:
+          - "Open with what draws them toward the other person, even before they'd admit it. What do they want?"
+      - heading: "Doubt"
+        placeholders:
+          - "Give them the fear, history, or stake that makes them pull away. Why shouldn't they want this?"
+      - heading: "Holding back"
+        placeholders:
+          - "Show them resist — guarded, distant, testing. How do they keep their distance?"
+      - heading: "Drawn back"
+        placeholders:
+          - "Let the pull win over the fear. What moment makes them lean in despite themselves?"
+      - heading: "The choice"
+        placeholders:
+          - "Force a decision, out loud, with something real on the line. What do they choose?"
+      - heading: "The consequence"
+        placeholders:
+          - "Show what the choice costs or gives them. How does it change where they stand?"
+
+  redemption:
+    name: "Redemption"
+    suggested: false
+    scope_fit: [character]
+    summary:
+      about: "A character who's done wrong earns their way back. Redemption isn't forgiveness handed over — it's paid for, usually at a price that proves the change is real."
+      using: "Use it for a fallen or flawed character clawing toward grace. Don't make it easy or fast — a backslide and a real sacrifice keep it honest. The grace at the end must be earned, never granted."
+      judging: "Judge whether the redemption is paid for, not granted: the debt must be clear, the refusal genuine, and the final price high enough to prove the change. Flag grace that arrives too easily — no real cost, no backslide, no sacrifice."
+    beats:
+      - heading: "The debt"
+        placeholders:
+          - "Establish the wrong they carry and the harm that needs answering. What weighs on them?"
+      - heading: "The refusal"
+        placeholders:
+          - "Let them resist the path back at first — denial, defensiveness, despair. Why won't they try?"
+      - heading: "A reason to try"
+        placeholders:
+          - "Give them the person, moment, or line that cracks the refusal open. What makes them start?"
+      - heading: "The first real cost"
+        placeholders:
+          - "Make them pay early — proof the change isn't just words. What do they give up?"
+      - heading: "The backslide"
+        placeholders:
+          - "Pull them toward the old self. What tempts them, and how close do they come to falling back?"
+      - heading: "The sacrifice"
+        placeholders:
+          - "Demand the hard, final price that proves it. What do they lay down for good?"
+      - heading: "Earned grace"
+        placeholders:
+          - "Grant the grace they've earned — not erasing the past, but moving beyond it. What does redemption look like for them?"
+
+  change_of_heart:
+    name: "Change of Heart"
+    suggested: false
+    scope_fit: [character]
+    summary:
+      about: "The classic transformation: a character who believes a quiet lie about themselves is worn down by the story until they can finally embrace the truth — and become who they were meant to be."
+      using: "Use it for a protagonist who grows. Name the lie and the truth first; everything in between exists to test the lie. The change only counts if the climax forces them to choose the truth, out loud, under pressure."
+      judging: "Judge whether the character changes a belief, not just their circumstances — by the end a reader should see them act on the new truth. Flag a lie that's never clear, a story that never tests it, or a climax that doesn't force a choice between the old lie and the new truth."
+    beats:
+      - heading: "The lie they live by"
+        placeholders:
+          - "Show the false belief that quietly runs their life — about themselves, other people, or the world. What do they wrongly believe?"
+      - heading: "What they want"
+        placeholders:
+          - "Give them a clear outward goal they chase. What do they think will finally make them whole?"
+      - heading: "A glimpse of the truth"
+        placeholders:
+          - "Let the real truth flicker into view — through a person, a moment, a contradiction. What plants the first seed of doubt?"
+      - heading: "Clinging to the lie"
+        placeholders:
+          - "Have them dismiss that doubt and double down on the old belief. How do they explain it away?"
+      - heading: "The lie starts to cost"
+        placeholders:
+          - "Make the false belief fail them in a way they can't ignore. What does holding on to it cost them here?"
+      - heading: "The breaking point"
+        placeholders:
+          - "Strip the lie away and leave them with nothing to stand on yet — the lowest, most honest moment. What shatters?"
+      - heading: "The choice"
+        placeholders:
+          - "Force them to choose, under pressure, between the comforting lie and the harder truth. What do they finally pick?"
+      - heading: "Living the truth"
+        placeholders:
+          - "Show them act from the new belief and reap what it brings. Who have they become?"
+
+  revenge:
+    name: "Revenge"
+    suggested: false
+    scope_fit: [character, story]
+    summary:
+      about: "A character is wronged and sets out to make someone pay. The arc tracks not just the pursuit but what it costs them — revenge always takes a price from the one seeking it."
+      using: "Use it for a vengeance-driven storyline. The wrong has to justify the obsession, and the cost has to be real — the strongest revenge arcs ask whether it was worth it, even when the target falls."
+      judging: "Judge whether the vengeance carries weight and cost: the original wrong must justify the obsession, the pursuit must face obstacles, and the chase must take something from the avenger. Flag a final reckoning that lands as a mere kill rather than a real choice, or a price that never reaches the page."
+    beats:
+      - heading: "The wrong"
+        placeholders:
+          - "Open with the injury that can't be forgiven — what's done to them, or to someone they love? Make it land."
+      - heading: "The vow"
+        placeholders:
+          - "Show the moment they decide to get even, no matter the cost. What do they swear, and to whom?"
+      - heading: "The hunt begins"
+        placeholders:
+          - "Set them on the trail — gathering what they need, closing the distance. What's their first move toward the target?"
+      - heading: "Closing in"
+        placeholders:
+          - "Tighten the pursuit through obstacles and near-misses. What stands between them and the one they're after?"
+      - heading: "The cost"
+        placeholders:
+          - "Let the chase take something from them — a bond, their peace, a piece of who they were. What does vengeance burn down along the way?"
+      - heading: "Face to face"
+        placeholders:
+          - "Bring them to the target at last, within reach. What's the confrontation they've been driving toward?"
+      - heading: "The reckoning"
+        placeholders:
+          - "Decide what they do when the moment finally comes — and what it leaves them with. Was it worth what it cost?"
