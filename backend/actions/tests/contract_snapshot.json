@@ -1,0 +1,2153 @@
+[
+  {
+    "actors": [
+      "internal"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "_accept_add_worldbuilding",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "_accept_draft_world_entity",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "_accept_enrich_character",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "_accept_generate_thread",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "_accept_init_elements",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "_accept_update_project_meta",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "_accept_user_wishes_rough",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "accept_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "field": "string",
+      "force": "bool?",
+      "proposal_id": "string",
+      "value": "any?"
+    },
+    "chat_exposure": "bound",
+    "name": "accept_character_field",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "accept_invention",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "accept_outline_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "field": "string",
+      "force": "bool?",
+      "proposal_id": "string",
+      "value": "any?"
+    },
+    "chat_exposure": "bound",
+    "name": "accept_project_meta_field",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "force": "bool?",
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "accept_proposal",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "accept_suggestion",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "body": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "add_braindump",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "description": "string?",
+      "misbelief": "string?",
+      "name": "string",
+      "need": "string?",
+      "role": "string?",
+      "story": "string?",
+      "want": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "add_character",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "spec": "object"
+    },
+    "chat_exposure": "bound",
+    "name": "add_invention",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "string?",
+      "item_type": "string",
+      "parent_id": "string?",
+      "text": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "add_outline_item",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "beats": "list?",
+      "color": "string?",
+      "description": "string?",
+      "scope_name": "string?",
+      "scope_type": "string?",
+      "title": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "add_plot_thread",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "chapter_id": "string",
+      "position": "int?",
+      "title": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "add_scene",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "beats": "list",
+      "chapter_id": "string",
+      "title": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "add_scene_with_beats",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "after_beat_id": "string?",
+      "kind": "string?",
+      "text": "string",
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "add_thread_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "color": "string?",
+      "glyph": "string?",
+      "name": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "add_world_block",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "description": "string?",
+      "entity_type": "string",
+      "title": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "add_world_entity",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "content": "string?",
+      "pnote": "string?",
+      "tags": "list?",
+      "title": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "add_worldbuilding",
+    "route": "propose",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "alias_name": "string",
+      "primary_name": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "alias_character",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "binding_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyse_gauge",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyze_scene",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyze_scene__hook_grade",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyze_scene__pov_purity",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyze_scene__resolve_nouns",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyze_scene__scene_properties",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyze_scene__subtext",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyze_scene__summary",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "analyze_scene__voice",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "annotate_braindump",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "ref": "object",
+      "scope_name": "string",
+      "thread_ref": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "bind_gauge",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "config": "object"
+    },
+    "chat_exposure": "bound",
+    "name": "create_preset",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "delete_braindump",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "delete_character",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "item_id": "string",
+      "item_type": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "delete_outline_item",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "delete_plot_thread",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "preset_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "delete_preset",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "beat_id": "string",
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "delete_thread_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "delete_worldbuilding",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "dismiss_invention",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "dismiss_suggestion",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "block": "string?",
+      "kind": "string?",
+      "name": "string?",
+      "worldbuilding_id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "draft_world_entity",
+    "route": "propose",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "character_id": "int",
+      "name": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "enrich_promoted_character",
+    "route": "propose",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "binding_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "extract_gauge_scale",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "character_id": "string",
+      "description": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "generate_character_portrait",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "all_braindumps": "list",
+      "braindumps": "list",
+      "scope_name": "string?",
+      "scope_type": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "generate_thread",
+    "route": "propose",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "user_button"
+    ],
+    "args": {
+      "description": "string"
+    },
+    "chat_exposure": "toolbox",
+    "name": "generate_thread_from_description",
+    "route": "propose",
+    "stub": false,
+    "tool_name": "quick_add_thread"
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "case": "string?",
+      "description": "string?",
+      "from_project": "bool?"
+    },
+    "chat_exposure": "bound",
+    "name": "generate_title",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_braindump_tag_categories",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_braindumps",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "chapter_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "get_chapter",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "chapter_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "get_chapter_docs",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "chapter_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "get_chapter_prose",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "character_id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "get_character",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "character_id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "get_character_full",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_characters",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_gauge_board",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_gauge_catalogue",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_gauge_inventions",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_gauge_presets",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_gauge_suggestions",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "include_prose": "bool?"
+    },
+    "chat_exposure": "bound",
+    "name": "get_grand_outline",
+    "route": "read",
+    "stub": false,
+    "tool_name": "get_outline"
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_items",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "toolbox",
+    "name": "get_lens_templates",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_outline_scaffolds",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scope_name": "string?",
+      "scope_type": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "get_plot_threads",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_project_meta",
+    "route": "read",
+    "stub": false,
+    "tool_name": "get_project_overview"
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_project_meta_full",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_rules",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_scene_pipelines",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "revision_id": "int",
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "get_scene_revision",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_section_lenses",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_suggestions",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "get_thread",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_thread_scaffolds",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_threads_with_beats",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_world",
+    "route": "read",
+    "stub": false,
+    "tool_name": "get_world_entities"
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "name": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "get_world_block",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_world_blocks",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "get_worldbuildings",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "acts": "list?",
+      "base_template": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "init_grand_outline",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "user_button"
+    ],
+    "args": {
+      "paragraphs": "list",
+      "position": "int?",
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "insert_scene_paragraphs",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "description": "string"
+    },
+    "chat_exposure": "toolbox",
+    "name": "invent_lens_from_ask",
+    "route": "read",
+    "stub": false,
+    "tool_name": "quick_invent_lens"
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "link_id": "int",
+      "link_type": "string",
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "link_scene_entity",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "list_scene_revisions",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "beat_id": "string",
+      "beat_index": "int?",
+      "scene_id": "string",
+      "thread_id": "string"
+    },
+    "chat_exposure": "toolbox",
+    "name": "place_thread_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": "place_thread_beat_in_outline"
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "name": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "promote_to_character",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "block": "string",
+      "kind": "string?",
+      "name": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "promote_to_world_entity",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat"
+    ],
+    "args": {
+      "aliases": "list?",
+      "appearance": "dict?",
+      "backstory": "string?",
+      "character_id": "int",
+      "color": "string?",
+      "description": "string?",
+      "internal_arc": "string?",
+      "misbelief": "string?",
+      "name": "string?",
+      "need": "string?",
+      "pnote": "string?",
+      "relationship_notes": "string?",
+      "relationships": "list?",
+      "status": "string?",
+      "story": "string?",
+      "summary": "string?",
+      "type": "string?",
+      "voice_profile": "dict?",
+      "want": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "propose_character_edit",
+    "route": "propose",
+    "stub": false,
+    "tool_name": "update_character"
+  },
+  {
+    "actors": [
+      "chat"
+    ],
+    "args": {
+      "after_beat_id": "string?",
+      "kind": "string?",
+      "text": "string",
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "propose_insert_beat",
+    "route": "propose",
+    "stub": false,
+    "tool_name": "insert_thread_beat"
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "edits": "list",
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "propose_scene_edits",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat"
+    ],
+    "args": {
+      "beat_id": "string",
+      "kind": "string?",
+      "text": "string?",
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "propose_update_beat",
+    "route": "propose",
+    "stub": false,
+    "tool_name": "update_thread_beat"
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "field": "string",
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "reject_character_field",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "field": "string",
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "reject_project_meta_field",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "proposal_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "reject_proposal",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "item_id": "string",
+      "item_type": "string",
+      "new_index": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "reorder_outline_item",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "beat_ids": "list",
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "reorder_thread_beats",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "token": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "restore_deleted_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "revision_id": "int",
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "restore_scene_revision",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "run_init_elements",
+    "route": "propose",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "user_button"
+    ],
+    "args": {
+      "thread_id": "string"
+    },
+    "chat_exposure": "toolbox",
+    "name": "run_merge_rough_into_grand",
+    "route": "propose",
+    "stub": false,
+    "tool_name": "quick_place_beats_in_outline"
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "run_user_wishes_rough",
+    "route": "propose",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "allow_empty": "bool?",
+      "auto_analyze": "bool?",
+      "content": "dict?",
+      "scene_id": "string",
+      "text": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "save_scene_content",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "query": "string",
+      "top_k": "int?"
+    },
+    "chat_exposure": "bound",
+    "name": "search_prose",
+    "route": "read",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "chapter_id": "string",
+      "character": "string?",
+      "mode": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "set_chapter_pov",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "binding_id": "string",
+      "report_view": "string?",
+      "visual": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "set_gauge_view",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "character": "string?",
+      "mode": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "set_project_pov_default",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "enabled": "bool",
+      "key": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "set_scene_pipeline",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "suggest_custom_gauges",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {},
+    "chat_exposure": "bound",
+    "name": "suggest_gauges",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "user_button"
+    ],
+    "args": {
+      "alias_name": "string",
+      "primary_name": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "unalias_character",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "binding_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "unbind_gauge",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "undelete_braindump",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "undelete_character",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "undelete_worldbuilding",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "link_id": "int",
+      "link_type": "string",
+      "scene_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "unlink_scene_entity",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "body": "string",
+      "id": "int"
+    },
+    "chat_exposure": "bound",
+    "name": "update_braindump",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "aliases": "list?",
+      "appearance": "dict?",
+      "backstory": "string?",
+      "color": "string?",
+      "description": "string?",
+      "id": "int",
+      "internal_arc": "string?",
+      "is_antagonist": "bool?",
+      "is_main_character": "bool?",
+      "is_protagonist": "bool?",
+      "misbelief": "string?",
+      "name": "string?",
+      "need": "string?",
+      "pnote": "string?",
+      "relationship_notes": "string?",
+      "relationships": "list?",
+      "status": "string?",
+      "story": "string?",
+      "summary": "string?",
+      "type": "string?",
+      "voice_profile": "dict?",
+      "want": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_character",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "binding_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "update_gauge",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "item_id": "string",
+      "item_type": "string",
+      "kind": "string?",
+      "text": "string?",
+      "written": "bool?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_outline_item",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "description": "string?",
+      "name": "string?",
+      "scope_name": "string?",
+      "scope_type": "string?",
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "update_plot_thread",
+    "route": "write",
+    "stub": false,
+    "tool_name": "update_plot_thread_info"
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "preset_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "update_preset",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "audience": "string?",
+      "genre": "string?",
+      "genres": "list?",
+      "logline": "string?",
+      "perspective": "string?",
+      "synopsis": "string?",
+      "tense": "string?",
+      "theme": "string?",
+      "themes": "list?",
+      "title": "string?",
+      "tones": "list?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_project_meta",
+    "route": "propose",
+    "stub": false,
+    "tool_name": "update_project_overview"
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "kind": "string?",
+      "proposal_id": "string",
+      "text": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_proposed_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "field": "string",
+      "proposal_id": "string",
+      "value": "any?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_proposed_field",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "field": "string",
+      "proposal_id": "string",
+      "value": "any?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_proposed_meta_field",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "kind": "string?",
+      "proposal_id": "string",
+      "text": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_proposed_outline_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "proposal_id": "string",
+      "value": "any?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_proposed_world_entity",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "beat_id": "string",
+      "kind": "string?",
+      "text": "string?",
+      "thread_id": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "update_thread_beat",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "color": "string?",
+      "glyph": "string?",
+      "hint": "string?",
+      "label": "string?",
+      "name": "string"
+    },
+    "chat_exposure": "bound",
+    "name": "update_world_block",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "chat",
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "description": "string?",
+      "entity_id": "int",
+      "title": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_world_entity",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  },
+  {
+    "actors": [
+      "cron",
+      "internal",
+      "user_button"
+    ],
+    "args": {
+      "content": "string?",
+      "id": "int",
+      "pnote": "string?",
+      "status": "string?",
+      "tags": "list?",
+      "title": "string?"
+    },
+    "chat_exposure": "bound",
+    "name": "update_worldbuilding",
+    "route": "write",
+    "stub": false,
+    "tool_name": ""
+  }
+]
