@@ -1,0 +1,139 @@
+# Unified staleness config (D31).
+#
+# One mapping, three consumers:
+#   - dispatch: bumps the project's `ProjectDomainVersion` row for `domain` on
+#     every successful write whose capability appears in `mutated_by`
+#     (see actions/domain_versions.py), and attaches
+#     `staleness: {domain: version}` to read results whose capability appears
+#     in `read_by`.
+#   - Night Eyes: stores a per-thread `read_baseline` of versions it has seen,
+#     and prepends a `[STALE]` system message when a baseline domain drifts.
+#   - Frontend (deferred): same `invalidates` field drives auto-refetch.
+#
+# Naming: domains are short, snake_case, story-shaped (not table-shaped). A
+# capability appears under exactly ONE `mutated_by` list per domain it dirties;
+# a read appears under exactly ONE `read_by` list per domain it serves. Reads
+# that don't map to a domain (none today) simply return no staleness field.
+
+domains:
+  characters:
+    mutated_by: [add_character, update_character, delete_character, undelete_character, generate_character_portrait, _accept_init_elements, promote_to_character, alias_character, unalias_character, _accept_enrich_character, accept_character_field, reject_character_field, update_proposed_field]
+    read_by: [get_characters]
+
+  worldbuilding:
+    # Rules live inside the worldbuilding blob, so get_rules reads this domain
+    # and any worldbuilding mutation invalidates it. World "blocks" are just tags
+    # on these rows (plus an empty-heading registry), so the block reads/writes
+    # belong to the same domain — adding an item or a heading restales the page.
+    mutated_by: [add_worldbuilding, _accept_add_worldbuilding, update_worldbuilding, delete_worldbuilding, undelete_worldbuilding, add_world_block, update_world_block, add_world_entity, update_world_entity, _accept_init_elements, promote_to_world_entity, _accept_draft_world_entity, update_proposed_world_entity]
+    read_by: [get_worldbuildings, get_rules, get_world_blocks, get_world_block]
+
+  outline:
+    # Outline IS the single act/chapter/scene tree AND scene content. So
+    # `save_scene_content` and the thread-beat placement also invalidate it.
+    mutated_by:
+      - init_grand_outline
+      - add_outline_item
+      - update_outline_item
+      - delete_outline_item
+      - restore_deleted_beat
+      # Deleting a thread beat clears `from_item` on the outline beats placed
+      # from it, so the outline must refetch too.
+      - delete_thread_beat
+      - reorder_outline_item
+      - run_merge_rough_into_grand
+      - accept_outline_beat
+      - place_thread_beat
+      - save_scene_content
+      - propose_scene_edits
+      - insert_scene_paragraphs
+      - add_scene
+      - add_scene_with_beats
+      - set_chapter_pov
+      - set_project_pov_default
+    read_by: [get_grand_outline, get_chapter_docs]
+
+  # On/off switches for the scene-analysis pipelines. Each pipeline's own write
+  # (analyze_scene__*) invalidates `outline` directly (where the scene + its
+  # analysis live), so it needs no entry here — this domain is just the switches.
+  scene_pipelines:
+    mutated_by: [set_scene_pipeline]
+    read_by: [get_scene_pipelines]
+
+  braindumps:
+    mutated_by: [add_braindump, update_braindump, delete_braindump, undelete_braindump, annotate_braindump]
+    read_by: [get_braindumps]
+
+  project_meta:
+    mutated_by: [update_project_meta, _accept_update_project_meta, accept_project_meta_field, reject_project_meta_field, update_proposed_meta_field]
+    read_by: [get_project_meta]
+
+  plot_threads:
+    mutated_by:
+      - generate_thread
+      - _accept_generate_thread
+      - run_user_wishes_rough
+      - _accept_user_wishes_rough
+      - add_plot_thread
+      - update_plot_thread
+      - delete_plot_thread
+      - delete_thread_beat
+      - restore_deleted_beat
+      # Author beat add/edit/delete are NOT here on purpose: useThreadBeats is
+      # local-optimistic, so invalidating plot_threads on every (debounced)
+      # keystroke just refetches every thread's beats (get_threads_with_beats) for nothing.
+      # Only the proposal caps refetch — to surface / clear the green overlay.
+      - accept_beat
+      - update_proposed_beat
+    read_by: [get_plot_threads]
+
+  items:
+    mutated_by: [_accept_init_elements]
+    read_by: [get_items]
+
+  lenses:
+    # Lens analyses + suggestions live in the discovery blob; the relevant
+    # reads are the suggestions surface. Nothing writes this domain any more
+    # (the old bind/unbind_template_lens were removed; gauges replaced them).
+    mutated_by: []
+    read_by: [get_suggestions]
+
+  gauges:
+    # The lens/charts route's data (the gauges.Gauge* tables) —
+    # its OWN domain so the old `lenses` domain is untouched. World mutations are
+    # ALSO listed here so section-bound gauges (custody→cast, whereabouts→Places)
+    # restale when their bound World block changes — the live-read staleness edge.
+    # 3-layer model: preset CRUD + accept/dismiss + bind/instance + suggest writes.
+    mutated_by:
+      # preset layer (the user's reusable bank)
+      - create_preset
+      - update_preset
+      - delete_preset
+      - accept_suggestion
+      - accept_invention
+      - add_invention
+      - dismiss_suggestion
+      - dismiss_invention
+      # bind layer (instances)
+      - bind_gauge
+      - unbind_gauge
+      - update_gauge
+      - set_gauge_view
+      - analyse_gauge
+      - extract_gauge_scale
+      # candidate lists
+      - suggest_gauges
+      - suggest_custom_gauges
+      # World edits restale section-bound gauges (live read)
+      - add_worldbuilding
+      - _accept_add_worldbuilding
+      - update_worldbuilding
+      - delete_worldbuilding
+      - undelete_worldbuilding
+      - add_world_block
+      - update_world_block
+      - add_world_entity
+      - update_world_entity
+    # get_lens_templates = chat's compact view of the bank (+ the author's presets).
+    # get_gauge_catalogue is NOT here: it is static config, nothing restales it.
+    read_by: [get_gauge_board, get_gauge_presets, get_lens_templates]
