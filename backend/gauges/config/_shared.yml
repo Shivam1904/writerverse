@@ -1,0 +1,87 @@
+# ═══════════════════════════════════════════════════════════════════════
+# SHARED — global bits every type file relies on. One source of truth.
+# ═══════════════════════════════════════════════════════════════════════
+
+# One status vocabulary, used EVERYWHERE the same state is shown — rail buckets,
+# chart badges, sublabels. Fixes the eyeball's "three vocabularies" finding.
+status_vocab:
+  holds:    "holds"            # judging lens, passes
+  needs:    "needs a look"     # judging lens, a problem found
+  mapping:  "just a map"       # descriptive lens, no verdict
+  unscanned: "not scanned yet" # bound but never run
+
+# The plain kind word per type (what shows on the bank card + decide card).
+# NEVER the code categories (FEELING / TRACKING / LOOSE END / FAIR SHARE).
+kind_words:
+  arc:          "an arc"
+  map:          "a map"
+  tracker:      "a tracker"
+  checklist:    "a checklist"
+  setup_payoff: "a setup → payoff"
+
+# Scope labels — what the user calls the subject a lens watches.
+# object & place are symmetric — both name a World-list entity (Items / Locations);
+# the picker draws the subject from the matching World block. (Dev: mirror to
+# backend/config/gauges/_shared.yml.)
+scope_labels:
+  story:        "the whole story"
+  character:    "a character"
+  relationship: "two characters"
+  object:       "an item"
+  place:        "a place"
+
+# y_items source → the one-line "how the scale gets filled" the setup UI shows.
+# Source-aware (NOT one generic hint).
+source_blurbs:
+  predefined: "Built in — tweak the steps if you like."
+  extracted:  "Pulled from your story — review and edit what the engine finds."
+  section:    "Comes from a part of your world — keep that section up to date and it follows."
+  user:       "You describe what to look for."
+
+# The custom-lens flow is identical across types EXCEPT the per-type `custom_dialog`
+# field list (defined in each type file). Shared rules:
+custom_lens:
+  picks_form_first: true            # step 0 = choose the type (see DESIGNER_INSTRUCTIONS §)
+  locked_head_readonly: true        # ai.analyse_head/extract_head shown 🔒, never editable
+  placeholders_are_examples: true   # every placeholder is a real example, never "enter text"
+  offer_extract_seed: true          # "✦ draft from my story" seeds y_items where source allows
+  suggest_from: template_bank       # ✦ suggest pulls phrasings from same-type catalogue lenses
+
+# ── Rules — the verdict-function registry (OPEN set; 3 families) ──
+# A `rule` is a pure-ish function (values, y_items) → {ok, score, offending[]}.
+# It's what gives a lens its verdict; the `offending[]` IS the report's findings.
+# A lens picks ONE rule (field `rule`; `math_rule` is the legacy name for the shape
+# subset) from its type's COMPATIBLE set — or `none` (a descriptive map, no verdict).
+# This is ONE registry for ALL verdicts — shape rules, the old "tracker invariants",
+# AND coverage all live here (no separate mechanisms). The custom-lens dialog shows a
+# demo of each compatible rule so the user can pick. Mirrors the `visuals` registry:
+# open — add a rule = add the function + a row here.
+#
+# THREE families, by the input the rule reads:
+#   shape       — the per-scene SEQUENCE; needs an ORDERED-ladder y_items
+#   constraint  — the SEQUENCE; a per-step legality check (was the tracker "invariant")
+#   coverage    — the SET / sequence of values present (whole-text)
+# cost: math = cheap, deterministic, ship now · fuzzy = heuristic/AI, defer.
+rules:
+  rising:           {family: shape,      label: "should climb",            checks: "values trend up across scenes",                       cost: math,  ordered: true,  status: live}
+  falling:          {family: shape,      label: "should fall",             checks: "values trend down",                                   cost: math,  ordered: true,  status: live}
+  flat:             {family: shape,      label: "should hold steady",      checks: "low variance — barely moves",                         cost: math,  ordered: true,  status: live}
+  arc:              {family: shape,      label: "rise then fall (bell curve)", checks: "one peak across the story",                       cost: fuzzy, ordered: true,  status: deferred}
+  oscillate:        {family: shape,      label: "should swing (alternating)",  checks: "regular up/down swings",                          cost: fuzzy, ordered: true,  status: deferred}
+  monotone_up:      {family: constraint, label: "only grows",              checks: "never moves down (e.g. knowledge only grows)",        cost: math,  ordered: true,  status: live}
+  monotone_down:    {family: constraint, label: "only worsens",            checks: "never improves on its own (e.g. condition)",          cost: math,  ordered: true,  status: live}
+  single_occupancy: {family: constraint, label: "one at a time",           checks: "exactly one value 'on' per scene (one holder)",       cost: math,  ordered: false, status: live}
+  no_jump:          {family: constraint, label: "no impossible jump",      checks: "no illegal transition between adjacent scenes (teleport)", cost: math, ordered: false, status: live}
+  cover_once:       {family: constraint, label: "each once",               checks: "each y_item appears at most once (no repeats)",       cost: math,  ordered: false, status: live}
+  cover_all:        {family: coverage,   label: "all present",             checks: "every y_item appears somewhere in the text",          cost: math,  ordered: false, status: live}
+  cover_in_order:   {family: coverage,   label: "in order",                checks: "y_items appear in their listed order (phases)",       cost: math,  ordered: false, status: live}
+  none:             {family: "—",        label: "no verdict — a map",      checks: "the line is read, not judged",                        cost: "—",   ordered: false, status: live}
+
+# ── Walks — the configurable x-axis menu (AXIS.md). walk = corpus + text read;
+# tick = granularity (depends on walk). Default {outline, scene} = today's
+# behaviour (each scene's beats). Mirrors frontend data.ts `WALKS`. `story`
+# reads each scene's prose (scene or chapter ticks).
+walks:
+  story:   {label: "the whole story", ticks: [scene, chapter], default: scene}
+  outline: {label: "the outline", ticks: [act, chapter, scene, heading, beat], default: scene}
+  thread:  {label: "a thread", ticks: [heading, beat], default: beat}

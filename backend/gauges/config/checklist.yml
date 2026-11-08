@@ -1,0 +1,157 @@
+# ═══════════════════════════════════════════════════════════════════════
+# LAUNCH · TYPE: checklist  ·  display: checklist  ·  JUDGES (covered N of M)
+# A required set — each item should appear SOMEWHERE in the story (coverage).
+# Launch lenses: story_skeleton · genre_promise · character_arc_beats
+# ═══════════════════════════════════════════════════════════════════════
+archetype:
+  id: checklist
+  display: checklist                              # DEFAULT visual (= visuals[0]); user's per-binding pick overrides
+  visuals: [checklist, progress_ring, beats_timeline]   # menu — "Show as ▾" (ticked list · N-of-M ring · where each beat lands)
+  report_views: [missing_list, summary]           # what's absent — "Show findings as ▾"
+  judges: true
+  data_style: coverage            # each item present SOMEWHERE in the whole text (NOT per-scene)
+  eyes:
+    user:
+      kind_word: "a checklist"
+      y_items_word: "things to hit"
+    ai:
+      analyse_head: >          # LOCKED · AI-only
+        For each item, decide whether the story fulfils it ANYWHERE (semantic
+        match, not exact words). Mark present/absent with the single strongest
+        evidence line.
+      extract_head: >          # LOCKED · usually predefined — the set is fixed
+        (The required items are normally fixed for this lens.)
+    designer:
+      glyph: bars
+      verdict_style: banner
+      empty_state: "Run a scan to see which are present."
+      bank_card:
+        shows: [name, kind_word, watches one-liner, glyph]
+      decide_card:               # for a checklist, the LIST is the preview (no synthetic shape)
+        shows: "name · watches · the full list of items as unchecked rows · each becomes hit/miss after a scan · setup cost"
+        example: "render the y_items as unchecked rows"
+      chart_view:
+        shows: "header (name · scope) · covered-N-of-M verdict · each item + description · hit/miss · evidence pin · missing ones highlighted"
+        output_language: "Name what's missing plainly: 'no earned solution yet', not 'item 5 absent'."
+      custom_dialog:
+        - {field: name,    label: "Name it",                   placeholder: "Heist-Movie Beats"}
+        - {field: watches, label: "What should the story hit?", placeholder: "the beats a good heist needs"}
+        - {field: y_items, label: "The things that should each show up", placeholder: "the crew assembles / the plan / the twist / the getaway", note: "each gets a one-line meaning"}
+        - {field: analyse_body, label: "Anything specific for the engine?", placeholder: "count it present even if it's implied off-page", locked_head: true}
+
+lenses:
+  # ─────────────────────────────────────────────────────────────────────
+  # ★ FOUNDATIONAL · STORY · predefined — the three-act backbone
+  # Teaches: turn a pile of ideas into a shaped story. The spine every draft needs.
+  # Verdict preview: "beats present: 4 of 5"
+  # ─────────────────────────────────────────────────────────────────────
+  - id: story_skeleton
+    name: "Story Skeleton"
+    question: "Does the story hit its beats?"
+    tier: core            # beginner working set — bank surfaces these first
+    scope_type: story
+    y_items_source: predefined
+    rule: [cover_all]   # each beat present somewhere (live)
+    eyes:
+      user:
+        watches: "Whether your story hits the load-bearing beats every shaped story leans on."
+        read_as: "Each beat should show up somewhere. An empty row is a beat you haven't written yet — not always wrong, but these five are the spine; a story missing two of them usually feels shapeless."
+      ai:
+        analyse_body: "Mark a beat present if the story delivers its FUNCTION anywhere, even if it doesn't look textbook — e.g. any moment that locks the hero into the journey counts as the lock-in, however it's staged."
+    y_items:
+      - {value: "Inciting incident", description: "The event that knocks the hero out of normal life and starts the story."}
+      - {value: "Lock-in",           description: "The hero commits to the journey — the door shuts behind them, no easy way back."}
+      - {value: "Midpoint shift",    description: "A reversal or revelation that changes the game and raises the stakes."}
+      - {value: "All is lost",       description: "The lowest point — the hero seems beaten, the goal furthest away."}
+      - {value: "Climax",            description: "The final confrontation that settles the story's central question."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # STORY · predefined — genre conventions
+  # Teaches: deliver what your genre's readers showed up for.
+  # Verdict preview: "conventions met: 3 of 5"
+  #
+  # ONE lens; genre is a BIND-TIME pick — NOT 5 near-identical lenses (that would be
+  # repetition). 5 genres ship: Mystery (default, = y_items) + the 4 in `genre_presets`.
+  # The pick swaps the scale and lives on the binding at runtime (same pattern as the
+  # scope subject and the visual pick). Dev wires the picker off `genre_presets`.
+  # ─────────────────────────────────────────────────────────────────────
+  - id: genre_promise
+    name: "Genre Promise"
+    question: "Does it deliver what fans came for?"
+    tier: range           # genre is a bind-time pick — shown as "more advanced"
+    scope_type: story
+    y_items_source: predefined
+    rule: [cover_all]   # each convention met somewhere (live)
+    genre_default: mystery   # the live default; its scale is the y_items below
+    eyes:
+      user:
+        watches: "Whether your draft delivers what readers of your genre came for."
+        read_as: "Missing a convention isn't a bug — it can be a deliberate twist. But a genre that breaks its core promises (a mystery with no fair clues, a romance with no real obstacle) usually just frustrates the reader."
+      ai:
+        analyse_body: "Count a convention met if the draft delivers it ANYWHERE, even partly or off-page. Judge by function, not by label — a 'fair clue' is anything the reader could genuinely use, however small."
+    # Default genre = MYSTERY (most teachable about 'fair play'); its scale is y_items.
+    y_items:
+      - {value: "A question posed early",   description: "A crime or puzzle dropped in fast — the thing the reader wants answered."}
+      - {value: "Clues the reader can follow", description: "Enough is shown fairly that a sharp reader could solve it — nothing withheld by cheating."}
+      - {value: "Convincing false trails",  description: "Red herrings that mislead honestly, then resolve."}
+      - {value: "The hunt drives the story", description: "Scenes move forward by investigating, not by coincidence."}
+      - {value: "An earned solution",       description: "The answer follows from the planted clues, not a reveal from nowhere."}
+    # The other 4 genres the picker can swap in (Mystery default lives in y_items above):
+    genre_presets:
+      - genre: romance
+        label: "Romance"
+        y_items:
+          - {value: "A couple worth rooting for",         description: "Two people the reader wants to see together."}
+          - {value: "A real obstacle keeping them apart", description: "A believable reason they can't just be together — not a misunderstanding one chat fixes."}
+          - {value: "Forced proximity or rising pull",    description: "Scenes that throw them together and turn up the attraction."}
+          - {value: "The dark moment",                    description: "The point it looks like it can't work — the relationship's 'all is lost'."}
+          - {value: "An earned, satisfying ending",       description: "They end together (HEA) or hopeful (HFN), and it feels deserved."}
+      - genre: thriller
+        label: "Thriller / Suspense"
+        y_items:
+          - {value: "A clear and present danger",         description: "A threat with real stakes, established early."}
+          - {value: "A capable but pressured lead",       description: "Someone with something to lose, pushed past their limits."}
+          - {value: "A ticking clock",                    description: "A reason it has to be solved NOW — time, body count, escalation."}
+          - {value: "A worthy antagonist",                description: "An opposing force smart or strong enough to make winning hard."}
+          - {value: "A climax that pays off the danger",  description: "The threat is confronted head-on, not defused off-page."}
+      - genre: fantasy
+        label: "Fantasy / Adventure"
+        y_items:
+          - {value: "A world with its own rules",         description: "A setting that feels real and consistent — magic/tech that costs something."}
+          - {value: "A call to adventure",                description: "The hero is pulled out of the ordinary into the larger world."}
+          - {value: "Stakes beyond the hero",             description: "Something bigger than one person is on the line."}
+          - {value: "Rules honoured under pressure",      description: "The magic/system doesn't bend to rescue the plot."}
+          - {value: "A climax that tests what they learned", description: "The final trial uses the world's rules and the hero's growth."}
+      - genre: coming_of_age
+        label: "Coming-of-age / Literary"
+        y_items:
+          - {value: "A protagonist on a threshold", description: "Someone at a turning point between who they were and who they'll be."}
+          - {value: "A formative pressure",         description: "A relationship, loss, or world that forces them to grow."}
+          - {value: "A loss of innocence",          description: "A belief about the world or themselves breaks."}
+          - {value: "A reckoning",                  description: "They face the cost of growing up — no clean answers required."}
+          - {value: "A changed self",               description: "They end visibly different from who they began, for better or worse."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # ★ FOUNDATIONAL · CHARACTER · predefined — the inner-arc beats
+  # Teaches: an arc is a sequence — lie → want → need → truth → change.
+  # Verdict preview: "arc beats: 3 of 5"
+  # ─────────────────────────────────────────────────────────────────────
+  - id: character_arc_beats
+    name: "Character Arc Beats"
+    question: "Does this arc hit its steps in order?"
+    tier: range           # the beats-breakdown companion to the core "Does the Hero Grow?"
+    scope_type: character
+    y_items_source: predefined
+    rule: [cover_all]   # each arc beat present somewhere (live)
+    eyes:
+      user:
+        watches: "Whether this character's inner arc hits its load-bearing beats."
+        read_as: "Each beat should appear somewhere in this character's thread. A missing beat is usually why an arc 'doesn't land' — a change with no moment of truth feels unearned; a want with no lie underneath it feels thin."
+      ai:
+        analyse_body: "Mark a beat present if its FUNCTION lands anywhere in the character's scenes, even implicitly. The lie and the change especially can be shown through action rather than stated outright."
+    y_items:
+      - {value: "The lie they believe", description: "The false belief about themselves or the world they start the story holding."}
+      - {value: "The want",             description: "The external goal they consciously chase (often the wrong thing for them)."}
+      - {value: "The need",             description: "What they actually require to grow — usually the opposite of the want."}
+      - {value: "The moment of truth",  description: "The scene where they're forced to face the lie head-on."}
+      - {value: "The change",           description: "Who they've become by the end — the lie dropped, or fatally kept."}

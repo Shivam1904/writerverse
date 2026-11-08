@@ -1,0 +1,134 @@
+# ═══════════════════════════════════════════════════════════════════════
+# LAUNCH · TYPE: arc  ·  display: ladder line  ·  JUDGES (verdict banner)
+# A quality climbs/descends an ordered ladder; the math_rule checks the move.
+# Launch lenses: does_hero_grow (rising) · tension_curve (arc) ·
+#                enemies_to_allies (falling)
+# ═══════════════════════════════════════════════════════════════════════
+archetype:
+  id: arc
+  display: ladder_line                       # DEFAULT visual (= visuals[0]); user's per-binding pick overrides
+  visuals: [ladder_line, line_with_ideal, gauge]   # menu — "Show as ▾" (line · line+ghosted-ideal · end-state dial)
+  report_views: [inline_markers, list, summary]    # findings forms — "Show findings as ▾"
+  judges: true
+  data_style: scene_mapped        # ONE value per scene from the steps + a math_rule shape check
+  eyes:
+    user:
+      kind_word: "an arc"
+      y_items_word: "steps"
+    ai:
+      analyse_head: >          # LOCKED · AI-only · uneditable even on custom lenses
+        Score each scene with ONE step from the ordered ladder, or null if the
+        subject isn't present. The ladder runs low→high; respect that order.
+      extract_head: >          # LOCKED
+        Produce the ordered rungs lowest→highest, each with a one-line description
+        of what that rung means in THIS story.
+    designer:
+      glyph: arc
+      verdict_style: banner
+      empty_state: "Pick the subject and run a scan to see the arc."
+      bank_card:
+        shows: [name, kind_word, watches one-liner, glyph]
+      decide_card:               # the "Add this lens?" no-data preview
+        shows: [name, watches, ghosted example line + a wobble, good, off, the steps, setup cost]
+        example: "synth an ideal line from math_rule (rising/falling/flat) + one wobble dip"
+      chart_view:                # the populated chart
+        shows: [header "name · scope", verdict banner, read_as, the line,
+                wobble markers on rule-breaks, y-axis steps (description on hover), evidence]
+        output_language: "Verdict in plain words — never 'rising OK · 1/36 step-pairs violate'."
+      custom_dialog:             # "Create a custom arc" fields, in order
+        - {field: name,         label: "Name it",                   placeholder: "Faith Tested"}
+        - {field: watches,      label: "What does it watch?",       placeholder: "whether her faith erodes as the cult tightens"}
+        - {field: y_items,      label: "The steps (lowest → highest)", placeholder: "devout / doubting / broken", note: "each step gets a one-line meaning"}
+        - {field: math_rule,    label: "Want a verdict? Pick how it should move (or none → just a map)",
+           options: [rises, falls, holds, rise-then-fall, swings, none],
+           note: "shows a live demo of each (see _shared.yml math_rules); rise-then-fall & swings are coming soon. Picking a rule is what gives a custom lens its verdict."}
+        - {field: analyse_body, label: "Anything specific for the engine?", placeholder: "judge actions, not what she says she believes", locked_head: true}
+
+lenses:
+  # ─────────────────────────────────────────────────────────────────────
+  # ★ FOUNDATIONAL · CHARACTER · rising — the protagonist must change
+  # Teaches: an arc is growth. The hero should not end as they began.
+  # Verdict preview: "holds — 92%" / "wobble at sc6"
+  # ─────────────────────────────────────────────────────────────────────
+  - id: does_hero_grow
+    name: "Does the Hero Grow?"
+    question: "Does the hero grow?"   # LANGUAGE.md — the lens IS a question; `name` is the short nickname
+    tier: core            # beginner working set — bank surfaces these first
+    scope_type: character
+    y_items_source: predefined
+    math_rule: rising
+    eyes:
+      user:
+        watches: "Whether your main character actually changes — grows from who they were at the start toward who they need to become."
+        direction: "rises — unchanged → transformed"
+        good: "The line climbs: scene by scene, what happens to them is changing who they are."
+        "off": "It stays flat — the hero ends the story the same person who started it. Things happened, but they didn't grow."
+        read_as: "Climbs as the hero grows. A flat stretch = scenes where they coast unchanged — fine for a beat or two, a problem if it's most of the book. A dip = they slip back to the old self; check it's a deliberate setback, not a loss of thread."
+      ai:
+        analyse_body: "Score each scene by what the character DOES under pressure, not by what they say about themselves — a scene where they fall back into the old pattern sits at a lower rung. Record the rung you see each scene."
+    math_rule_explain: "A growth arc expects the line to climb from 'unchanged' toward 'transformed'. If it trends flat, the hero isn't being changed by the story — readers will feel they watched events rather than a person growing."
+    y_items:
+      - {value: unchanged,   description: "The same person they were on page one — old beliefs and habits intact."}
+      - {value: shaken,      description: "Events crack the old certainty; they start to doubt the way they've always done things."}
+      - {value: trying,      description: "They test a new way of being — clumsily, not yet sure of it."}
+      - {value: committing,  description: "They choose the new self even when it costs them something."}
+      - {value: transformed, description: "They've become who the story needed them to be, and it holds under pressure."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # ★ FOUNDATIONAL · STORY · arc (rise-then-fall) — verdict DEFERRED
+  # Teaches: tension should build to a climax, then ease. The basic story shape.
+  # Verdict preview: "builds to a peak"  (arc verdict DEFERRED — renders as a map for now)
+  # ─────────────────────────────────────────────────────────────────────
+  - id: tension_curve
+    name: "Tension Curve"
+    question: "Does the tension rise and break?"
+    tier: core
+    scope_type: story
+    y_items_source: predefined
+    math_rule: arc           # rise-then-fall — verdict DEFERRED in the engine; renders as a map until implemented
+    eyes:
+      user:
+        watches: "Whether the pressure in your story builds toward the climax, then releases at the end."
+        direction: "rise then fall — one strong peak near the climax, then a wind-down"
+        good: "Tension climbs across the book, hits its highest point at the climax, then eases in the final scenes."
+        "off": "It peaks too early and sags, stays flat with no build, or never comes down (no resolution)."
+        read_as: "Look for one strong peak near the end — not an early spike, not a flat line, not a cliff that never resolves. (Automatic pass/fail for this rise-then-fall shape is coming soon — for now, read the shape.)"
+      ai:
+        analyse_body: "Read the overall pressure on the READER, not just the volume of action — a quiet confrontation can be 'high'. Weigh stakes, pace, and uncertainty together."
+    math_rule_explain: "A tension curve expects one rising arc to a peak near the climax, then a release. (The automatic verdict for this rise-then-fall shape is coming soon.)"
+    y_items:
+      - {value: calm,     description: "Little at stake; the reader can breathe."}
+      - {value: building, description: "Pressure rising under the surface — something's coming."}
+      - {value: high,     description: "Real stakes, fast events, hard to look away."}
+      - {value: breaking, description: "Climactic — maximum pressure, everything on the line."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # RELATIONSHIP · falling — a key relationship should turn, not stay static
+  # Teaches: relationships are arcs too. Axis = hostility (high→low = thaw).
+  # Verdict preview: "thaws" / "still hostile"
+  # ─────────────────────────────────────────────────────────────────────
+  - id: enemies_to_allies
+    name: "Enemies to Allies"
+    question: "Do they really go from enemies to allies?"
+    tier: range           # demonstrates the engine's reach (relationship scope + falling rule)
+    scope_type: relationship
+    y_items_source: predefined
+    math_rule: falling
+    eyes:
+      user:
+        watches: "Whether two characters who start as enemies actually warm toward each other — instead of staying frozen at the same temperature all book."
+        direction: "falls — starts near 'enemies', should cool toward 'allied' (the hostility drops)"
+        good: "The hostility comes down, step by step, until they're on the same side."
+        "off": "They stay enemies the whole way, or flip to allies in one scene with nothing earning the change."
+        read_as: "Falls as they thaw. A jump back up = a flare-up — fine if it's a real setback, a problem if they yo-yo for no reason. (The ladder is read top-down as 'how hostile': enemies up top, allied at the bottom.)"
+      ai:
+        analyse_body: "Judge how the pair TREAT each other on the page — their actions and words toward one another — not how either privately feels. A scene where they don't interact is null."
+    math_rule_explain: "An enemies-to-allies arc expects the line to fall from 'enemies' toward 'allied'. If it stays flat at the top, the thaw isn't happening; if it drops in a single jump, it isn't earned."
+    # Ordered low→high (per the locked head): lowest hostility first. The line should
+    # START high (enemies) and FALL to allied.
+    y_items:
+      - {value: allied,  description: "Fully on the same side — trust earned, fighting together."}
+      - {value: thawing, description: "The ice is breaking — guarded cooperation, the odd kindness."}
+      - {value: wary,    description: "Civil but watchful; the grudge isn't gone."}
+      - {value: hostile, description: "Open friction — sniping, refusing to help."}
+      - {value: enemies, description: "Actively working to beat each other."}

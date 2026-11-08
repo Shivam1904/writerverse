@@ -1,0 +1,65 @@
+extends: checklist
+# ═══════════════════════════════════════════════════════════════════════
+# EXTENDED (NOT launch) · TYPE: checklist · coverage · JUDGES (covered N of M)
+# Professional structure frameworks. Lenses-only — the type ARCHETYPE is the
+# launch/config-samples `checklist` archetype, unchanged.
+# ═══════════════════════════════════════════════════════════════════════
+lenses:
+  # ── PRO · framework structure beats — a bind-time FRAMEWORK pick, the same
+  #         preset pattern as Genre Promise. One lens, four frameworks (limited
+  #         repetition). Distinct from the launch Story Skeleton (the simple
+  #         three-act starter): this is for writers working to a named framework.
+  - id: story_structure
+    name: "Story Structure"
+    question: "Does the story follow its structure?"
+    scope_type: story
+    y_items_source: predefined
+    rule: [cover_in_order]   # phased beats, in order — DEFERRED (renders as map until the engine implements cover_in_order)
+    structure_default: heros_journey   # the live default; its beats are the y_items below
+    eyes:
+      user:
+        watches: "Whether the story hits the beats of the structural framework you're writing to."
+        read_as: "Pick your framework; each beat should appear somewhere. These are deeper, framework-specific beats — for when the three-act Story Skeleton isn't enough."
+      ai:
+        analyse_body: "Mark a beat present if its FUNCTION lands anywhere, even if staged unconventionally, and record the scene(s) where each beat lands (so order can be checked separately)."
+    # Default framework = HERO'S JOURNEY; its beats are y_items.
+    y_items:
+      - {value: "Ordinary world",        description: "The hero's normal life before the call."}
+      - {value: "Call to adventure",     description: "The disruption that invites them out of it."}
+      - {value: "Crossing the threshold", description: "They commit and enter the special world."}
+      - {value: "Tests, allies, enemies", description: "They're tried, and gather a crew."}
+      - {value: "The ordeal",            description: "The central crisis — a death-and-rebirth."}
+      - {value: "The reward",            description: "They seize what they came for."}
+      - {value: "The road back",         description: "Pursued, they head home, changed."}
+      - {value: "Return with the elixir", description: "They come back transformed, with something for the world."}
+    # The other frameworks the picker can swap in (Hero's Journey default = y_items).
+    structure_presets:
+      - framework: save_the_cat
+        label: "Save the Cat"
+        y_items:
+          - {value: "Opening image",   description: "A snapshot of the hero's world and flaw before change."}
+          - {value: "Theme stated",    description: "The story's argument, voiced early (often missed by the hero)."}
+          - {value: "Catalyst",        description: "The event that upends the status quo."}
+          - {value: "Break into two",  description: "The hero chooses to act — into the new world."}
+          - {value: "Midpoint",        description: "A false win or false defeat that raises the stakes."}
+          - {value: "All is lost",     description: "The lowest point; the old way fails for good."}
+          - {value: "Finale",          description: "The hero applies what they learned and resolves it."}
+      - framework: tragedy
+        label: "Tragedy (Freytag)"
+        y_items:
+          - {value: "Exposition",        description: "The world and the hero's standing, established."}
+          - {value: "Inciting incident", description: "The event that sets the fall in motion."}
+          - {value: "Rising action",     description: "Choices and pressures that tighten the trap."}
+          - {value: "Climax",            description: "The turning point — the fatal decision."}
+          - {value: "Falling action",    description: "Consequences close in; escape narrows."}
+          - {value: "Catastrophe",       description: "The downfall — ruin or death — lands."}
+      - framework: three_act_full
+        label: "Three-Act (full)"
+        y_items:
+          - {value: "Setup",            description: "Ordinary world, hero, and what's at stake."}
+          - {value: "Inciting incident", description: "The event that starts the story."}
+          - {value: "First plot point", description: "The hero commits; act one ends."}
+          - {value: "Midpoint",         description: "A reversal that changes the game."}
+          - {value: "Second plot point", description: "The low point that launches the final push."}
+          - {value: "Climax",           description: "The final confrontation."}
+          - {value: "Resolution",       description: "The new normal after the dust settles."}

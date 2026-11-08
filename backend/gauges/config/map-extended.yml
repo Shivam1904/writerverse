@@ -1,0 +1,64 @@
+extends: map
+# ═══════════════════════════════════════════════════════════════════════
+# EXTENDED (NOT launch) · TYPE: map · contour line · DESCRIPTIVE (no verdict)
+# Professional / advanced maps. Lenses-only — the type ARCHETYPE is the
+# launch/config-samples `map` archetype, unchanged.
+# ═══════════════════════════════════════════════════════════════════════
+lenses:
+  # ── PRO · the dramatic-irony gap (named in the catalogue) ───────────────
+  - id: dramatic_irony_gap
+    name: "Dramatic Irony"
+    question: "Who knows what the reader knows?"
+    scope_type: story
+    y_items_source: predefined
+    eyes:
+      user:
+        watches: "How much the READER knows that the characters don't — the size of the dramatic-irony gap, scene by scene."
+        look_for: "Spikes = strong irony (the reader squirms, knowing what's coming). Flat-at-none stretches = everyone's equally informed, no irony tension. A long acute plateau risks frustration — 'why don't they SEE it?'."
+      ai:
+        analyse_body: "Estimate the gap between what the READER knows and what the viewpoint characters know this scene — high when the reader holds a secret the characters don't. Describe, don't judge."
+    y_items:
+      - {value: none,   description: "Reader and characters know the same — no irony."}
+      - {value: slight, description: "The reader knows a little more than the characters."}
+      - {value: strong, description: "The reader knows something important the characters don't."}
+      - {value: acute,  description: "The reader sees the bomb under the table; the characters are oblivious."}
+
+  # ── PRO · one character's emotional ride (character-scope emotional map —
+  #         a cell the launch maps don't cover) ──────────────────────────
+  - id: emotional_arc
+    name: "Emotional Journey"
+    question: "What is this character feeling, scene by scene?"
+    scope_type: character
+    y_items_source: predefined
+    eyes:
+      user:
+        watches: "One character's emotional ride across the story — what they're feeling, scene by scene."
+        look_for: "A flat line means the character is emotionally static — wallpaper in their own story. You want a varied ride that tracks what happens to them."
+      ai:
+        analyse_body: "Read THIS character's dominant emotional state each scene — the feeling that most shapes how they behave, not a backdrop mood (a grieving character who lashes out reads by the driver, anger, not the backdrop, grief). Judge it from THIS character's vantage: in one scene a triumphant villain and a cornered hero sit at opposite ends. Place it by how strongly they feel it, not by how dramatic the scene is — a quiet scene where they privately resolve to betray someone can be steady-to-lifted at full strength. Null if they're absent. Describe what's on the page; don't judge the arc."
+    # One signed valence ladder (anguished↔elated) — the rungs fold emotion KIND into
+    # intensity so the line stays chartable. Descriptions name which feelings land where.
+    y_items:
+      - {value: anguished, description: "Acute pain at full force — grief, terror, heartbreak, despair, rage that consumes."}
+      - {value: low,       description: "Down but contained — sadness, fear, anger, guilt, discouragement colouring their choices."}
+      - {value: steady,    description: "Level — calm, composed, acceptance, quiet resolve held in check."}
+      - {value: lifted,    description: "Up — hope, warmth, determination, gladness, anticipation."}
+      - {value: elated,    description: "Soaring at full force — joy, triumph, love, exhilaration."}
+
+  # ── PRO · per-scene hook strength (chapter openings/closings) ───────────
+  - id: hook_strength
+    name: "Hook Strength"
+    question: "Does every scene pull you into the next?"
+    scope_type: story
+    y_items_source: predefined
+    eyes:
+      user:
+        watches: "How strongly each scene grabs — its opening pull and its closing push, scene by scene."
+        look_for: "Weak hooks in a row are where readers drift off. You want most scenes to open with a pull and close with a reason to turn the page; sagging hooks mid-book are the danger zone."
+      ai:
+        analyse_body: "Judge how strongly the scene's OPENING pulls the reader in AND how strongly its ENDING pushes them onward (a question, a turn, a threat). Score the overall hook strength."
+    y_items:
+      - {value: flat,     description: "No hook — opens and closes inertly."}
+      - {value: mild,     description: "A little pull."}
+      - {value: pull,     description: "A clear reason to keep reading."}
+      - {value: gripping, description: "Can't-put-it-down — a strong open and a cliff or turn at the close."}

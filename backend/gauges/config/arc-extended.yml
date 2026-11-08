@@ -1,0 +1,102 @@
+extends: arc
+# ═══════════════════════════════════════════════════════════════════════
+# EXTENDED (NOT launch) · TYPE: arc · ladder line · JUDGES
+# The professional / advanced arc bank + the two oscillate lenses the engine now
+# supports. Lenses-only — the type ARCHETYPE is the launch/config-samples `arc`
+# archetype (visuals, locked AI heads, report_views, custom_dialog), unchanged.
+# Audience: writers past the beginner core — assumes the craft terms are known.
+# ═══════════════════════════════════════════════════════════════════════
+lenses:
+  # ── PRO · named change arc — the playtest's "model chart" ────────────────
+  - id: redemption_arc
+    name: "Redemption Arc"
+    question: "Does this character earn their redemption?"
+    scope_type: character
+    y_items_source: predefined
+    math_rule: rising
+    eyes:
+      user:
+        watches: "Whether a fallen or flawed character climbs back toward grace — earning redemption across the story."
+        direction: "rises — fallen → redeemed"
+        good: "The line climbs as they make amends and change; the redemption is earned, scene by scene."
+        "off": "It jumps to 'redeemed' without the work, or never climbs at all."
+        read_as: "Climbs toward redemption. A flat stretch = scenes where they coast; a single jump up = unearned grace — check it's paid for."
+      ai:
+        analyse_body: "Judge redemption by costly ACTIONS — amends, sacrifice, changed choices — never by apology or stated intention."
+    math_rule_explain: "A redemption arc expects a climb from fallen toward redeemed. A flat trend or a sudden jump means the redemption isn't earned."
+    y_items:
+      - {value: fallen,    description: "At their lowest — defined by the wrong they've done."}
+      - {value: reckoning, description: "Forced to face what they've done; denial cracks."}
+      - {value: atoning,   description: "Actively making amends, at real cost."}
+      - {value: changed,   description: "Acting from the new self, consistently."}
+      - {value: redeemed,  description: "Grace earned — the debt is paid, and it holds."}
+
+  # ── PRO · the corruption slide (ported from config-samples, refined) ────
+  - id: power_corrupts
+    name: "Power Corrupts"
+    question: "Does power corrupt them, step by step?"
+    scope_type: character
+    y_items_source: predefined
+    math_rule: rising
+    eyes:
+      user:
+        watches: "Whether a character slides from principled toward tyrannical as they gain power."
+        direction: "rises — principled → tyrannical"
+        good: "The line climbs steadily toward tyrannical; the slide is motivated."
+        "off": "It stalls or dips — the corruption isn't being earned."
+        read_as: "Climbs as corruption rises. A dip = a scene that slips back toward good — check it's intended, not a lost thread."
+      ai:
+        analyse_body: "Judge actions and decisions, not stated intentions — a 'for the greater good' speech while crossing a line is still a step up."
+    math_rule_explain: "A power-corrupts arc expects the slide from principled toward tyrannical. A flat or downward trend means the corruption isn't motivated convincingly."
+    y_items:
+      - {value: principled,  description: "Holds the line even when power is offered."}
+      - {value: tempted,     description: "Starts bending rules — for the right reasons, he tells himself."}
+      - {value: compromised, description: "Crosses lines knowingly; calls it necessary."}
+      - {value: tyrannical,  description: "Uses power for himself alone, no restraint left."}
+
+  # ── NEW (engine caught up) · OSCILLATE · relationship push-pull ─────────
+  - id: push_and_pull
+    name: "Push & Pull"
+    question: "Do these two keep pushing and pulling apart?"
+    scope_type: relationship
+    y_items_source: predefined
+    math_rule: oscillate
+    eyes:
+      user:
+        watches: "Whether a relationship swings between closeness and distance — the on-again/off-again pull."
+        direction: "swings — should rise and fall repeatedly, not settle"
+        good: "Closeness oscillates — drawn together, pushed apart, again — keeping the will-they-won't-they alive."
+        "off": "It flatlines (settled, no tension) or climbs one way only (then it's a warmth arc, not push-pull)."
+        read_as: "Look for repeated up-and-down swings. A flat line = the tension's gone slack; a one-way climb = they've simply gotten together."
+      ai:
+        analyse_body: "Score the closeness BETWEEN the pair each scene, from how they act toward each other. Record the level you see each scene."
+    math_rule_explain: "A push-pull expects the line to swing up and down repeatedly. A flat or one-directional line means the tension has resolved."
+    y_items:
+      - {value: apart,   description: "Pushed away — distance, conflict, avoidance."}
+      - {value: guarded, description: "Wary, holding back."}
+      - {value: drawn,   description: "Pulled toward each other; the spark shows."}
+      - {value: close,   description: "Intimate, connected — for now."}
+
+  # ── NEW (engine caught up) · OSCILLATE · story-wide morale rollercoaster ─
+  - id: hope_and_despair
+    name: "Hope & Despair"
+    question: "Does hope rise and fall across the story?"
+    scope_type: story
+    y_items_source: predefined
+    math_rule: oscillate
+    eyes:
+      user:
+        watches: "Whether the story's morale swings between hope and despair — the rollercoaster that keeps readers gripped."
+        direction: "swings — should rise and fall repeatedly"
+        good: "Hope and despair trade off — wins followed by setbacks — so no stretch feels safe or hopeless for long."
+        "off": "A long flat run (relentless grimness, or unbroken triumph) — readers go numb either way."
+        read_as: "Look for repeated swings between hope and despair. Long flat runs at either pole go numb; you want the trade-off."
+      ai:
+        analyse_body: "Read the prevailing sense of HOPE vs DESPAIR the scene leaves the reader with — are things looking up or down? Record the level you see each scene."
+    math_rule_explain: "Expects morale to swing between hope and despair. A long flat run at either pole means the rollercoaster has stalled."
+    y_items:
+      - {value: despair,    description: "All seems lost."}
+      - {value: bleak,      description: "Things look bad; little light."}
+      - {value: uncertain,  description: "Could go either way."}
+      - {value: hopeful,    description: "Things are looking up."}
+      - {value: triumphant, description: "A real win — the high point."}

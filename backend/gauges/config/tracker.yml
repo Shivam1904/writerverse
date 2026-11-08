@@ -1,0 +1,170 @@
+# ═══════════════════════════════════════════════════════════════════════
+# LAUNCH · TYPE: tracker  ·  display: state lanes  ·  JUDGES (invariant banner)
+# A categorical state per scene, in lanes; a per-chart INVARIANT must hold.
+# Launch lenses: whos_where (Places) · who_knows_secret · the_key_object (cast)
+# ═══════════════════════════════════════════════════════════════════════
+archetype:
+  id: tracker
+  display: state_lanes                            # DEFAULT visual (= visuals[0]); user's per-binding pick overrides
+  visuals: [state_lanes, step_line, transition_list]   # menu — "Show as ▾" (lanes · step-line for ordered states · just the hand-offs)
+  report_views: [breach_flags, list, summary]     # invariant breaches — "Show findings as ▾"
+  judges: true
+  data_style: scene_mapped        # ONE state per scene + the invariant check
+  eyes:
+    user:
+      kind_word: "a tracker"
+      y_items_word: "states"
+    ai:
+      analyse_head: >          # LOCKED · AI-only — PURE observation, no verdict
+        Record the state(s) the subject is in for each scene — one OR MORE from the
+        list, or null if not present — reading only what the scene shows. Don't judge;
+        the rule layer checks the data points separately.
+      extract_head: >          # LOCKED
+        List the possible states (no order needed), each with a one-line description.
+    designer:
+      glyph: track
+      verdict_style: banner
+      empty_state: "{y_items_hint}"      # source-driven, e.g. 'add holders on the People page'
+      bank_card:
+        shows: [name, kind_word, watches one-liner, glyph]
+      decide_card:
+        shows: [name, watches, ghosted example lanes, the invariant in words, good, off, setup cost]
+        example: "synth 2 lanes with a single clean hand-off (one occupied at a time)"
+      chart_view:
+        shows: [header "name · scope", verdict banner, the INVARIANT in plain words,
+                lanes (one per state, description on hover), occupancy per scene, transition markers]
+        output_language: "State the breach plainly: 'two holders in scene 5', not 'invariant violated'."
+      custom_dialog:
+        - {field: name,        label: "Name it",                placeholder: "Who Has the Knife"}
+        - {field: watches,     label: "What are you tracking?", placeholder: "who's holding the murder weapon each scene"}
+        - {field: y_items,     label: "The states it can be in", placeholder: "list them — or track a part of your world", note: "toggle: list them ▸ / track a World section ▾"}
+        - {field: invariant,   label: "The rule that should hold", placeholder: "only one person can hold it at a time, and it can't teleport"}
+        - {field: analyse_body,label: "Anything specific for the engine?", placeholder: "'lost/hidden' counts as nobody holding it", locked_head: true}
+
+lenses:
+  # ─────────────────────────────────────────────────────────────────────
+  # CHARACTER · SECTION-bound (Places) — whereabouts continuity
+  # Teaches: basic location continuity — a character can't be in two places.
+  # Verdict preview: "one place at a time" / "teleport in sc4"
+  # ─────────────────────────────────────────────────────────────────────
+  - id: whos_where
+    name: "Who's Where"
+    question: "Where is everyone?"
+    tier: range           # continuity is a second-pass concern — shown as "more advanced"
+    scope_type: character
+    y_items_source: section          # binds to the Places section; grows on edit
+    y_items_block: places            # default scale entity — the Places World block (canonical key)
+    rule: [single_occupancy, no_jump]  # one place at a time (live) + no teleport (no_jump deferred → renders as map)
+    eyes:
+      user:
+        watches: "Which place this character is in, scene by scene."
+        invariant: "One place at a time — a character can't be in two places at once, and can't cross the map between back-to-back scenes with no travel shown."
+        good: "A path you can trace — every move between places is accounted for."
+        "off": "They're in two places in one scene, or they teleport across the world with no journey in between."
+        y_items_hint: "Places come from your world — add them in the Places section and they show up here as lanes."
+      ai:
+        analyse_body: "For each scene, record the place(s) this character is physically present in — every one the scene shows, whether that's one or more; use a named 'in transit' if the story shows them mid-journey, and leave it empty if they're off-page. Record only what's on the page."
+    y_items: []   # resolved live from the bound Places / World section
+
+  # ─────────────────────────────────────────────────────────────────────
+  # STORY · EXTRACTED · monotonic knowledge — reveals & dramatic irony
+  # Teaches: track who knows the secret. Once you know, you can't un-know.
+  # Verdict preview: "knowledge only grows" / "un-known in sc7"
+  # ─────────────────────────────────────────────────────────────────────
+  - id: who_knows_secret
+    name: "Who Knows the Secret"
+    question: "Who's in on the secret?"
+    tier: range
+    scope_type: story
+    y_items_source: extracted
+    rule: [monotone_up]   # knowledge only grows (live)
+    visual_default: step_line   # ordered states (unaware→suspects→knows) read best as a step-line, not lanes — overrides the type default (visuals[0]=state_lanes)
+    eyes:
+      user:
+        watches: "How much each character knows about a key secret, scene by scene."
+        invariant: "Knowledge only grows — once a character learns the secret, they can't un-know it (unless the story explicitly makes them forget)."
+        good: "Each character's knowledge climbs or holds; reveals are one-way, and nobody acts unaware after they've learned the truth."
+        "off": "Someone 'forgets' what they were shown, or behaves as if they never learned it."
+        y_items_hint: "The engine pulls the levels from your story — usually unaware / suspects / knows; edit them to fit your secret."
+      ai:
+        analyse_body: "For each character, record their level of knowledge about the secret in each scene, read from how they speak and act about it. Record the level you observe — nothing about what 'should' happen across scenes."
+        extract_body: "Name the rungs of knowing for THIS secret, least→most informed, each with a one-line meaning."
+    y_items:
+      - {value: unaware,  description: "Has no idea the secret exists."}
+      - {value: suspects, description: "Senses something's off but can't name it."}
+      - {value: knows,    description: "In full possession of the secret."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # OBJECT · SECTION-bound (cast) — object custody continuity
+  # Teaches: an object can only be in one pair of hands at a time.
+  # Verdict preview: "one holder" / "two holders in sc5"
+  # ─────────────────────────────────────────────────────────────────────
+  - id: the_key_object
+    name: "The Key Object"
+    question: "Where is the key object — and who holds it?"
+    tier: range
+    scope_type: object
+    y_items_source: section          # binds to the People/cast section; grows on edit
+    y_items_block: characters        # default scale entity — the cast (Character table)
+    rule: [single_occupancy, no_jump]  # one holder at a time (live) + no owner-teleport (no_jump deferred → renders as map)
+    eyes:
+      user:
+        watches: "Who is holding a key object in each scene."
+        invariant: "One holder at a time — the object can't be in two people's hands at once, and it can't jump owners with no hand-off shown on the page."
+        good: "A clean chain of hand-offs — you can follow the object from hand to hand."
+        "off": "Two people hold it in the same scene, or it changes hands with no hand-off shown."
+        y_items_hint: "Holders come from your cast — add people on the People page and they appear here as lanes."
+      ai:
+        analyse_body: "For each scene, record who is holding the object — every holder the scene shows, whether that's one or more, or 'nobody' if it's lost, hidden, or unattended. Record only what's on the page."
+    y_items: []   # resolved live from the bound People / cast section
+
+  # ─────────────────────────────────────────────────────────────────────
+  # CHARACTER (default) · predefined · ordered deterioration — health / state
+  # Teaches: a person or thing only gets worse on its own — no silent heals.
+  # Multi-scope: the SAME chart serves a CHARACTER (health), an ITEM (wear), or a
+  # PLACE (ruin) — pick the subject at bind time; the ladder swaps (presets below).
+  # Visually a step-line like Who Knows the Secret, but a DIFFERENT use case AND a
+  # wider scope set — which counts as variety, not repetition. Its invariant is the
+  # mirror of Who Knows': knowledge only GROWS; condition only WORSENS.
+  # ─────────────────────────────────────────────────────────────────────
+  - id: condition
+    name: "Condition"
+    question: "How badly are they hurt, and does it stay consistent?"
+    tier: range
+    scope_type: character        # DEFAULT subject (= the y_items below). object → World Items; place → World Locations (scope label "a place" now in _shared.yml). The other two ladders live in `scope_presets`.
+    y_items_source: predefined
+    rule: [monotone_down]   # only worsens; no silent recovery (live)
+    scope_default: character     # the live default; its ladder is the y_items below
+    visual_default: step_line    # ordered deterioration reads as a step-line, not lanes
+    eyes:
+      user:
+        watches: "The physical state of a character (or an item, or a place) as the story wears it down — scene by scene."
+        invariant: "It only worsens on its own — no silent recovery. A jump back toward 'healthy' needs a scene that earns it (treatment, repair, rest)."
+        good: "The decline is traceable, and every recovery has a scene behind it."
+        "off": "It quietly heals between scenes — 'critical' in sc5, fine in sc6 with nothing shown."
+        y_items_hint: "Built in for a character (healthy→dead) — swap the ladder for an item or a place (presets below)."
+      ai:
+        analyse_body: "For each scene, record the subject's current state (leave empty if absent). Record only what's on the page."
+    # Default subject = CHARACTER (health); its ladder is y_items.
+    y_items:
+      - {value: healthy,  description: "Unhurt — at full strength."}
+      - {value: hurt,     description: "Wounded but still functioning."}
+      - {value: critical, description: "Gravely hurt — at the edge."}
+      - {value: dead,     description: "Gone — no recovery, unless the story allows it."}
+    # The other two subjects the picker can swap in (character default lives in y_items).
+    # Same invariant for all three — only worsens, no silent recovery.
+    scope_presets:
+      - scope_type: object
+        label: "an item"
+        y_items:
+          - {value: pristine, description: "Intact — as good as new."}
+          - {value: worn,     description: "Showing wear; still works."}
+          - {value: damaged,  description: "Compromised — partly failing."}
+          - {value: broken,   description: "Destroyed or non-functional."}
+      - scope_type: place
+        label: "a place"
+        y_items:
+          - {value: secure,     description: "Safe, intact, under control."}
+          - {value: threatened, description: "Under pressure — siege, or decay setting in."}
+          - {value: damaged,    description: "Partly wrecked or lost."}
+          - {value: ruined,     description: "Destroyed or fallen."}

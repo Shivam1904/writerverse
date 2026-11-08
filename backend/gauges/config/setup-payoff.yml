@@ -1,0 +1,67 @@
+# ═══════════════════════════════════════════════════════════════════════
+# LAUNCH · TYPE: setup-payoff  ·  display: linked arcs  ·  JUDGES (N still hanging)
+# Plants linked to payoffs across scenes. No y_items ladder — the engine
+# EXTRACTS the pairs; the extract instruction is what makes them concrete.
+# Launch lens: loose_ends
+# ═══════════════════════════════════════════════════════════════════════
+archetype:
+  id: setup_payoff
+  display: payoff_arcs                                  # DEFAULT visual (= visuals[0]); user's per-binding pick overrides
+  visuals: [payoff_arcs, planted_paid_board, hanging_list]   # menu — "Show as ▾" (arcs · two-column board · just what's open)
+  report_views: [hanging_list, summary]                 # named open setups — "Show findings as ▾"
+  judges: true
+  data_style: coverage            # each setup paired with its payoff across the whole text
+  eyes:
+    user:
+      kind_word: "a setup → payoff"
+      y_items_word: "setups"     # not a scale — the discovered pairs
+    ai:
+      analyse_head: >          # LOCKED · AI-only — PURE extraction, no verdict
+        Find each SETUP (a planted thing/fact) and any later scene that uses or
+        resolves it (its PAYOFF); pair them, recording the scene number(s) for each.
+        Don't judge; the rule layer flags unpaid setups separately.
+      extract_head: >          # LOCKED — but the BODY makes the names concrete (fixes 'plant/payoff')
+        Name each setup and payoff in the STORY'S OWN words (e.g. "the unsent
+        postcards"), never as the generic words "plant"/"payoff".
+    designer:
+      glyph: promise
+      verdict_style: banner
+      empty_state: "Run a scan to find the setups and check their payoffs."
+      bank_card:
+        shows: [name, kind_word, watches one-liner, glyph]
+      decide_card:
+        shows: "name · watches · ghosted example (one closed arc + one open dashed) · good · off · setup cost"
+        example: "synth a scene axis with one solid arc (paid off) and one dashed open arc"
+      chart_view:
+        shows: "header (name · scope) · N-still-hanging verdict · scene axis with arcs · solid=paid off, dashed=open · the open ones listed BY NAME"
+        output_language: "List the hanging setups by their real names — never 'plant'/'payoff'."
+      custom_dialog:
+        - {field: name,         label: "Name it",               placeholder: "Every Gun Fires"}
+        - {field: watches,      label: "What should pay off?",   placeholder: "every object I make a point of should matter later"}
+        - {field: extract_body, label: "What counts as a setup?", placeholder: "a thing/fact the narration lingers on", note: "and what counts as its payoff?"}
+        - {field: analyse_body, label: "Anything specific for the engine?", placeholder: "a payoff can be a mention, doesn't need a whole scene", locked_head: true}
+
+lenses:
+  # ─────────────────────────────────────────────────────────────────────
+  # ★ FOUNDATIONAL · STORY · extracted — the classic: pay off what you plant
+  # Teaches: Chekhov's gun — if you make a point of it, it has to matter later.
+  # Verdict preview: "2 setups still hanging"
+  # ─────────────────────────────────────────────────────────────────────
+  - id: loose_ends
+    name: "Loose Ends"
+    question: "Did you finish what you started?"
+    tier: core            # beginner working set — bank surfaces these first
+    scope_type: story
+    y_items_source: extracted
+    eyes:
+      user:
+        watches: "Whether everything you make a point of setting up actually pays off later."
+        good: "Every planted thing — an object, a skill, a secret, a promise — comes back and matters."
+        "off": "Setups left dangling — a gun shown on the wall that never fires, a skill introduced and never used."
+        read_as: "Lists each thing you set up and whether it landed — e.g. 'the spare key under the mat — still hanging'. Each hanging setup is a loose end to either pay off or cut."
+      ai:
+        # The y_items ARE the extracted setups, each carrying its setup-scene(s) + payoff-scene(s).
+        # The verdict is the TYPE's pairing (a setup with no payoff scene = hanging) — NOT cover_all;
+        # do not default this lens to cover_all. It's all in the prompts below.
+        extract_body: "The y_items ARE the setups — extract one per setup, each carrying: its name in the story's own words (e.g. 'the locked drawer'); the scene number(s) where it's PLANTED; and the scene number(s) where it's PAID OFF (leave empty if none yet). A setup = an object, fact, skill, or promise the narration deliberately draws attention to; its payoff = a later scene that uses, resolves, or pointedly subverts it. Never the generic words 'plant'/'payoff'."
+        analyse_body: "For each extracted setup, record the scene(s) that pay it off — a payoff genuinely USES, RESOLVES, or pointedly SUBVERTS the setup (a throwaway mention that changes nothing isn't one). Leave the payoff list empty when the story never delivers one."

@@ -1,0 +1,155 @@
+# ═══════════════════════════════════════════════════════════════════════
+# LAUNCH · TYPE: map  ·  display: contour line  ·  DESCRIPTIVE (no verdict)
+# A quality traced scene-by-scene. No right answer — read the shape.
+# Launch lenses: mood_map · scene_energy · whos_driving · relationship_heat
+# ═══════════════════════════════════════════════════════════════════════
+archetype:
+  id: map
+  display: contour_line                      # DEFAULT visual (= visuals[0]); user's per-binding pick overrides
+  visuals: [contour_line, bars, heat_strip]  # menu — "Show as ▾" (line · bars for categorical · colour band)
+  report_views: [notes, summary]             # descriptive → observations, not failures
+  judges: false
+  data_style: scene_mapped        # ONE value per scene; repeats and rises/falls are fine; NO judgement
+  # A map is just a scene_mapped scale with NO math_rule. Add a math_rule to any of
+  # these (in the custom dialog) and it becomes an ARC (judged) — see arc.yml.
+  eyes:
+    user:
+      kind_word: "a map"
+      y_items_word: "levels"
+    ai:
+      analyse_head: >          # LOCKED · AI-only
+        Label each scene with ONE level, or null if not implied. DESCRIBE, do not
+        judge — there is no right or wrong value.
+      extract_head: >          # LOCKED
+        Produce the levels, each with a one-line description. Order them only if
+        they have a natural low→high reading.
+    designer:
+      glyph: arc               # same line glyph; the CAPTION (not banner) signals "map"
+      verdict_style: caption
+      empty_state: "Run a scan to see the shape across your scenes."
+      bank_card:
+        shows: [name, kind_word, watches one-liner, glyph]
+      decide_card:
+        shows: "name · watches · ghosted example contour · the look-for caption (no pass/fail) · setup cost"
+        example: "synth a gentle up-and-down contour (NOT a directional ideal — there's no rule)"
+      chart_view:
+        shows: "header (name · scope) · a quiet what-to-look-for caption, NOT a verdict banner · the line · y-axis levels with description on hover · evidence"
+        output_language: "Frame as observation, never pass/fail. The rail badge must say 'just a map', not 'holds'."
+      custom_dialog:
+        - {field: name,        label: "Name it",                 placeholder: "Sense of Dread"}
+        - {field: watches,     label: "What do you want to see?", placeholder: "how heavy the dread sits in each scene"}
+        - {field: y_items,     label: "The levels",              placeholder: "calm / uneasy / suffocating", note: "low→high if it has a natural reading"}
+        - {field: look_for,    label: "What should you watch for?", placeholder: "long flat patches mean the dread's gone slack"}
+        - {field: analyse_body,label: "Anything specific for the engine?", placeholder: "read the atmosphere, not just what characters say", locked_head: true}
+
+lenses:
+  # ─────────────────────────────────────────────────────────────────────
+  # STORY · predefined — the broad emotional read
+  # Teaches: vary the emotional colour; avoid a monotone.
+  # ─────────────────────────────────────────────────────────────────────
+  - id: mood_map
+    name: "Mood Map"
+    question: "How does each chapter feel?"
+    tier: core            # beginner working set — bank surfaces these first
+    scope_type: story
+    y_items_source: predefined
+    eyes:
+      user:
+        watches: "The emotional colour of every scene — the feeling the reader carries from one to the next, start to finish."
+        look_for: "Long flat stretches at one mood read as monotone; wild swings between neighbouring scenes read as whiplash. You want variety with a through-line — light and dark, but earned."
+      ai:
+        analyse_body: "Read the dominant feeling the scene LEAVES THE READER WITH — its atmosphere — not just what characters say they feel."
+    y_items:
+      - {value: bleak,   description: "Cold, hopeless, despairing."}
+      - {value: sombre,  description: "Heavy, sad, subdued."}
+      - {value: neutral, description: "Even, matter-of-fact."}
+      - {value: warm,    description: "Hopeful, tender, bright."}
+      - {value: radiant, description: "Joyful, soaring, triumphant."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # STORY · predefined — pacing / momentum
+  # Teaches: every scene should pull its weight. Find the sagging patches.
+  # ─────────────────────────────────────────────────────────────────────
+  - id: scene_energy
+    name: "Scene Energy"
+    question: "Where does the story drag?"
+    tier: core
+    scope_type: story
+    y_items_source: predefined
+    eyes:
+      user:
+        watches: "How much each scene moves the story — its energy and momentum, scene by scene."
+        look_for: "Several low-energy scenes in a row are a sagging patch — where readers put the book down. A whole book at top energy is exhausting; you want rises and dips, with no dead zones."
+      ai:
+        analyse_body: "Judge how much the scene CHANGES things and how fast it moves, not how loud it is — a tense quiet negotiation can be 'driving'. A scene that ends where it began is 'stalled'."
+    y_items:
+      - {value: stalled, description: "Nothing moves — no new information, no change; a scene you could cut."}
+      - {value: quiet,   description: "Low-key — mood or character work, little forward motion."}
+      - {value: moving,  description: "The story clearly advances; something changes."}
+      - {value: driving, description: "High momentum — fast, eventful, hard to put down."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # STORY · predefined · CATEGORICAL (unordered) — the one bars-default map
+  # Teaches: vary the KIND of scene — don't stack info-dumps or all-talk.
+  # The launch set's example of "same type, different visual": categorical → bars.
+  # ─────────────────────────────────────────────────────────────────────
+  - id: scene_types
+    name: "Scene Types"
+    question: "Is it all talk, or all action?"
+    tier: range
+    scope_type: story
+    y_items_source: predefined
+    visual_default: bars      # categorical/unordered — reads as bars, not the type default contour_line
+    eyes:
+      user:
+        watches: "What KIND each scene is — action, dialogue, introspection, or exposition — across the story."
+        look_for: "Several of the same kind in a row is the warning sign: three exposition scenes back-to-back is an info-dump stretch; an all-dialogue run goes talky. You want the kinds mixed. (No high/low here — it's just which kind.)"
+      ai:
+        analyse_body: "Label each scene by its DOMINANT mode — what the scene mostly DOES — even when it blends kinds. These are categories with no high→low order; never rank them."
+    y_items:
+      - {value: action,        description: "Things happen — events, movement, physical stakes."}
+      - {value: dialogue,      description: "Driven by people talking — a conversation or confrontation."}
+      - {value: introspection, description: "Inner work — a character thinking, feeling, deciding."}
+      - {value: exposition,    description: "Delivering information — backstory, world, set-up."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # CHARACTER · predefined — agency / active-vs-passive
+  # Teaches: the hero should drive their own story (especially late).
+  # ─────────────────────────────────────────────────────────────────────
+  - id: whos_driving
+    name: "Who's Driving"
+    question: "Who's driving the story?"
+    tier: core
+    scope_type: character
+    y_items_source: predefined
+    eyes:
+      user:
+        watches: "How much this character drives the action versus gets carried along by it, scene to scene."
+        look_for: "A protagonist stuck at 'passive' for long runs is being dragged through their own story. You want them mostly making choices that steer events — and rising to 'driving' by the climax."
+      ai:
+        analyse_body: "Score this character's agency in THIS scene — who's steering the action. Agency is about who drives events, not emotional state: a terrified character fleeing for their life is still reactive; a calm one pulling strings from the shadows is driving. Read it per-character — in the same scene the detective running an interrogation is driving while the suspect is reactive. Off-page or absent is null. Record what the scene shows."
+    y_items:
+      - {value: passive,  description: "Acted upon — events happen TO them; a passenger, making no real choice."}
+      - {value: reactive, description: "Responds to others' moves, but only inside a frame someone else set; never initiates."}
+      - {value: deciding, description: "Makes real choices that matter — sets a plan going, creates an opening, actively pursues a goal."}
+      - {value: driving,  description: "Controls the scene — others react to THEM; sets the terms, dictates the pace, shapes the outcome."}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # RELATIONSHIP · extracted — the levels are pulled from the story
+  # Teaches: a relationship should move (warm/cool), not sit flat as wallpaper.
+  # ─────────────────────────────────────────────────────────────────────
+  - id: relationship_heat
+    name: "Relationship Heat"
+    question: "What's happening between these two?"
+    tier: range           # demonstrates the engine's reach (relationship scope + extracted scale)
+    scope_type: relationship
+    y_items_source: extracted
+    eyes:
+      user:
+        watches: "How warm or cold a relationship runs across the story — does the temperature actually move?"
+        look_for: "A line that barely moves means the relationship isn't doing dramatic work — it's wallpaper. You want it to warm and cool as the story tests it."
+        y_items_hint: "Pulled from your scenes — the engine names the levels it finds (e.g. 'distant', 'thawing', 'devoted'); review and edit them so they fit your pair."
+      ai:
+        analyse_body: "Read the emotional temperature BETWEEN the two named characters each scene — closeness, trust, warmth — from how they treat each other on the page, not from one character's private feelings. Read the bond as a two-way dynamic, and weigh subtext over surface: a pair who trade insults but risk their lives for each other run warm, not cold. Null if they don't interact."
+        extract_body: "Name 3–5 warmth levels you actually see in THIS pair, coldest→warmest, each with a one-line meaning in the story's own terms."
+    y_items: []   # filled by the extract pass / editable in the dialog
