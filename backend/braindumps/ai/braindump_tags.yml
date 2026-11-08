@@ -1,0 +1,34 @@
+# Braindump tag taxonomy — the ROOT > group > tag vocabulary for braindump tags.
+# CANONICAL SOURCE. The frontend fetches this (get_braindump_tag_categories) and
+# keeps a hardcoded copy only as an offline/loading fallback. Edit here.
+#
+# Six lean categories: Character (who they are + feel + look), Plot (events,
+# conflicts, turns), World (setting, systems, history, atmosphere), Dialogue,
+# Theme, and Other (anything else / craft notes). ENTITIES (people, places,
+# things, threads) are NOT here — they live as real project data and merge into
+# the tag UI at runtime; the archived `Entity` group below is the type-tag
+# vocabulary the AI annotator still draws on. Every tag is unique across
+# categories (none appears in two groups), and World facets stay distinct from
+# the `Entity` type-tags (`magic_rule`/`tech_rule`/`setting`, never bare
+# magic/technology/location) so a facet and a type never collide.
+#
+# Each category carries a `color` (the dot colour for every tag in that group),
+# a DIFFERENT one per category from the aspect palette (frontend theme/aspects.ts),
+# so the dot alone tells which category a tag is in; the filter bar doubles as
+# the legend (wrt-123):
+#   Character blue #4a72b0 · Plot purple #7a5ea3 · World orange #c4742f
+#   · Dialogue green #4e8a55 · Theme brown #8a6a4a · Other gold #c79a3e
+# Keep these in sync with theme/aspects.ts (the frontend mirror) when it changes.
+
+categories:
+  "Character": { color: "#4a72b0", tags: [appearance, backstory, motivation, flaw, relationship, emotion] }
+  "Plot":      { color: "#7a5ea3", tags: [event, conflict_external, conflict_internal, goal, turning_point, resolution, flashback] }
+  "World":     { color: "#c4742f", tags: [setting, society, history, religion, magic_rule, tech_rule, atmosphere] }
+  "Dialogue":  { color: "#4e8a55", tags: [dialogue, confrontation, monologue, catchphrase] }
+  "Theme":     { color: "#8a6a4a", tags: [theme, motif, lesson] }
+  "Other":     { color: "#c79a3e", tags: [idea, question, todo, research, plot_hole] }
+
+# Pulled out of the active categories (entities are modelled elsewhere now).
+# Preserved for later (e.g. wiring braindump entity-tags to real entities).
+archived:
+  "Entity":              { color: "#5f7fb5", tags: [character, location, object, item, organization, faction, creature, technology, magic, vehicle, building, landmark, weapon, tool] }
