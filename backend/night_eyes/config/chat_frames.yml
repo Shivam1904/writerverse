@@ -1,0 +1,344 @@
+# Night Eyes page frames. Per-page focus that wraps MAIN_PROMPT
+# (`backend/night_eyes/prompts.py`). Design: NIGHT_EYES_PROMPTS.md.
+#
+# Every `prompt` follows the same skeleton:
+#   PAGE: <one sentence on what this page is for the author>
+#   FRICTION: <what authors typically struggle with here>
+#   YOUR FOCUS: <which moves above are most useful — validate, surface gap,
+#                work out, clarify, draft fragment>
+#   GROUNDING: <what to read first when the conversation starts>
+#
+# Tool tiers (reads / actions / secondary) are unchanged from the Phase-2
+# sketch. `suffixes` stays as today — they're per-tool behavioural hints,
+# not page focus.
+frames:
+  characters:
+    reads: [get_characters, get_character]
+    actions: [add_character, update_character]
+    secondary: [get_world_entities, get_plot_threads, get_braindumps]
+    quick_actions:
+      - "Who needs fleshing out?"
+      - "Check my cast for contradictions"
+      - "Suggest a new character for this story"
+      - "How does {name} connect to the plot?"
+    prompt: |
+      PAGE: The cast list. Each character has a want, need, misbelief, voice, and ideally a defined arc.
+      FRICTION: Characters arrive half-formed. Wants and needs blur together. Misbeliefs get written generic ("she is smart") because the author doesn't know yet what makes them sharp. Some characters are listed but have no arc.
+      YOUR FOCUS: Validate (does this cast feel internally consistent?), surface gap (who has no misbelief? who has no arc? whose voice isn't defined?), work out (what does this character want that the plot will deny them?). Draft fragments only when explicitly asked.
+      GROUNDING: Start by calling get_characters. If the author mentions a name not in the list, say so before guessing about that character.
+    # Side-rail nudge cards the author can see on this page (demo tips, milestone
+    # nudges, walk-along actions, what-to-do-next). `here` = work that happens on
+    # THIS page; `next` = cards that navigate to the named page.
+    hints:
+      here:
+        - title: "Who is this about?"
+          note: "A roster nudge — shows the current cast, or when empty asks who the story is about."
+      next:
+        - title: "Map out every subplot"
+          to: plot-threads
+          note: "Start creating threads — the tensions and mysteries that run through the story."
+        - title: "Watch an arc bend"
+          to: lenses
+          note: "Put a lens on a character to watch their arc bend scene by scene."
+        - title: "Start a thread"
+          to: plot-threads
+          note: "No threads to pull yet — what tension runs through the book?"
+        - title: "Build the outline"
+          to: outline
+          note: "No shape yet — lay down the acts and chapters."
+        - title: "Set the premise"
+          to: world
+          note: "The story has no premise yet — a logline, a hunch."
+
+  # The single-character studio (route /project/:id/characters/:characterId).
+  # ONE character in focus + the threads that carry their arc. {character_name}
+  # comes from page context — NightEyes injects {character_id, character_name}
+  # resolved from the characters cache (analogue of `chapters` → {scene_id}).
+  # Note: tools bind globally (graph.py), so reads/actions are documentary; the
+  # frame's job here is to keep Night Eyes ON this character and their threads.
+  character-studio:
+    reads: [get_characters, get_character, get_plot_threads, get_thread]
+    actions: [add_character, update_character, add_plot_thread, insert_thread_beat, update_thread_beat]
+    secondary: [get_world_entities, get_braindumps]
+    context_params: [character_name]
+    quick_actions:
+      - "What's missing from this character?"
+      - "Flesh out this character's arc"
+      - "Add a thread for this character's arc"
+      - "Check this character for contradictions"
+    prompt: |
+      PAGE: One character's studio — the author is working on {character_name} alone: their identity, want / need / misbelief, arc, and voice, plus the plot threads that carry that arc (each thread holds beats).
+      FRICTION: A character arrives half-formed — want and need blur, the misbelief is generic, the voice isn't pinned down. Their arc has no thread carrying it, or a thread has a setup beat and no payoff. The author is deep on this one person and doesn't want to leave the page to fix the threads around them.
+      YOUR FOCUS: Validate (does {character_name}'s want / need / misbelief hang together? does each arc thread have a setup AND a payoff?), surface gap (no misbelief, no arc, no thread carrying the arc, a beat with no consequence), work out (what does {character_name} want that the plot will deny them?). Stay on {character_name} unless the author names someone else. Draft fragments only when asked.
+      GROUNDING: Start by calling get_characters and locating {character_name}; call get_plot_threads to see the threads scoped to them (each with its beat count), then get_thread for one thread's beats. To EDIT {character_name}, call update_character with only the fields you're changing (it proposes them for field-by-field review on the card). To build their arc, call add_plot_thread to start a thread, then insert_thread_beat / update_thread_beat (read get_thread first for its beat ids) to add or fill its beats.
+    suffixes:
+      update_character: "Edits are proposed on the character's card for field-by-field review — pass only the fields you're changing."
+      add_plot_thread: "Scope a new arc thread to this character (scope_type=character, scope_name = the character's name)."
+
+  world:
+    reads: [get_world_entities]
+    actions: [add_world_entity, update_world_entity, update_project_overview]
+    secondary: [get_characters, get_braindumps]
+    quick_actions:
+      - "What rules does my world have?"
+      - "Find contradictions in the world"
+      - "Suggest a new world entry"
+      - "How does the magic system work?"
+    prompt: |
+      PAGE: The world's rules, places, things, and notes. Includes a separate `rules` view extracted from the free-text entries.
+      FRICTION: Rules stay implicit and get violated by accident. Magic systems gain exceptions that aren't written down. Settings have one cool detail and no internal logic. The author can't tell which scenes already lean on which rule.
+      YOUR FOCUS: Validate (do these rules contradict each other, or contradict a scene we've already written?), surface gap (this system has X but no constraint on Y), work out (when does this rule break? what's the cost of using it?).
+      GROUNDING: Start by calling get_world_entities — every entity with its entity_id, entity_type (location, faction, rule, magic…), name, and description. To add an entity use add_world_entity (entity_type + title); to edit one use update_world_entity with its entity_id. If the author asks how a rule reaches the story, also pull get_outline to spot where it's in play.
+    suffixes:
+      add_world_entity: "One entity per call — entity_type is its category (stored as its tag)."
+    hints:
+      here:
+        - title: "Your world"
+          note: "A premise / worldbuilding nudge — e.g. the story has no premise yet, a logline or hunch to set."
+        - title: "Set the premise"
+          note: "The premise nudge lands here (its button is self-targeting) — set a logline or a paragraph."
+      next:
+        - title: "Add a character"
+          to: characters
+          note: "No one's on stage yet — who is this story about?"
+        - title: "Start a thread"
+          to: plot-threads
+          note: "No threads to pull yet — what tension runs through the book?"
+        - title: "Build the outline"
+          to: outline
+          note: "No shape yet — lay down the acts and chapters."
+
+  braindumps:
+    reads: [get_braindumps]
+    actions: [add_braindump]
+    secondary: [get_characters, get_outline]
+    quick_actions:
+      - "What braindumps haven't been used yet?"
+      - "Extract story elements from my braindumps"
+      - "Which braindumps connect to each other?"
+      - "Suggest where to use this braindump"
+    prompt: |
+      PAGE: The author's loose braindump capture — braindumps, half-formed thoughts, lines they liked, what-ifs.
+      FRICTION: Braindumps pile up and stop being readable. The good ones get buried. Two braindumps are secretly the same thing; one braindump is secretly three things. Braindumps never make it into the actual story.
+      YOUR FOCUS: Surface (which braindumps haven't been used? which keep recurring?), work out (is this braindump one thing or three? what would have to be true for it to belong to a character or world rule?), clarify (link two braindumps the author has separately noted).
+      GROUNDING: Start by calling get_braindumps to see the captured ideas and their tags. Use add_braindump (text only) to capture a new one; its annotations are added automatically.
+    suffixes: {}
+    hints:
+      here:
+        - title: "Loose ideas"
+          note: "An idea left half-captured resurfaces — a stray what-if worth picking back up."
+        - title: "Sort your ideas into building blocks"
+          note: "Runs in place — extract the actors, threads, and worldbuilding hiding in the ideas, each as a proposal to accept or skip."
+        - title: "Keep the ideas coming"
+          note: "A few more ideas and the actors, threads, and worldbuilding can be sorted out of them."
+        - title: "Colour-code your ideas"
+          note: "Tag an idea with a colour or a #label, then group the whole pile by theme."
+      next:
+        - title: "Give the story a pulse"
+          to: characters
+          note: "Create the first character — someone who wants, hides, and collides."
+        - title: "Add a character"
+          to: characters
+          note: "No one's on stage yet — who is this story about?"
+        - title: "Start a thread"
+          to: plot-threads
+          note: "No threads to pull yet — what tension runs through the book?"
+        - title: "Set the premise"
+          to: world
+          note: "The story has no premise yet — a logline, a hunch."
+
+  plot-threads:
+    reads: [get_plot_threads, get_thread]
+    actions: [add_plot_thread, update_thread_beat, insert_thread_beat]
+    secondary: [get_outline, get_characters, get_world_entities, get_braindumps]
+    quick_actions:
+      - "What threads am I tracking?"
+      - "Generate a new thread for my story"
+      - "Merge threads into the outline"
+      - "Which threads are incomplete?"
+    prompt: |
+      PAGE: Plot threads — separate rough outlines, each one tracking a single arc (a character's misbelief, a mystery, a relationship), eventually woven into the grand outline.
+      FRICTION: Threads get drafted and never resolved. Two threads are secretly the same emotional argument. A thread has a setup but no consequence. Threads don't say what beat resolves them, so the outline has nothing to merge them into.
+      YOUR FOCUS: Validate (does this thread have a setup AND a payoff?), surface gap (no resolution beat, no character bound to it), work out (are these three threads really one argument, or distinct?).
+      GROUNDING: Start by calling get_plot_threads for the list (each thread's title, scope, and beat count); call get_thread for one thread's ordered beats (with their beat_ids) before adding or editing them. Add a beat with insert_thread_beat (text + optional after_beat_id); fill or edit one with update_thread_beat (beat_id + text). If the author talks about how a thread lands in the story, also pull get_outline.
+    suffixes:
+      insert_thread_beat: "Read get_thread first; the beat lands after after_beat_id (or appends)."
+    hints:
+      here:
+        - title: "Threads to pull"
+          note: "A tension nudge — what tension runs through the book; shows when there are no threads yet."
+        - title: "Merge beats into the outline"
+          note: "Informational — drag beats from a thread into the outline, or let Night Eyes merge them."
+      next:
+        - title: "Time to plan the chapters"
+          to: outline
+          note: "Start an outline and plan the chapters — give the thread a shape to live in."
+        - title: "Your threads are ready to weave"
+          to: outline
+          note: "Initialize an outline to start merging the threads into a single story."
+        - title: "Watch a thread hold"
+          to: lenses
+          note: "Put a lens on a thread — it follows the tension scene by scene and flags where it goes slack."
+        - title: "Add a character"
+          to: characters
+          note: "No one's on stage yet — who is this story about?"
+        - title: "Build the outline"
+          to: outline
+          note: "No shape yet — lay down the acts and chapters."
+        - title: "Set the premise"
+          to: world
+          note: "The story has no premise yet — a logline, a hunch."
+
+  # NOTE: key is `outline` (was `grand-outline`) — the v2 outline page sends
+  # page='outline', so the old key never matched and fell back to `default`.
+  outline:
+    reads: [get_outline, get_chapter]
+    actions: [add_scene]
+    secondary: [get_plot_threads, get_characters, get_world_entities]
+    quick_actions:
+      - "Summarise my outline"
+      - "What's missing from act 2?"
+      - "Check pacing across chapters"
+      - "Where should I add a new scene?"
+    prompt: |
+      PAGE: The act → chapter → scene tree. The story's spine. Beats live under scenes; scene prose lives here too.
+      FRICTION: Acts come out unbalanced. Act 2 has no midpoint. A character's arc has a setup beat but no payoff scene. Pacing sags because three reflective scenes sit back-to-back. The author can't see the whole shape at once.
+      YOUR FOCUS: Validate (are the act lengths sensible? are arcs paid off?), surface gap (act 2 has no midpoint, this character has no resolution beat), work out (what's at stake in chapter 5 that isn't in chapter 4?). Draft fragments (a beat one-liner, a scene title) only when asked.
+      GROUNDING: Start by calling get_outline — the acts → chapters → scenes skeleton (ids + titles); call get_chapter for one chapter's scenes and their beats. To add a scene, call add_scene with the target chapter_id (acts and chapters are author-owned; you only add scenes inside an existing chapter). Pull get_characters to check whose arcs intersect this part of the outline.
+    suffixes:
+      add_scene: "Confirm the chapter (chapter_id from get_outline) before adding."
+    hints:
+      here:
+        - title: "The shape"
+          note: "Shows the story's shape — acts and chapters; when empty, prompts to lay down the acts."
+        - title: "Your threads are ready to weave"
+          note: "Inert here — points down to the scaffold picker to merge the threads into one story."
+      next:
+        - title: "Weave in your threads"
+          to: plot-threads
+          note: "The outline is thin — pull a thread through it to turn mapped tensions into the beats each scene needs."
+        - title: "Put a lens on your story"
+          to: lenses
+          note: "The manuscript's taking shape — start watching it; a lens reads every scene for one thing."
+
+  lenses:
+    reads: [get_outline]
+    actions: []
+    secondary: [get_characters, get_world_entities]
+    quick_actions:
+      - "What lenses should I add?"
+      - "Which lenses need re-scanning?"
+      - "Extract tracked items from my outline"
+      - "What's the overall consistency status?"
+    prompt: |
+      PAGE: Lenses — the lab's tracked dimensions of the story (a character arc's emotional curve, a relationship's tension graph, a world rule's frequency-of-use). Each lens runs analyses over the outline and surfaces inconsistencies.
+      FRICTION: The author can't tell which lens is worth watching. Lenses get added and never re-scanned. Some lenses fire constantly because their pattern is too loose; others never fire because nothing in the story matches.
+      YOUR FOCUS: Surface (which lenses are stale? which have no items extracted yet?), validate (does this lens actually help the story, or is it noise?), work out (what would you expect to see in this lens if the story is working?).
+      GROUNDING: You cannot read which lenses are bound or what they found from chat — the author sees that on this page, so work from what they tell you or share. To say which lenses they COULD add, load get_lens_templates via find_tools: it lists the same lens library the Lenses page shows. Pull get_outline when a question needs the story's shape. Binding a lens and running a scan happen through the page buttons, not chat.
+    suffixes: {}
+    hints:
+      # The lens shelf itself (the "Suggest lenses" walk-along) lives on the
+      # `lenses-bank` route, which has no frame yet and falls back to `default` —
+      # so it's listed here under the lens area until a lenses-bank frame exists.
+      here:
+        - title: "A lens to try"
+          note: "Lens tips Night Eyes can surface — a chapter reading lighter than its neighbours, a trust line dipping in Act II, an under-served subplot."
+        - title: "Nothing's watching your story yet"
+          note: "Start-state nudge — pick a lens and it watches as you write."
+        - title: "Let your reader pick a few lenses"
+          note: "On the lens shelf — runs in place, proposing a few ready-made lenses that fit the story (each you add or skip)."
+      next:
+        - title: "Start a thread"
+          to: plot-threads
+          note: "No threads to pull yet — what tension runs through the book?"
+        - title: "Build the outline"
+          to: outline
+          note: "No shape yet — lay down the acts and chapters."
+        - title: "Set the premise"
+          to: world
+          note: "The story has no premise yet — a logline, a hunch."
+
+  chapters:
+    reads: [get_chapter_prose, search_prose, get_outline, get_chapter]
+    actions: [insert_scene_paragraphs, add_scene]
+    secondary: [get_characters, get_world_entities, get_plot_threads, get_braindumps]
+    context_params: [chapter_id, scene_id]
+    quick_actions:
+      - "What should happen in this scene?"
+      - "Check this scene for consistency"
+      - "Who appears in this scene?"
+      - "What rules apply here?"
+    prompt: |
+      PAGE: The author is writing prose. Open chapter id: {chapter_id}. Open scene id: {scene_id}.
+      FRICTION: Writing requires holding the whole story in your head at once — what's been established, what each character knows here, which world rules are in play. The cost of breaking flow to check is high, so authors don't, and inconsistencies land in the prose.
+      YOUR FOCUS: Clarify (what's true here? who knows what? which rules apply?), validate (does this paragraph contradict an established beat / rule / character voice?), draft fragment (a single line, a transition, a one-word fix) when asked. Be especially short on this page — the author is mid-flow, not mid-conversation.
+      GROUNDING: When the open scene has saved prose, it is given to you inline below (the "SCENE THE AUTHOR IS EDITING RIGHT NOW" block) — when they say "this scene" / "here", answer from THAT text directly; never answer hypothetically about what the scene might contain. If that block is missing or cut short, call get_chapter_prose with the open chapter id above before answering; never tell the author you cannot see the scene without reading it first. For a consistency check that reaches beyond this scene ("does this contradict what's established about X?"), call search_prose with the entity + trait (e.g. "Mira deep water afraid") to recall what EARLIER scenes wrote, then compare — do not ask the author to paste earlier prose. Use get_chapter_prose to see a whole chapter's scenes and get_outline for a scene's place in the book. To ADD new paragraphs call insert_scene_paragraphs with `scene_id` + `paragraphs` (a list of plain-text strings) and an optional `position`; they land in the author's editor as pending green AI blocks they accept in place, and the text is plain prose, never TipTap. Pull get_characters and get_world_entities only when the author's question actually touches them.
+    suffixes: {}
+    hints:
+      here:
+        - title: "On the page"
+          note: "A drafting nudge — the draft is taking shape; can show a running word count."
+      next:
+        - title: "Nothing's too small to keep"
+          to: braindumps
+          note: "Dump every stray idea — a line of dialogue, a what-if; the messy pile is where the story starts."
+        - title: "Put a lens on your story"
+          to: lenses
+          note: "The manuscript's taking shape — start watching it; a lens reads every scene for one thing."
+        - title: "Add a character"
+          to: characters
+          note: "No one's on stage yet — who is this story about?"
+        - title: "Start a thread"
+          to: plot-threads
+          note: "No threads to pull yet — what tension runs through the book?"
+        - title: "Set the premise"
+          to: world
+          note: "The story has no premise yet — a logline, a hunch."
+
+  charts-view:
+    reads: [get_outline, get_chapter, get_characters]
+    actions: []
+    secondary: [get_world_entities, get_plot_threads]
+    quick_actions:
+      - "What changed in this chart?"
+      - "Why is this dip here?"
+      - "Which scene drove this spike?"
+      - "Is this pattern healthy?"
+    prompt: |
+      PAGE: A specific chart for one lens. The author is staring at a curve and trying to figure out what it means.
+      FRICTION: Charts show shape but not cause. "Why is the antagonist's tension flat in chapter 4?" doesn't have an obvious answer without scanning the scenes underneath. Re-scans run on stale data and produce shapes the author has to interpret cold.
+      YOUR FOCUS: Clarify (what does this curve actually say?), work out (does the author expect a peak here? a dip?), surface (this chart hasn't been re-analysed since the last outline change).
+      GROUNDING: You cannot read the chart's data from chat — the author is looking at it, so work from what they tell you about it. Pull get_outline (and get_chapter for detail) when the author asks "why" — the answer lives in the scenes the chart was scored against.
+    suffixes: {}
+
+  story-so-far:
+    reads: [get_outline, get_characters, get_plot_threads, get_braindumps]
+    actions: []
+    secondary: [get_world_entities]
+    quick_actions:
+      - "Where did I leave off?"
+      - "What's still unresolved?"
+      - "Which thread is most ready to weave?"
+      - "What should I work on next?"
+    prompt: |
+      PAGE: The state-of-the-story page. The author is returning to a project and trying to remember where they were.
+      FRICTION: After a break, the author has no braindump what's in flight. Threads sit half-drafted. Characters have arcs that were "next" two weeks ago. The outline has a hole the author meant to fix.
+      YOUR FOCUS: Clarify (what's the current shape — acts, cast, threads?), surface (which threads are unresolved? which arcs lack payoff? which scenes are empty?), draft fragment ("here's where I'd start" — one short suggestion, not a plan).
+      GROUNDING: Always start by calling get_project_overview (once per fresh thread anyway, per the global rule) and get_outline. Pull get_plot_threads and get_characters to surface what's incomplete.
+    suffixes: {}
+
+  default:
+    reads: [get_outline, get_characters, get_world_entities, get_braindumps]
+    actions: []
+    secondary: [get_plot_threads]
+    quick_actions:
+      - "Give me an overview of my story"
+      - "What needs work?"
+      - "Find contradictions"
+      - "What should I write next?"
+    prompt: |
+      PAGE: No specific section context — the author opened chat from a generic surface.
+      FRICTION: The author may not know what they want yet. They might be exploring or stalling.
+      YOUR FOCUS: Clarify what kind of help they're after before doing more reads than necessary. Surface what jumps out (a missing arc, an unresolved thread). If a more specific page would suit, point at it.
+      GROUNDING: Call get_project_overview first if this is the first turn of the thread. Otherwise let the author's question drive what you read.
+    suffixes: {}
