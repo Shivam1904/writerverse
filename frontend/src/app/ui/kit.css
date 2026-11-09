@@ -1,0 +1,1102 @@
+/* ==============================================================
+ * Kit rich-effects layer — the treatments that are awkward in pure
+ * Tailwind utilities (gold sheen, per-instance entity tints via
+ * color-mix, metallic bevels, the exact braindumps idea row).
+ * Scoped to .wv2-root; reads theme tokens + --bevel-*/
+--sh-* / --serif. *==============================================================*/
+
+/* --- sheen: the subtle metallic top-highlight that makes a control read
+   as a raised, tactile button --- */
+.wv2-root .kit-sheen {
+  box-shadow: var(--bevel-up), 0 1px 2px rgba(15, 22, 33, 0.07);
+}
+
+/* --- AI button — polished 3D gold: bright highlight at the top easing into a
+   richer gold at the base (convex), white top-bevel + inner base shade --- */
+.wv2-root .kit-btn-ai {
+  color: color-mix(in srgb, var(--gold) 55%, var(--ink));
+  background: linear-gradient(180deg,
+      color-mix(in srgb, #ebbf45 10%, #fff) 0%,
+      color-mix(in srgb, #f3dc79 28%, #fff) 55%,
+      color-mix(in srgb, #e2d28d 40%, #ffffff) 100%);
+  /* box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1px rgba(231, 160, 20, 0.16),
+    0 1px 2px rgba(213, 157, 34, 0.12); */
+}
+
+.wv2-root .kit-btn-ai:hover:not(:disabled) {
+  background: linear-gradient(180deg,
+      color-mix(in srgb, #c09725 10%, #fff) 0%,
+      color-mix(in srgb, #f3dc79 28%, #fff) 55%,
+      color-mix(in srgb, #dfb449 40%, #ffffff) 100%);
+}
+
+.wv2-root .kit-btn-ai:active:not(:disabled) {
+  box-shadow: inset 0 1px 3px rgba(199, 138, 17, 0.22);
+}
+
+/* --- primary — soft terra with a gentle hover gradient, no border --- */
+.wv2-root .kit-btn-primary {
+  background: var(--terra);
+  color: #fff;
+  box-shadow: var(--bevel-up);
+  transition: background .14s, box-shadow .14s;
+}
+
+.wv2-root .kit-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--terra) 82%, #fff) 0%, var(--terra) 100%);
+}
+
+.wv2-root .kit-btn-primary:active:not(:disabled) {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+/* --- secondary — a gentle convex surface→surface-2 gradient (matches the boxed
+   head tile + the ai diamond's convex fill) + LIGHT border, lifts on hover --- */
+.wv2-root .kit-btn-secondary {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  box-shadow: var(--bevel-up);
+  transition: background .14s, border-color .14s;
+}
+
+.wv2-root .kit-btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface) 100%);
+  border-color: color-mix(in srgb, var(--line) 80%, transparent);
+}
+
+/* --- AI diamond icon button — the kit-btn-ai colour on a 45°-rotated tile;
+   the ✦ inside counter-rotates so it stays upright --- */
+.wv2-root .kit-ai-diamond {
+  display: grid;
+  place-items: center;
+  border-radius: 26%;
+  transform: rotate(45deg);
+  /* secondary button look & feel — soft border + bevel-up, gold fill kept.
+     135deg here renders as a vertical (top→base) gradient AFTER the 45° rotation,
+     so the convex highlight matches secondary / boxed instead of running diagonally. */
+  background: linear-gradient(135deg,
+      color-mix(in srgb, #ebbf45 10%, #fff) 0%,
+      color-mix(in srgb, #f3dc79 28%, #fff) 55%,
+      color-mix(in srgb, #e2d28d 40%, #fff) 100%);
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  box-shadow: var(--bevel-up);
+  cursor: pointer;
+  transition: filter .12s, box-shadow .12s, border-color .14s;
+}
+
+.wv2-root .kit-ai-diamond:hover:not(:disabled) {
+  filter: brightness(1.04);
+  border-color: color-mix(in srgb, var(--line) 80%, transparent);
+  background: linear-gradient(135deg,
+      color-mix(in srgb, #c09725 10%, #fff) 0%,
+      color-mix(in srgb, #f3dc79 28%, #fff) 55%,
+      color-mix(in srgb, #dfb449 40%, #fff) 100%);
+}
+
+.wv2-root .kit-ai-diamond:active:not(:disabled) {
+  box-shadow: inset 0 1px 3px rgba(199, 138, 17, 0.22);
+}
+
+.wv2-root .kit-ai-diamond>* {
+  transform: rotate(-45deg);
+}
+
+/* ── nav button — a SELECTABLE rail item (mirrors the app sidebar row).
+ * Inactive = ghost (transparent, no button chrome). Hover = a light metallic
+ * surface→surface-2 gradient + line border + 1px top sheen. Active = the rail
+ * pill: ai-bg→terra-soft gradient, terra-tinted border, soft lift + sheen, and a
+ * terra-deep glyph. Two layouts: inline icon+label (default) and an icon tile. */
+.wv2-root .kit-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.wv2-root .kit-nav:hover {
+  color: var(--ink);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+.wv2-root .kit-nav.is-active,
+.wv2-root .kit-nav.is-active:hover {
+  color: var(--ink);
+  font-weight: 600;
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border-color: color-mix(in srgb, var(--terra) 20%, var(--line-2));
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+/* glyph: fainter than the label; only the active glyph takes the accent */
+.wv2-root .kit-nav-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+  transition: color .12s ease;
+}
+
+.wv2-root .kit-nav:hover .kit-nav-icon {
+  color: var(--ink-2);
+}
+
+.wv2-root .kit-nav.is-active .kit-nav-icon {
+  color: var(--terra-deep);
+}
+
+.wv2-root .kit-nav-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* icon layout — a large stacked tile: glyph above a small caption, centred
+ * (the collapsed-rail item). The whole control IS the tile. */
+.wv2-root .kit-nav--icon {
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 64px;
+  height: 56px;
+  padding: 0;
+  border-radius: var(--r-md);
+}
+
+.wv2-root .kit-nav--icon .kit-nav-label {
+  flex: 0 0 auto;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1;
+  color: var(--ink-4);
+}
+
+.wv2-root .kit-nav--icon:hover .kit-nav-label {
+  color: var(--ink-2);
+}
+
+.wv2-root .kit-nav--icon.is-active .kit-nav-label {
+  color: var(--terra-deep);
+}
+
+/* --- ✦ spark — 3D metallic gold (gradient fill + highlight + glow) --- */
+.wv2-root .kit-spark {
+  display: inline-block;
+  background: linear-gradient(160deg, #fdebab 0%, #e7c25f 40%, #b6862b 72%, #e0a631 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.45)) drop-shadow(0 0 2px rgba(180, 140, 20, 0.4));
+}
+
+/* --- raised active chip (segmented / toggle on) — button-like shine --- */
+.wv2-root .kit-raised {
+  background: linear-gradient(180deg, var(--surface) 0%,
+      color-mix(in srgb, var(--surface) 86%, var(--canvas)) 100%);
+  box-shadow: var(--bevel-up), var(--sh-1);
+}
+
+/* ============================================================
+ * CHIPS — three distinct kinds (shape + treatment carry meaning):
+ *   entity  → tinted pill by --chip-c (a story entity, dot = identity)
+ *   tag     → faint outlined pill (a passive label)
+ *   button  → raised, squarer, bevelled (an interactive facet)
+ * ============================================================ */
+
+/* entity — tinted by its colour (set inline as --chip-c) */
+.wv2-root .kit-chip-entity {
+  border: 1px solid color-mix(in srgb, var(--chip-c, var(--terra)) 10%, transparent);
+  background: color-mix(in srgb, var(--chip-c, var(--terra)) 9%, transparent);
+  color: color-mix(in srgb, var(--chip-c, var(--terra)) 72%, var(--ink));
+  border-radius: 99px;
+  font-weight: 600;
+  transition: background .14s, border-color .14s;
+}
+
+.wv2-root .kit-chip-entity:hover {
+  background: color-mix(in srgb, var(--chip-c, var(--terra)) 16%, transparent);
+}
+
+.wv2-root .kit-chip-entity.is-on {
+  background: color-mix(in srgb, var(--chip-c, var(--terra)) 18%, transparent);
+  border-color: color-mix(in srgb, var(--chip-c, var(--terra)) 40%, transparent);
+}
+
+/* author-placed entity → dashed gold */
+.wv2-root .kit-chip-entity.is-author {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--gold) 45%, var(--line));
+  background: color-mix(in srgb, var(--gold) 7%, transparent);
+  color: color-mix(in srgb, var(--gold) 75%, var(--ink));
+}
+
+/* the glossy identity dot */
+.wv2-root .kit-chip-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 7px;
+  background: var(--chip-c, var(--terra));
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .5), inset 0 -1px 1px rgba(0, 0, 0, .18);
+}
+
+/* tag — a faint placed container (passive label) */
+.wv2-root .kit-chip-tag {
+  border: 1px solid var(--line-2, var(--line));
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+  color: var(--ink-2);
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* button — interactive facet; reads as a small button */
+.wv2-root .kit-chip-button {
+  border: 1px solid color-mix(in srgb, var(--paper) 55%, transparent);
+  background: var(--surface);
+  color: var(--ink-2);
+  border-radius: var(--r-sm);
+  box-shadow: var(--bevel-up);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+}
+
+.wv2-root .kit-chip-button:hover {
+  border-color: var(--paper);
+  color: var(--ink);
+}
+
+.wv2-root .kit-chip-button:active {
+  transform: translateY(.5px);
+}
+
+/* active → soft terra fill, no border, gentle hover */
+.wv2-root .kit-chip-button.is-on {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--terra) 13%, var(--surface));
+  color: var(--terra-deep);
+  box-shadow: var(--bevel-up);
+}
+
+.wv2-root .kit-chip-button.is-on:hover {
+  background: color-mix(in srgb, var(--terra) 19%, var(--surface));
+  border-color: transparent;
+}
+
+/* ---- focus box: a container that takes a border ONLY on its box when the
+   transparent field inside is focused (no background, no field border).
+   This is the braindump input box — custom content lives inside it. ---- */
+.wv2-root .kit-focus-box {
+  border: 1px solid transparent;
+  transition: border-color .14s, box-shadow .14s;
+}
+
+.wv2-root .kit-focus-box:focus-within {
+  border-color: color-mix(in srgb, var(--terra) 55%, transparent);
+}
+
+/* ---- badge (status) — light border, low roundness ---- */
+.wv2-root .kit-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border-radius: var(--r-xs);
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  color: var(--ink-3);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.wv2-root .kit-badge-terra {
+  color: var(--terra-deep);
+  border-color: color-mix(in srgb, var(--terra) 22%, transparent);
+}
+
+.wv2-root .kit-badge-clay {
+  color: var(--clay);
+  border-color: color-mix(in srgb, var(--clay) 24%, transparent);
+}
+
+.wv2-root .kit-badge-teal {
+  color: var(--teal);
+  border-color: color-mix(in srgb, var(--teal) 24%, transparent);
+}
+
+.wv2-root .kit-badge-gold {
+  color: var(--gold);
+  border-color: color-mix(in srgb, var(--gold) 30%, transparent);
+}
+
+.wv2-root .kit-badge-sage {
+  color: var(--sage);
+  border-color: color-mix(in srgb, var(--sage) 26%, transparent);
+}
+
+/* filter — the braindumps filter-strip chip: NO idle border/background;
+   hover is a faint wash, active gets a surface fill + hairline ring */
+.wv2-root .kit-chip-filter {
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  border-radius: var(--r-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, color .12s, box-shadow .12s;
+}
+
+.wv2-root .kit-chip-filter:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+  color: var(--ink-2);
+}
+
+.wv2-root .kit-chip-filter.is-on {
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--paper) 55%, var(--line));
+}
+
+/* ============================================================
+ * IDEA ROW — the exact braindumps .sg-item (serif body, paper-tint
+ * hover, inset left colour-bar via --idea-c, gold pinned wash).
+ * ============================================================ */
+.wv2-root .kit-idea-row {
+  border-radius: var(--r-lg);
+  border: 1px solid transparent;
+  transition: background .14s, border-color .14s;
+}
+
+.wv2-root .kit-idea-row:hover {
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+
+.wv2-root .kit-idea-row.pinned {
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--gold-soft) 50%, transparent) 0%,
+      color-mix(in srgb, var(--gold-soft) 30%, transparent) 100%);
+}
+
+.wv2-root .kit-idea-row.has-color {
+  background: color-mix(in srgb, var(--idea-c) 7%, transparent);
+  box-shadow: inset 3px 0 0 var(--idea-c);
+}
+
+.wv2-root .kit-idea-row.has-color:hover {
+  background: color-mix(in srgb, var(--idea-c) 12%, transparent);
+}
+
+.wv2-root .kit-idea-body {
+  font-family: var(--serif);
+  font-size: 16.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: -.003em;
+}
+
+.wv2-root .kit-idea-body em {
+  font-style: italic;
+  color: var(--ink-2);
+}
+
+/* inside tag chip — lives in a list/phrase: no border, no background, just text
+   + a delete (and an optional tiny dot). Sizes to content. */
+.wv2-root .kit-chip-inside {
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-weight: 500;
+  height: auto;
+  padding: 1px 2px;
+  border-radius: var(--r-xs);
+}
+
+.wv2-root .kit-chip-inside:hover {
+  color: var(--ink-2);
+}
+
+/* ============================================================
+ * PHRASE — a little half-sentence (serif). Lists: grid / clamped / paragraph.
+ * Each may carry an expandable inside-tag chip list (collapsed by default).
+ * ============================================================ */
+.wv2-root .kit-phrase-tx {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+/* first two words — a scannable lede so the list reads as ideas */
+.wv2-root .kit-phrase-lead {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.wv2-root .kit-phrase.is-clamp .kit-phrase-tx {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* muted, tight chevron — does not draw attention, no count */
+.wv2-root .kit-phrase-toggle {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 3px;
+  vertical-align: baseline;
+}
+
+.wv2-root .kit-phrase-toggle:hover {
+  color: var(--ink-3);
+}
+
+.wv2-root .kit-phrase-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px 8px;
+  margin-top: 4px;
+}
+
+/* paragraph mode — the whole list forms ONE paragraph, phrases joined by … */
+.wv2-root .kit-phrase-para {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+
+.wv2-root .kit-phrase-sep {
+  color: var(--ink-4);
+}
+
+.wv2-root .kit-phrase-tags-inline {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  margin: 0 4px;
+  vertical-align: baseline;
+}
+
+/* ============================================================
+ * CARD HEAD — the gradient header (Night Eyes chat header): a soft
+ * surface→surface-2 gradient with a bottom rule, an avatar plinth (✦),
+ * title + subtitle + actions.
+ * ============================================================ */
+.wv2-root .kit-cardhead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-bottom: 1px solid var(--line-2);
+}
+
+.wv2-root .kit-cardhead-avatar {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border: 1px solid var(--line-2);
+  box-shadow: var(--sh-1);
+}
+
+.wv2-root .kit-cardhead-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -.01em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.wv2-root .kit-cardhead-sub {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+
+/* ============================================================
+ * HEADS — three more header types (besides the gradient CardHead):
+ *   ContainerHead — icon-in-a-box + heading + subheading (nested containers)
+ *   RailHead      — glyph-in-a-box + title + subtitle/list + optional action
+ *   PageHead      — eyebrow + glyph + title + muted suffix + actions
+ * ============================================================ */
+
+/* the lit icon tile shared by container/rail heads */
+.wv2-root .kit-head-box {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  /* secondary button look & feel — soft border + bevel-up, lit fill kept */
+  border: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  border-radius: var(--r-md);
+  color: var(--terra-deep);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  box-shadow: var(--bevel-up);
+  transition: border-color .14s;
+}
+
+.wv2-root .kit-head-box:hover {
+  border-color: color-mix(in srgb, var(--line) 80%, transparent);
+}
+
+/* shared by container + rail heads. Base = STORY (serif) → rail head keeps it.
+   Container head overrides to SYSTEM below. */
+.wv2-root .kit-head-title {
+  font-family: var(--serif);
+  font-size: 15.5px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+/* container head title = SYSTEM family (rail head title stays story/serif) */
+.wv2-root .kit-containerhead .kit-head-title {
+  font-family: var(--ui-tight);
+  letter-spacing: -.01em;
+}
+
+/* container head — a (lighter) gradient head, same family as CardHead:
+   icon-in-a-box + heading + subheading. Meant to sit at the TOP of a container
+   that rounds + borders it (overflow-hidden), not the head itself. */
+.wv2-root .kit-containerhead {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-bottom: 1px solid var(--line-2);
+}
+
+.wv2-root .kit-head-mark {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.wv2-root .kit-head-sub {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 3px;
+}
+
+/* #2 rail head */
+.wv2-root .kit-railhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.wv2-root .kit-railhead-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.wv2-root .kit-railhead-sub {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+/* #3 page head */
+.wv2-root .kit-pagehead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .kit-pagehead-eyebrow {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1;
+  margin-bottom: 7px;
+}
+
+/* page head = SYSTEM family (was serif). Inter Tight, tighter tracking. */
+.wv2-root .kit-pagehead-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--ui-tight);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.02em;
+}
+
+.wv2-root .kit-pagehead-glyph {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--terra-deep);
+}
+
+.wv2-root .kit-pagehead-glyph svg {
+  filter: drop-shadow(0 1px 1px rgba(20, 25, 35, .16));
+}
+
+.wv2-root .kit-pagehead-suffix {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+.wv2-root .kit-pagehead-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
+ * BEAT LIST — thread-block beat editor: marker + transparent field per row.
+ * No field border; focus borders the whole ROW. ⠿ reorders; Tab cycles kind.
+ * ============================================================ */
+.wv2-root .kit-beat-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-root .kit-beat-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 16px 12px 1fr auto;
+  align-items: start;
+  gap: 4px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  transition: border-color .14s, background .14s;
+}
+
+.wv2-root .kit-beat-row:focus-within {
+  border-color: color-mix(in srgb, var(--terra) 45%, transparent);
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+}
+
+
+.wv2-root .kit-beat-handle {
+  grid-column: 1;
+  justify-self: center;
+  padding-top: 6px;
+  color: var(--ink-4);
+  font-size: 11px;
+  line-height: 1;
+  cursor: grab;
+  user-select: none;
+  opacity: 0;
+  transition: opacity .12s;
+}
+
+.wv2-root .kit-beat-row:hover .kit-beat-handle,
+.wv2-root .kit-beat-row:focus-within .kit-beat-handle {
+  opacity: .55;
+}
+
+.wv2-root .kit-beat-handle:active {
+  cursor: grabbing;
+}
+
+.wv2-root .kit-beat-dot {
+  grid-column: 2;
+  margin-top: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.wv2-root .kit-beat-dot.is-text {
+  background: var(--beat-c, var(--terra));
+}
+
+.wv2-root .kit-beat-dot.is-ph {
+  background: transparent;
+  border: 1.5px dashed var(--beat-c, var(--terra));
+}
+
+.wv2-root .kit-beat-spacer {
+  grid-column: 2;
+  width: 7px;
+}
+
+.wv2-root .tl-spacer {
+  flex: 1 1 auto;
+}
+
+.wv2-root .kit-beat-input {
+  grid-column: 3;
+  border: 0;
+  background: transparent;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  width: 100%;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  padding: 3px 0;
+  margin-left: 10px;
+}
+
+.wv2-root .kit-beat-input::placeholder {
+  color: var(--ink-4);
+}
+
+.wv2-root .kit-beat-input--heading {
+  font-weight: 700;
+  margin-left: 0px;
+}
+
+.wv2-root .kit-beat-input--placeholder {
+  font-style: italic;
+  color: var(--ink-3);
+}
+
+.wv2-root .kit-beat-kindtag {
+  grid-column: 4;
+  align-self: center;
+  font-family: var(--ui);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--ink-4);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .12s;
+}
+
+.wv2-root .kit-beat-row:focus-within .kit-beat-kindtag {
+  opacity: 1;
+}
+
+.wv2-root .kit-beat-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+}
+
+.wv2-root .kit-beat-add:hover {
+  color: var(--terra);
+}
+
+.wv2-root .kit-beat-add-plus {
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ---- analysis view — a flagged beat keeps its dot SHAPE but turns red + blinks
+   (headings, normally markerless, get a red dot here too) ---- */
+.wv2-root .kit-beat-dot.is-contra {
+  background: var(--clay) !important;
+  border: none !important;
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px color-mix(in srgb, var(--clay) 28%, transparent);
+  animation: kit-contra-blink 1.1s ease-in-out infinite;
+}
+
+@keyframes kit-contra-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px color-mix(in srgb, var(--clay) 30%, transparent);
+  }
+
+  50% {
+    opacity: .5;
+    box-shadow: 0 0 0 3px var(--surface), 0 0 0 7px color-mix(in srgb, var(--clay) 8%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wv2-root .kit-beat-dot.is-contra {
+    animation: none;
+  }
+}
+
+/* analysis — the contradiction reasonings under a flagged beat (one per gauge);
+   spans the text column so it sits under the beat, not under the marker. */
+.wv2-root .kit-contra-list {
+  grid-column: 3 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 5px 0 6px;
+}
+
+.wv2-root .kit-contra-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 10px;
+  border-left: 2px solid var(--clay);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: color-mix(in srgb, var(--clay) 6%, transparent);
+}
+
+.wv2-root .kit-contra-mk {
+  flex: 0 0 auto;
+  color: var(--clay);
+  font-size: 11px;
+}
+
+.wv2-root .kit-contra-text {
+  flex: 1;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.wv2-root .kit-contra-gauge {
+  flex: 0 0 auto;
+  align-self: center;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+/* ============================================================
+ * FORM FIELD — inline-edit field (studio FieldEdit). normal · placeholder ·
+ * suggest (green). Simple form = labeled rows; madlibs = inline blanks.
+ * ============================================================ */
+.wv2-root .kit-field {
+  margin-bottom: 13px;
+}
+
+.wv2-root .kit-field-lbl {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+
+.wv2-root .kit-field-val {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink);
+  cursor: text;
+}
+
+.wv2-root .kit-field-gap {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink-3);
+  cursor: text;
+}
+
+.wv2-root .kit-field-gap:hover {
+  color: var(--ink-2);
+}
+
+.wv2-root .kit-field-input {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--terra);
+  outline: none;
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  padding: 0 0 2px;
+  field-sizing: content;
+}
+
+.wv2-root .kit-field-input--inline {
+  width: auto;
+  min-width: 90px;
+  display: inline-block;
+  vertical-align: baseline;
+  max-width: 100%;
+}
+
+/* inline madlibs blank */
+.wv2-root .kit-field--inline {
+  display: inline;
+}
+
+.wv2-root .kit-field--inline .kit-field-gap {
+  border-bottom: 1px dashed var(--line-2);
+  padding-bottom: 1px;
+}
+
+.wv2-root .kit-madlib {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--ink);
+}
+
+/* suggest (green) — the field's ONLY change is a soft green tint (no layout
+   change, so accepting never reflows the text). The accept/reject are SEPARATE:
+   absolute in the container's top-right corner. Subtle, not bright. */
+.wv2-root .kit-field {
+  position: relative;
+}
+
+.wv2-root .kit-field-val.is-proposed {
+  background: color-mix(in srgb, var(--asp-proposals) 9%, transparent);
+  color: color-mix(in srgb, var(--asp-proposals) 70%, var(--ink));
+
+}
+
+.wv2-root .kit-field-input.is-proposed {
+  background: color-mix(in srgb, var(--asp-proposals) 8%, transparent);
+  color: color-mix(in srgb, var(--asp-proposals) 70%, var(--ink));
+  border-bottom-color: color-mix(in srgb, var(--asp-proposals) 55%, transparent);
+}
+
+.wv2-root .kit-prop-acts {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  transform: translateX(100%);
+}
+
+/* inline (madlibs) blank → acts float just above-right so the sentence never shifts */
+.wv2-root .kit-field--inline {
+  position: relative;
+  display: inline-block;
+}
+
+.wv2-root .kit-field--inline .kit-prop-acts {
+  top: auto;
+  bottom: calc(100%);
+  gap: 2px;
+
+}
+
+/* subtler accept/reject — tick = soft-green chip (bigger), cross = muted (smaller) */
+.wv2-root .kit-prop-yes {
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--asp-proposals) 35%, transparent);
+  border-radius: 6px;
+  cursor: pointer;
+  line-height: 1;
+  font-size: 12.5px;
+  background: color-mix(in srgb, var(--asp-proposals) 14%, transparent);
+  color: color-mix(in srgb, var(--asp-proposals) 78%, var(--ink));
+}
+
+.wv2-root .kit-prop-yes:hover {
+  background: color-mix(in srgb, var(--asp-proposals) 22%, transparent);
+}
+
+.wv2-root .kit-prop-no {
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-xs);
+  background: transparent;
+  color: var(--ink-4);
+  cursor: pointer;
+  line-height: 1;
+  font-size: 11px;
+}
+
+.wv2-root .kit-prop-no:hover {
+  color: var(--ink-2);
+}
+
+/* accept-all — subtle green pill */
+.wv2-root .kit-acceptall {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 27px;
+  padding: 0 11px;
+  cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--asp-proposals) 35%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--asp-proposals) 14%, transparent);
+  color: color-mix(in srgb, var(--asp-proposals) 78%, var(--ink));
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.wv2-root .kit-acceptall:hover {
+  background: color-mix(in srgb, var(--asp-proposals) 22%, transparent);
+}

@@ -1,0 +1,51 @@
+/* ==============================================================
+ * shadcn token bridge — maps shadcn's semantic tokens onto the
+ * existing WriterVerse theme tokens (set on :root by ThemeProvider)
+ * and radius tokens (--r-*, on .wv2-root). Defining the aliases here
+ * means all 17 themes + the live tweak panel keep working for free:
+ * the kit reads --background etc., which just point at --paper etc.
+ *
+ * Scoped to .wv2-root (where --r-* live). When we add Radix
+ * body-portaled overlays, mirror the needed tokens onto :root too.
+ * ============================================================== */
+
+.wv2-root {
+  --background: var(--paper);
+  --foreground: var(--ink);
+
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+
+  --primary: var(--terra);
+  /* on-primary contrast — the one genuinely new token. First-draft default;
+     refine per-theme later (light-terra themes like forest/material). */
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--ink);
+
+  --muted: var(--surface-2);
+  --muted-foreground: var(--ink-3);
+
+  --accent: var(--terra-soft);
+  --accent-foreground: var(--terra-deep);
+
+  --destructive: var(--clay);
+  --destructive-foreground: #ffffff;
+
+  --ai: var(--gold);
+  --ai-soft: var(--gold-soft);
+  --ai-foreground: var(--terra-deep);
+
+  --border: var(--line);
+  --input: var(--line-2);
+  --ring: var(--terra);
+
+  /* nested-container shade — lighter than --paper */
+  --container: color-mix(in srgb, var(--paper) 42%, var(--surface));
+
+  --radius: var(--r-lg);
+}
