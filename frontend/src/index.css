@@ -1,0 +1,787 @@
+/* Type system — ONE editorial serif (Newsreader) for headings + reading,
+   Inter reserved for dense UI chrome only. Newsreader is screen-optimised
+   with an optical-size axis, so it carries both display and long-form prose. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&display=swap');
+
+/* Import ProseMirror CSS */
+@import 'prosemirror-view/style/prosemirror.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== DESIGN SYSTEM ===== */
+/* Modular, consistent theming following book-like aesthetic */
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply text-gray-800 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50;
+    line-height: 1.7;
+  }
+
+  /* Beautiful typography for headings — single editorial serif */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--wv-font-serif);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* Book-like text styling — same serif, near-black warm ink */
+  .book-text {
+    font-family: var(--wv-font-serif);
+    line-height: 1.8;
+    color: var(--wv-ink);
+  }
+}
+
+@layer components {
+  /* ===== COLOR THEME SYSTEM ===== */
+  /* Primary Theme Colors - Warm Book Palette */
+  :root {
+    /* ===== TYPE SYSTEM ===== */
+    /* One serif for everything a customer reads; Inter only for dense UI chrome. */
+    --wv-font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --wv-font-ui: 'Inter', system-ui, sans-serif;
+    /* Near-black warm ink for prose/headings; soft for secondary text. */
+    --wv-ink: #211a14;
+    --wv-ink-soft: #5b4c40;
+
+    /* wv-pg rust/terracotta — semantic Tailwind primary (replaces orphaned blue) */
+    --wv-primary-50: #fff7f0;
+    --wv-primary-100: #ffe8d4;
+    --wv-primary-200: #fac9a0;
+    --wv-primary-300: #f0a06c;
+    --wv-primary-400: #e07535;
+    --wv-primary-500: #c25615;
+    --wv-primary-600: #9d4300;
+    --wv-primary-700: #793400;
+    --wv-primary-800: #562600;
+    --wv-primary-900: #391900;
+  }
+
+  /* ===== CARD SYSTEM ===== */
+  .book-card {
+    @apply bg-white rounded-2xl shadow-lg border border-stone-200;
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .book-card-hover {
+    @apply book-card hover:shadow-xl transition-all duration-300;
+    transform: translateY(-2px);
+  }
+
+  .book-card-hover:hover {
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04),
+      0 0 0 1px rgba(251, 191, 36, 0.2);
+  }
+
+  /* ===== INPUT SYSTEM ===== */
+  .input-field {
+    @apply w-full px-4 py-3 border border-stone-300 rounded-xl bg-white;
+    @apply focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500;
+    @apply transition-all duration-300;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .input-field.error {
+    @apply border-red-300 focus:ring-red-500;
+  }
+
+  /* ===== NAVIGATION SYSTEM ===== */
+  .nav-primary {
+    @apply bg-white border-b border-stone-200;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+
+  /* ===== TEXT SYSTEM ===== */
+  .text-gradient-warm {
+    @apply bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-cool {
+    @apply bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent;
+  }
+
+  /* ===== PAGE SYSTEM ===== */
+  .page-container {
+    @apply bg-white rounded-2xl shadow-2xl border border-stone-200;
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+
+  /* ===== LOADING SYSTEM ===== */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-amber-200 border-t-amber-600;
+  }
+
+  .spinner-sm {
+    @apply w-4 h-4;
+  }
+
+  .spinner-md {
+    @apply w-6 h-6;
+  }
+
+  .spinner-lg {
+    @apply w-8 h-8;
+  }
+
+  /* ===== AVATAR SYSTEM ===== */
+  .avatar {
+    @apply bg-gradient-to-br from-amber-400 to-orange-500 text-white font-bold;
+    @apply rounded-full flex items-center justify-center shadow-lg;
+  }
+
+  .avatar-sm {
+    @apply w-8 h-8 text-sm;
+  }
+
+  .avatar-md {
+    @apply w-12 h-12 text-lg;
+  }
+
+  .avatar-lg {
+    @apply w-16 h-16 text-xl;
+  }
+
+  .avatar-xl {
+    @apply w-20 h-20 text-2xl;
+  }
+
+  /* ===== BADGE SYSTEM ===== */
+  .badge {
+    @apply px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  /* ===== ALERT SYSTEM ===== */
+  .alert {
+    @apply px-4 py-3 rounded-xl border;
+  }
+
+  .alert-success {
+    @apply bg-green-50 border-green-200 text-green-700;
+  }
+
+  .alert-error {
+    @apply bg-red-50 border-red-200 text-red-700;
+  }
+
+  .alert-warning {
+    @apply bg-yellow-50 border-yellow-200 text-yellow-700;
+  }
+
+  .alert-info {
+    @apply bg-blue-50 border-blue-200 text-blue-700;
+  }
+
+  /* ===== ICON SYSTEM ===== */
+  .icon-container {
+    @apply rounded-2xl flex items-center justify-center;
+  }
+
+  .icon-container-primary {
+    @apply bg-gradient-to-br from-amber-100 to-orange-100;
+  }
+
+  .icon-container-secondary {
+    @apply bg-gradient-to-br from-purple-100 to-indigo-100;
+  }
+
+  .icon-container-success {
+    @apply bg-gradient-to-br from-green-100 to-emerald-100;
+  }
+
+  .icon-primary {
+    @apply text-amber-600;
+  }
+
+  .icon-secondary {
+    @apply text-purple-600;
+  }
+
+  .icon-success {
+    @apply text-green-600;
+  }
+}
+
+/* ===== ANIMATION SYSTEM ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+/* ===== SCROLLBAR SYSTEM ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.5);
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.8);
+}
+
+/* Scrollbar for panels */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
+
+/* ===== FOCUS SYSTEM ===== */
+.focus-visible:focus {
+  @apply outline-none ring-2 ring-amber-500 ring-offset-2;
+}
+
+/* ===== TEXT UTILITIES ===== */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ===== SCROLLBAR UTILITIES ===== */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thumb-amber-300::-webkit-scrollbar-thumb {
+  background-color: #fcd34d;
+  border-radius: 3px;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* ===== RICH TEXT EDITOR STYLES ===== */
+.rich-text-editor {
+  @apply border border-amber-200 rounded-lg bg-white shadow-sm;
+}
+
+.editor-toolbar {
+  @apply flex items-center gap-1 p-3 border-b border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50;
+}
+
+.toolbar-group {
+  @apply flex items-center gap-1;
+}
+
+.toolbar-divider {
+  @apply w-px h-6 bg-amber-300 mx-2;
+}
+
+.toolbar-button {
+  @apply p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-amber-100 transition-all duration-200 flex items-center justify-center;
+}
+
+.toolbar-button.is-active {
+  @apply border;
+  background-color: var(--wv-primary-100);
+  color: var(--wv-primary-700);
+  border-color: var(--wv-primary-200);
+}
+
+.toolbar-button:hover {
+  @apply shadow-sm;
+}
+
+.editor-content {
+  @apply p-4 min-h-32;
+}
+
+/* Tiptap Editor Styles — the manuscript surface: fine paper, not a form field */
+.ProseMirror {
+  @apply outline-none;
+  font-family: var(--wv-font-serif);
+  font-size: 1.125rem;
+  line-height: 1.85;
+  color: var(--wv-ink);
+}
+
+.ProseMirror p {
+  @apply mb-4;
+}
+
+.ProseMirror h1 {
+  @apply text-3xl font-bold mb-6 mt-8;
+  font-family: var(--wv-font-serif);
+  color: var(--wv-ink);
+}
+
+.ProseMirror h2 {
+  @apply text-2xl font-semibold mb-4 mt-6;
+  font-family: var(--wv-font-serif);
+  color: var(--wv-ink);
+}
+
+.ProseMirror h3 {
+  @apply text-xl font-semibold mb-3 mt-4;
+  font-family: var(--wv-font-serif);
+  color: var(--wv-ink);
+}
+
+.ProseMirror ul, .ProseMirror ol {
+  @apply mb-4 pl-6;
+}
+
+.ProseMirror li {
+  @apply mb-2;
+}
+
+.ProseMirror strong {
+  @apply font-semibold text-gray-900;
+}
+
+.ProseMirror em {
+  @apply italic;
+}
+
+.ProseMirror s {
+  @apply line-through text-gray-500;
+}
+
+.ProseMirror img {
+  @apply max-w-full h-auto rounded-lg shadow-sm border border-gray-200;
+  margin: 1rem 0;
+}
+
+/* Image resize functionality */
+.resize-image {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.resize-image:hover {
+  @apply border-primary-300 shadow-md;
+}
+
+.resize-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(-45deg, transparent 30%, var(--wv-primary-500) 30%, var(--wv-primary-500) 40%, transparent 40%, transparent 60%, var(--wv-primary-500) 60%, var(--wv-primary-500) 70%, transparent 70%);
+  cursor: se-resize;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.resize-image:hover::after {
+  opacity: 1;
+}
+
+/* Make images resizable */
+.resize-image {
+  resize: both;
+  overflow: auto;
+  min-width: 100px;
+  min-height: 100px;
+}
+
+.ProseMirror.is-editor-empty::before {
+  content: attr(data-placeholder);
+  @apply text-gray-400 italic;
+  pointer-events: none;
+  height: 0;
+  float: left;
+}
+
+/* Focus styles */
+.rich-text-editor:focus-within {
+  @apply ring-2 ring-primary-200 border-primary-300;
+}
+
+/* Responsive toolbar */
+@media (max-width: 640px) {
+  .editor-toolbar {
+    @apply flex-wrap gap-2;
+  }
+  
+  .toolbar-group {
+    @apply flex-wrap;
+  }
+}
+
+/* Entity Mention Highlighting */
+.entity-mention {
+  @apply cursor-pointer rounded-sm px-1 -mx-1 transition-colors duration-100;
+}
+
+.entity-mention-character {
+  @apply bg-amber-100 text-amber-800 hover:bg-amber-200;
+}
+
+/* Span ref (Braindump / World Building) - badge on hover (REMOVED: replaced by TagActionToolbar) */
+.span-ref {
+  /* Keep base styles if needed, but the tooltip is gone */
+}
+
+/* AI-generated paragraph — pending block until the author accepts or dismisses it.
+   Driven entirely by an `ai-generated` entry in the paragraph's attrs.refs;
+   accepting strips that ref and the box reverts to a normal paragraph. */
+.ai-gen-block {
+  @apply relative rounded-md pl-3 pr-12 pb-1.5 pt-1.5;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  /* same green as proposal boxes (theme/aspects.ts → --asp-proposals), kept faint */
+  background: color-mix(in srgb, var(--asp-proposals) 9%, transparent);
+}
+
+/* Small check button; sits beside Dismiss at the box's top-right corner
+   (AiGeneratedBlock positions both; the right padding above clears them). */
+.ai-gen-accept {
+  @apply flex h-[18px] w-[18px] cursor-pointer items-center justify-center rounded-full text-white transition-colors duration-100;
+  background: color-mix(in srgb, var(--asp-proposals) 70%, transparent);
+  user-select: none;
+  opacity: 0.65;
+}
+.ai-gen-accept:hover {
+  background: var(--asp-proposals);
+  opacity: 1;
+}
+
+/* Paragraph numbers — muted, in the left margin, only on paragraph hover.
+   Driven by the ParagraphNumbers extension (view-only decorations). */
+.pm-para-num-host {
+  position: relative;
+}
+.pm-para-num {
+  position: absolute;
+  right: 100%;
+  top: 0.15em;
+  margin-right: 0.6em;
+  width: 2em;
+  text-align: right;
+  font-family: var(--ui);
+  font-size: 0.7em;
+  line-height: 1;
+  color: var(--ink-3, #9ca3af);
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.12s ease;
+}
+.pm-para-num-host:hover .pm-para-num {
+  opacity: 0.45;
+}
+
+/* ===== SELECTION SYSTEM ===== */
+::selection {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: #92400e;
+}
+
+/* ===== BOOK PREVIEW STYLES ===== */
+
+/* Book page background with realistic paper texture */
+.book-page-container {
+  background: linear-gradient(to right, #F5F0E8 0%, #FDF8F3 3%, #FDF8F3 97%, #F5F0E8 100%);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 4px 8px rgba(0, 0, 0, 0.04),
+    0 16px 48px rgba(0, 0, 0, 0.08),
+    inset 0 0 80px rgba(255, 255, 255, 0.6);
+  border-left: 4px solid #E8DDD3;
+  position: relative;
+}
+
+.book-page-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(0, 0, 0, 0.01) 28px,
+      rgba(0, 0, 0, 0.01) 29px
+    );
+  pointer-events: none;
+}
+
+/* Book content typography */
+.book-content {
+  font-family: var(--wv-font-serif);
+  font-size: 18px;
+  line-height: 1.8;
+  color: #2C2416;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.book-content p {
+  margin-bottom: 0;
+  text-indent: 1.5em;
+  margin-top: 0.5em;
+}
+
+.book-content p:first-of-type,
+.book-content .no-indent {
+  text-indent: 0;
+}
+
+/* Drop cap for first paragraph of chapters */
+.drop-cap::first-letter {
+  float: left;
+  font-family: var(--wv-font-serif);
+  font-size: 4.5em;
+  line-height: 0.8;
+  padding-right: 0.15em;
+  padding-top: 0.1em;
+  color: #8B6914;
+  font-weight: 700;
+}
+
+/* Chapter headings */
+.chapter-title {
+  font-family: var(--wv-font-serif);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.9em;
+  color: #6B5B4F;
+  margin-bottom: 0.5em;
+}
+
+.chapter-name {
+  font-family: var(--wv-font-serif);
+  font-weight: 700;
+  font-size: 2em;
+  color: #2C2416;
+  margin-bottom: 0.3em;
+  letter-spacing: -0.01em;
+}
+
+.chapter-subtitle {
+  font-family: var(--wv-font-serif);
+  font-style: italic;
+  font-size: 1.3em;
+  color: #4A3F35;
+  font-weight: 400;
+}
+
+/* Decorative divider */
+.book-divider {
+  text-align: center;
+  margin: 2.5em 0;
+  color: #B8A896;
+  font-size: 1.2em;
+  letter-spacing: 0.5em;
+}
+
+/* Scene break */
+.scene-break {
+  text-align: center;
+  margin: 2em 0;
+  color: #9B8B7A;
+  font-size: 1.5em;
+  letter-spacing: 0.8em;
+}
+
+/* Title page styling */
+.title-page {
+  font-family: var(--wv-font-serif);
+  text-align: center;
+}
+
+.title-page .book-title {
+  font-size: 3em;
+  font-weight: 700;
+  color: #2C2416;
+  line-height: 1.2;
+  margin-bottom: 0.5em;
+  letter-spacing: -0.02em;
+}
+
+.title-page .book-subtitle {
+  font-size: 1.5em;
+  font-weight: 400;
+  font-style: italic;
+  color: #4A3F35;
+  margin-bottom: 1.5em;
+}
+
+.title-page .book-author {
+  font-size: 1.3em;
+  font-weight: 500;
+  color: #6B5B4F;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Table of contents */
+.toc-entry {
+  display: flex;
+  align-items: baseline;
+  padding: 0.6em 0;
+  border-bottom: 1px solid #E8DDD3;
+}
+
+.toc-entry .toc-title {
+  font-family: var(--wv-font-serif);
+  font-weight: 600;
+  font-size: 1.1em;
+  color: #2C2416;
+  flex-shrink: 0;
+}
+
+.toc-entry .toc-spacer {
+  flex: 1;
+  border-bottom: 1px dotted #B8A896;
+  margin: 0 0.5em;
+  position: relative;
+  top: -0.3em;
+}
+
+.toc-entry .toc-page {
+  font-family: var(--wv-font-serif);
+  font-weight: 600;
+  color: #6B5B4F;
+  flex-shrink: 0;
+}
+
+/* Settings drawer */
+.settings-drawer-overlay {
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.settings-drawer {
+  background: linear-gradient(to bottom, #FFFFFF 0%, #FAFAF8 100%);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.15);
+}
+
+/* Chapter navigation sidebar */
+.chapter-nav {
+  background: linear-gradient(to right, #FFFFFF 0%, #FAFAF8 100%);
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.08);
+}
+
+.chapter-nav-item {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.chapter-nav-item:hover {
+  background-color: #F5F0E8;
+  border-left-color: #D4C4B0;
+}
+
+.chapter-nav-item.active {
+  background-color: #FDF8F3;
+  border-left-color: #8B6914;
+}
+
+/* Reading progress bar */
+.reading-progress-bar {
+  height: 3px;
+  background: linear-gradient(to right, #D4C4B0, #8B6914);
+  transition: width 0.1s ease-out;
+}
+
+/* Print styles */
+@media print {
+  .book-page-container {
+    box-shadow: none;
+    border: none;
+    background: white;
+  }
+  
+  .settings-drawer-overlay,
+  .chapter-nav,
+  .reading-progress-bar {
+    display: none !important;
+  }
+}
