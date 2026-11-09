@@ -1,0 +1,223 @@
+/* ==============================================================
+ * ProfileForm — the "blank profile, by hand" card.
+ * Ported from writerverse/people-init.html (block 3 · .profile),
+ * turned into a real inline form. Scoped under .wv2-root so it
+ * inherits the active theme tokens (--terra, --ink, --surface…).
+ * ============================================================== */
+
+.wv2-root .pf-card {
+  position: relative;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 13px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .55) inset,
+    0 1px 2px rgba(60, 40, 15, .04),
+    0 18px 46px -26px rgba(40, 28, 8, .3);
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 108px 1fr;
+  gap: 20px;
+}
+
+.wv2-root .pf-tab {
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px 4px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-bottom: 0;
+  border-radius: var(--r-xs) var(--r-xs) 0 0;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.wv2-root .pf-badge {
+  position: absolute;
+  top: 15px;
+  right: 17px;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  opacity: .7;
+}
+
+.wv2-root .pf-portrait {
+  align-self: start;
+  width: 108px;
+  height: 128px;
+  border: 1.5px dashed var(--terra);
+  border-radius: 9px;
+  background:
+    radial-gradient(120% 90% at 50% 18%, color-mix(in srgb, var(--terra) 10%, transparent), transparent 60%),
+    var(--paper-2);
+  display: grid;
+  place-items: center;
+}
+
+.wv2-root .pf-portrait svg {
+  width: 62px;
+  height: 62px;
+  fill: none;
+  stroke: var(--terra);
+  stroke-width: 1.5;
+  opacity: .5;
+}
+
+.wv2-root .pf-body { min-width: 0; }
+
+.wv2-root .pf-name {
+  width: 100%;
+  display: block;
+  font-family: var(--serif);
+  font-size: 23px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.01em;
+  line-height: 1.05;
+  margin-bottom: 13px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  outline: none;
+}
+.wv2-root .pf-name::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.wv2-root .pf-fields { display: grid; grid-template-columns: 1fr; gap: 0; }
+
+.wv2-root .pf-field {
+  display: grid;
+  grid-template-columns: 78px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding: 7px 0;
+  border-top: 1px dashed var(--line-2);
+}
+.wv2-root .pf-field:first-child { border-top: 0; }
+
+.wv2-root .pf-k {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.wv2-root .pf-v {
+  width: 100%;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.42;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+}
+.wv2-root textarea.pf-v { min-height: 1.42em; }
+.wv2-root .pf-v::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* Role-style single-select chips (a radio group) */
+.wv2-root .pf-field:has(.pf-chips) { align-items: center; }
+.wv2-root .pf-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wv2-root .pf-chip {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.wv2-root .pf-chip:hover { border-color: var(--terra); color: var(--terra-deep); }
+.wv2-root .pf-chip.is-on {
+  color: var(--terra-deep);
+  background: var(--terra-soft);
+  border-color: color-mix(in srgb, var(--terra) 45%, var(--line-2));
+  font-weight: 700;
+}
+
+.wv2-root .pf-foot {
+  grid-column: 1 / -1;
+  margin-top: 5px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .pf-note {
+  font-family: var(--serif);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-2);
+  font-style: italic;
+  letter-spacing: -.003em;
+  flex: 1;
+  min-width: 180px;
+}
+
+.wv2-root .pf-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--terra-deep);
+  background: var(--terra-soft);
+  border: 1px solid color-mix(in srgb, var(--terra) 35%, var(--line-2));
+  padding: 8px 15px;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter .14s, transform .1s, opacity .14s;
+}
+.wv2-root .pf-submit svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.wv2-root .pf-submit:hover:not(:disabled) { filter: brightness(.99) saturate(1.1); }
+.wv2-root .pf-submit:active:not(:disabled) { transform: translateY(1px); }
+.wv2-root .pf-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+@media (max-width: 560px) {
+  .wv2-root .pf-card { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .wv2-root .pf-field { text-align: left; }
+}

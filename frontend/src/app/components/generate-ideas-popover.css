@@ -1,0 +1,289 @@
+/* ==============================================================
+ * GenerateIdeasPopover — the shared "generate from your ideas" panel.
+ *
+ * Portaled to <body>, so it sits OUTSIDE `.wv2-root`. Color tokens
+ * (--surface, --ink, --terra…) ride on <html> and resolve fine, but the
+ * STATIC tokens (--ui / --serif / shadows) are scoped to .wv2-root and would
+ * NOT — which is why the old popover lost its fonts and looked unstyled. So we
+ * re-declare the font tokens on the root here and write shadows/radii literally.
+ * Selectors are bare (no .wv2-root prefix) for the same reason.
+ * ============================================================== */
+
+.gip-pop {
+  /* fonts the portaled subtree can't inherit from .wv2-root */
+  --ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --serif: 'Lora', 'Source Serif Pro', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+
+  position: fixed;
+  z-index: 1000;
+  width: 440px;
+  max-width: calc(100vw - 24px);
+  max-height: min(620px, calc(100vh - 24px));
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .6) inset,
+    0 18px 50px -22px rgba(35, 24, 6, .42),
+    0 3px 10px rgba(35, 24, 6, .07);
+  padding: 15px 15px 13px;
+  font-family: var(--ui);
+  color: var(--ink);
+  animation: gip-in .14s ease-out;
+}
+@keyframes gip-in {
+  from { opacity: 0; transform: translateY(-4px) scale(.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---- header ---- */
+.gip-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.gip-spark {
+  color: var(--gold);
+  font-size: 14px;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(180, 140, 20, .45));
+}
+.gip-title {
+  flex: 1;
+  font-family: var(--ui);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: var(--ink);
+}
+.gip-x {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.gip-x:hover { background: var(--surface-2); color: var(--ink); }
+.gip-hint {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  margin: 0 0 12px;
+}
+
+/* ---- ideas list ---- */
+.gip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
+  max-height: 340px;
+  margin: 0 -5px;
+  padding: 2px 5px;
+}
+
+.gip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.5;
+  letter-spacing: -.003em;
+  color: var(--ink-3);
+  transition: background .12s, border-color .12s, color .12s;
+}
+.gip-item:hover { background: var(--surface-2); }
+.gip-item.is-on { color: var(--ink); }
+
+/* selection check — a small box that fills terra when on */
+.gip-check {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  width: 17px;
+  height: 17px;
+  border-radius: var(--r-xs);
+  border: 1.5px solid var(--line-3);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  transition: background .12s, border-color .12s;
+}
+.gip-item.is-on .gip-check {
+  background: var(--terra);
+  border-color: var(--terra);
+}
+.gip-check svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transition: opacity .1s;
+}
+.gip-item.is-on .gip-check svg { opacity: 1; }
+
+.gip-item-txt {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* a committed new idea — same row, but with a remove × */
+.gip-item--new { cursor: default; }
+.gip-item-x {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: -1px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: .55;
+  transition: opacity .12s, background .12s, color .12s;
+}
+.gip-item-x:hover { opacity: 1; background: var(--surface-2); color: var(--ink); }
+
+/* the add row — a blank braindump waiting to be written */
+.gip-item--add {
+  cursor: text;
+  align-items: center;
+  border: 1px dashed var(--line-3);
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+.gip-item--add:focus-within {
+  border-color: var(--terra);
+  background: var(--terra-soft);
+}
+.gip-add-plus {
+  flex: 0 0 auto;
+  width: 17px;
+  height: 17px;
+  border-radius: var(--r-xs);
+  border: 1.5px dashed var(--line-3);
+  display: grid;
+  place-items: center;
+  color: var(--terra-deep);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+.gip-item--add:focus-within .gip-add-plus { border-color: var(--terra); }
+.gip-add-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.5;
+  letter-spacing: -.003em;
+  color: var(--ink);
+}
+.gip-add-input::placeholder { color: var(--ink-4); font-style: italic; }
+.gip-add-go {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 9px;
+  background: var(--surface);
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.gip-add-go:hover { border-color: var(--terra); background: var(--terra-soft); }
+
+/* ---- footnote + actions ---- */
+.gip-savenote {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--ink-4);
+  margin: 9px 2px 0;
+}
+.gip-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+/* primary AI button — self-styled (the .wv2-btn classes live under .wv2-root,
+   which this portaled subtree is outside of). */
+.gip-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, var(--terra), color-mix(in srgb, var(--terra) 74%, #2a1206));
+  border: 1px solid color-mix(in srgb, var(--terra) 70%, #2a1206);
+  padding: 8px 15px;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .2) inset, 0 6px 16px -7px color-mix(in srgb, var(--terra) 65%, transparent);
+  transition: transform .1s, filter .14s, opacity .14s;
+}
+.gip-go-spark {
+  font-size: 12px;
+  line-height: 1;
+  filter: drop-shadow(0 0 3px rgba(255, 240, 200, .5));
+}
+.gip-go:hover:not(:disabled) { filter: brightness(1.06); }
+.gip-go:active:not(:disabled) { transform: translateY(1px); }
+.gip-go:disabled { opacity: .45; cursor: not-allowed; }
+
+.gip-cancel {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-3);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 4px 9px;
+  border-radius: 6px;
+  transition: background .12s, color .12s;
+}
+.gip-cancel:hover:not(:disabled) { color: var(--ink-2); background: var(--surface-2); }
+.gip-cancel:disabled { opacity: .5; cursor: not-allowed; }

@@ -1,0 +1,65 @@
+/* Avatar photo variant — a frameless headshot rendered from the AI portrait.
+ * Square, cropped tight to the top-center (the head) of the full-figure PNG,
+ * with a diagonal sheen masked to the figure's silhouette + alpha-following
+ * drop-shadows, so it reads as the same little 3D lit object as the glossy
+ * mark it replaces. No border, no frame. `--port-src` is the image url(). */
+.wv2-root .wv2-av-photo {
+  position: relative;
+  display: inline-block;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  background-image: var(--port-src);
+  background-repeat: no-repeat;
+  background-size: 320% auto;       /* zoom into the head */
+  background-position: center top;   /* top-center */
+  /* 3D lift: deep cast shadow below + bright rim light on top + a metallic punch. */
+  filter:
+    saturate(1.12) contrast(1.05)
+    drop-shadow(0 2.5px 3px rgba(0, 0, 0, .5))
+    drop-shadow(0 1px 1px rgba(0, 0, 0, .3))
+    drop-shadow(0 -1px 0.5px rgba(255, 255, 255, .65));
+}
+/* specular SHINE — bright glossy highlight (hotspot + diagonal streak), clipped
+   to the figure; `screen` makes it pop like polished metal. */
+.wv2-root .wv2-av-photo-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-image: var(--port-src);
+  mask-image: var(--port-src);
+  -webkit-mask-size: 320% auto;
+  mask-size: 320% auto;
+  -webkit-mask-position: center top;
+  mask-position: center top;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  background:
+    radial-gradient(58% 42% at 33% 20%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(125deg,
+      rgba(255, 255, 255, .78) 0%,
+      rgba(255, 255, 255, .12) 26%,
+      transparent 44%,
+      transparent 68%,
+      rgba(255, 255, 255, .2) 100%);
+  mix-blend-mode: screen;
+}
+/* volume SHADING — darken toward the base so the form reads round, not flat. */
+.wv2-root .wv2-av-photo-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: var(--port-src);
+  mask-image: var(--port-src);
+  -webkit-mask-size: 320% auto;
+  mask-size: 320% auto;
+  -webkit-mask-position: center top;
+  mask-position: center top;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  background: linear-gradient(180deg,
+    transparent 36%,
+    rgba(0, 0, 0, .16) 76%,
+    rgba(0, 0, 0, .36) 100%);
+  mix-blend-mode: multiply;
+}

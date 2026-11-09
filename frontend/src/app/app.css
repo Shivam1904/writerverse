@@ -1,0 +1,3283 @@
+/* ==============================================================
+ * app — the BASE shell. Metallic chrome.
+ * Color tokens (--canvas, --ink, --terra, …) are set on <html> by
+ * ThemeProvider from the active theme. Static tokens (radius, shadow,
+ * type) live here. All visual styling is scoped under .wv2-root so it
+ * never bleeds into the v1 project page.
+ * ============================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap');
+
+/* Aspect colours — FIXED category identity, theme-independent. Mirror of
+   theme/aspects.ts (keep in sync). On :root so body-portaled popovers get them
+   too. magic/items/rules share pink; faction/culture/history share brown. */
+:root {
+  --asp-story: #7a5ea3;
+  --asp-story-soft: #e6ddf2;
+  --asp-characters: #4a72b0;
+  --asp-characters-soft: #dbe6f5;
+  --asp-braindumps: #c79a3e;
+  --asp-braindumps-soft: #f1e3b8;
+  --asp-proposals: #4e8a55;
+  --asp-proposals-soft: #d8ecd5;
+  --asp-locations: #3d8c8a;
+  --asp-locations-soft: #d2e8e6;
+  --asp-items: #b05a86;
+  --asp-items-soft: #f1d8e6;
+  --asp-rules: #b05a86;
+  --asp-rules-soft: #f1d8e6;
+  --asp-magic: #b05a86;
+  --asp-magic-soft: #f1d8e6;
+  --asp-factions: #8a6a4a;
+  --asp-factions-soft: #e7d9c8;
+  --asp-culture: #8a6a4a;
+  --asp-culture-soft: #e7d9c8;
+  --asp-history: #8a6a4a;
+  --asp-history-soft: #e7d9c8;
+  --asp-creatures: #b0533f;
+  --asp-creatures-soft: #f0d5cd;
+  --asp-world: #c4742f;
+  --asp-world-soft: #f3ddc4;
+  --asp-threads: #6a6a72;
+  --asp-threads-soft: #e2e2e6;
+}
+
+.wv2-root {
+  /* radius */
+  --r-xs: 4px;
+  --r-sm: 6px;
+  --r-md: 9px;
+  --r-lg: 13px;
+  --r-xl: 18px;
+  /* shadow */
+  --sh-1: 0 1px 2px rgba(15, 22, 33, .08), 0 1px 1px rgba(15, 22, 33, .05);
+  --sh-2: 0 2px 6px rgba(15, 22, 33, .10), 0 1px 2px rgba(15, 22, 33, .06);
+  --sh-3: 0 6px 20px rgba(12, 18, 28, .14), 0 2px 5px rgba(12, 18, 28, .07);
+  --sh-4: 0 16px 44px rgba(8, 13, 22, .22), 0 5px 12px rgba(8, 13, 22, .10);
+  /* metallic bevels */
+  --bevel-up: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -1px 0 rgba(0, 0, 0, .04);
+  --bevel-in: inset 0 1px 3px rgba(0, 0, 0, .14), inset 0 -1px 0 rgba(255, 255, 255, .35);
+  /* type — three families (see ui/typography.css for the named levels):
+     · system = the app chrome — native system sans (-apple-system / SF)
+     · story  = the editorial / story voice — Lora
+     · ai     = the Night Eyes voice — Spectral */
+  --ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --ui-tight: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --serif: 'Lora', 'Source Serif Pro', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  /* NB: `--ai` is already taken (the AI brand COLOUR), so the AI font is `--ai-font`. */
+  --ai-font: 'Spectral', Georgia, serif;
+  /* width of the Night Eyes dock; shared by the panel, the body reserve, and the toast offset */
+  --ne-dock-w: 440px;
+  --wm-gutter: 220px;
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.wv2-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  transition: padding-right .2s cubic-bezier(.2, .7, .2, 1);
+}
+
+/* Night Eyes docked + open → reserve the dock column so it sits beside the
+   content as a right sidebar instead of overlaying it. */
+.wv2-root.wv2-dock-open .wv2-body {
+  padding-right: var(--ne-dock-w);
+  gap: 5px;
+  margin-left: 5px;
+  margin-bottom: 5px;
+}
+
+/* fine cool grain so surfaces read as brushed, not flat digital */
+.wv2-root::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: .35;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5  0 0 0 0 0.5  0 0 0 0 0.55  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+.wv2-root * {
+  box-sizing: border-box;
+}
+
+/* The main app styles bare h1–h6 with its own (serif) heading font, which bleeds
+   into app headings that don't set a family (e.g. the box labels). Reset
+   headings inside the shell to our UI font. :where() keeps specificity low so the
+   serif title classes (--serif) still win. */
+.wv2-root :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--ui);
+}
+
+/* ---- sidebar — collapsible rail that floats open on hover ----
+ * .wv2-sidebar reserves the rail width in the flex flow; the actual
+ * chrome lives in .wv2-sidebar-panel, which is absolutely positioned
+ * so it can widen OVER the main content (overlay) without reflowing it.
+ * Pinned → the rail reserves the full width, so the panel pushes instead. */
+.wv2-sidebar {
+  --rail-collapsed: 78px;
+  --rail-expanded: 276px;
+  --rail-pad: 10px;
+  position: relative;
+  z-index: 30;
+  width: var(--rail-collapsed);
+  flex-shrink: 0;
+  transition: width .2s cubic-bezier(.2, .7, .2, 1);
+}
+
+.wv2-sidebar.is-pinned {
+  width: var(--rail-expanded);
+}
+
+.wv2-sidebar-panel {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 1;
+  width: var(--rail-collapsed);
+  display: flex;
+  flex-direction: column;
+  /* Flat paper, matching the topbar. The chrome (topbar + rails) reads as one
+     continuous frame around the canvas; the paper→surface step at the rail's
+     right edge is the seam — no border, no fade, no brushing. */
+  background: var(--paper);
+  overflow: hidden;
+  /* slower, softer open so the background eases in rather than snapping */
+  transition: width .36s cubic-bezier(.22, .61, .36, 1), box-shadow .36s ease;
+}
+
+/* `is-open` is JS-driven: pinned, or hovered for ~1s (hover-intent delay) */
+.wv2-sidebar.is-open .wv2-sidebar-panel {
+  width: var(--rail-expanded);
+}
+
+/* floating shadow only while overlaying (open, unpinned) */
+.wv2-sidebar.is-open:not(.is-pinned) .wv2-sidebar-panel {
+  box-shadow: var(--sh-3);
+}
+
+/* ---- panel top: gold mark + title + pin toggle ---- */
+.wv2-sidebar-top {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 44px;
+  padding: 0 10px 0 23px;
+}
+
+.wv2-sidebar-mark {
+  flex: 0 0 auto;
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1;
+  color: var(--gold);
+  filter: drop-shadow(0 0 5px rgba(180, 140, 20, .5));
+  animation: wv2-twinkle 3.4s ease-in-out infinite;
+}
+
+.wv2-sidebar-mark-lbl {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: -.005em;
+  color: var(--ink);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .14s ease;
+}
+
+.wv2-pin-btn {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .14s ease, background .12s ease, color .12s ease;
+}
+
+.wv2-pin-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.wv2-pin-btn:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink);
+}
+
+.wv2-pin-btn.is-pinned {
+  color: var(--terra-deep);
+}
+
+.wv2-sidebar.is-open .wv2-sidebar-mark-lbl,
+.wv2-sidebar.is-open .wv2-pin-btn {
+  opacity: 1;
+}
+
+/* ---- topbar (mockup .topbar) ---- */
+.wv2-topbar {
+  position: relative;
+  /* Above the everyday Night Eyes chrome (rail/FAB z90, chat panel z91) so the
+   * avatar dropdown isn't covered by it, but below the Night Eyes full-screen
+   * modal drawer (backdrop z94 / drawer z95) so that modal still covers the bar. */
+  z-index: 92;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  flex-shrink: 0;
+  padding: 0 18px;
+  margin: 5px;
+  gap: 16px;
+  background: var(--paper);
+  /* border-bottom: 1px solid var(--line-2); */
+}
+
+.wv2-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--terra-deep);
+  white-space: nowrap;
+  letter-spacing: -.005em;
+  padding: 0;
+}
+
+.wv2-topbar-mark {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #cf7a30 0%, #b35a1c 50%, #8e3f00 100%);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.wv2-topbar-mark::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .5), transparent 60%);
+}
+
+.wv2-topbar-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--line-2);
+  flex-shrink: 0;
+}
+
+.wv2-topbar-proj {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.wv2-topbar-title {
+  font-weight: 600;
+  font-size: 13.5px;
+  font-family: var(--serif);
+  color: var(--ink);
+  letter-spacing: -.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-topbar-meta {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.wv2-topbar-spacer {
+  flex: 1;
+}
+
+.wv2-topbar-gauge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+.wv2-topbar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.wv2-topbar-pill b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.wv2-topbar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--sage);
+}
+
+.wv2-topbar-dot-pulse {
+  animation: wv2-soft-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes wv2-soft-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(77, 106, 91, .4);
+  }
+
+  60% {
+    box-shadow: 0 0 0 5px rgba(77, 106, 91, 0);
+  }
+}
+
+/* "Auto watch" switch — a borderless pill toggle. ON: sage pulsing dot + a
+   slightly stronger label (the AI is allowed to watch the project). OFF: muted
+   still dot. State reads from shape/weight, not colour decoration. */
+.wv2-topbar-watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: color .15s, background .15s, border-color .15s;
+}
+
+.wv2-topbar-watch:hover {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+.wv2-topbar-watch.is-on {
+  color: var(--ink-2);
+}
+
+/* OFF → muted, non-pulsing dot; ON inherits the sage .wv2-topbar-dot. */
+.wv2-topbar-watch .wv2-topbar-dot {
+  background: var(--ink-3);
+  opacity: .45;
+}
+
+.wv2-topbar-watch.is-on .wv2-topbar-dot {
+  background: var(--sage);
+  opacity: 1;
+}
+
+/* Dev-only section-markers toggle — reuses .wv2-topbar-watch; the § sigil reads
+   muted off, accented on. */
+.wv2-topbar-markers-sigil {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  opacity: .55;
+}
+
+.wv2-topbar-markers.is-on {
+  background: var(--surface-2);
+  border-color: var(--line);
+}
+
+.wv2-topbar-markers.is-on .wv2-topbar-markers-sigil {
+  opacity: 1;
+  color: var(--terra);
+}
+
+.wv2-topbar-budget {
+  color: var(--ink-3);
+}
+
+.wv2-topbar-budget b {
+  color: var(--ink);
+}
+
+.wv2-topbar-save {
+  font-size: 11px;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.wv2-topbar-save-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+}
+
+.wv2-topbar-plan {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  padding: 4px 9px;
+}
+
+.wv2-topbar-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.wv2-topbar-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d9c3a0, #bca680);
+  color: #3a2e1c;
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 11px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .04) inset;
+  border: none;
+  cursor: pointer;
+  transition: box-shadow .12s;
+}
+
+.wv2-topbar-avatar:hover {
+  box-shadow: 0 0 0 2px var(--terra-soft);
+}
+
+/* avatar dropdown menu */
+.wv2-topbar-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-3);
+  z-index: 100;
+  padding: 4px 0;
+  animation: wv2-menu-in .12s ease-out;
+}
+
+@keyframes wv2-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.wv2-topbar-menu-user {
+  padding: 10px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.wv2-topbar-menu-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.wv2-topbar-menu-email {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wv2-topbar-menu-sep {
+  height: 1px;
+  background: var(--line);
+  margin: 4px 10px;
+}
+
+.wv2-topbar-menu-item {
+  display: block;
+  width: 100%;
+  padding: 7px 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: background .1s, color .1s;
+}
+
+.wv2-topbar-menu-item:hover {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  color: var(--ink);
+}
+
+.wv2-topbar-menu-danger {
+  color: var(--clay);
+}
+
+.wv2-topbar-menu-danger:hover {
+  background: color-mix(in srgb, var(--clay) 8%, transparent);
+  color: var(--clay);
+}
+
+@keyframes wv2-twinkle {
+
+  0%,
+  100% {
+    opacity: .7;
+    transform: scale(.92) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08) rotate(8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wv2-topbar-dot-pulse {
+    animation: none !important;
+  }
+
+  .wv2-topbar-menu {
+    animation: none !important;
+  }
+
+  .wv2-sidebar-mark {
+    animation: none !important;
+  }
+
+  .wv2-sidebar,
+  .wv2-sidebar-panel,
+  .wv2-nav-label,
+  .wv2-nav-count,
+  .wv2-nav-sublabel,
+  .wv2-nav-chev,
+  .wv2-nav-group-label,
+  .wv2-sidebar-mark-lbl,
+  .wv2-pin-btn {
+    transition: none !important;
+  }
+
+  .wv2-nav-item {
+    transition: background .12s ease, color .12s ease, border-color .12s ease, box-shadow .12s ease !important;
+  }
+}
+
+.wv2-nav {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 6px;
+}
+
+.wv2-nav-section {
+  padding: 0;
+}
+
+.wv2-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+/* group label — fades in with the panel (hidden in the collapsed rail) */
+.wv2-nav-group-label {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--ink-3);
+  padding: 14px 14px 5px 23px;
+  white-space: nowrap;
+  user-select: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+.wv2-sidebar.is-open .wv2-nav-group-label {
+  opacity: 1;
+}
+
+.wv2-nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* SAME height collapsed and expanded — the collapsed rail keeps this height too
+   * (it only swaps the inline icon+label for a tile-with-caption), so opening the
+   * drawer never resizes a row and the list never reflows / shifts. */
+  height: 44px;
+  margin: 0 6px;
+  padding: 0 10px 0 18px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--ink-2);
+  text-decoration: none;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  transition: background .12s ease, color .12s ease, border-color .12s ease, box-shadow .12s ease, height .3s ease, padding-top .3s ease;
+}
+
+/* hover / active borrow the Night Eyes user-bubble's metallic feel — a vertical
+ * (lit-from-above) gradient between theme elevation tokens, a 1px inset top
+ * highlight for the polished sheen (cf. .ne-orb), and a soft lift when active.
+ * Subtler than the bubble: warmth comes from theme tokens, not saturated hex. */
+.wv2-nav-item:hover {
+  color: var(--ink);
+}
+
+.wv2-nav-item.is-active {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* The full-width row pill is the EXPANDED-rail indicator. In the collapsed
+ * rail the indicator is a square icon tile instead (see .wv2-nav-icon-wrap
+ * below), so the pill is gated to .is-open. */
+.wv2-sidebar.is-open .wv2-nav-item:hover {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+.wv2-sidebar.is-open .wv2-nav-item.is-active {
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border-color: color-mix(in srgb, var(--terra) 20%, var(--line-2));
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+.wv2-sidebar.is-open .wv2-nav-item.is-active:hover {
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+}
+
+.wv2-nav-icon-wrap {
+  position: relative;
+  flex: 0 0 17px;
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+}
+
+/* icon is fainter than the label; only the active icon takes the accent */
+.wv2-nav-icon {
+  flex-shrink: 0;
+  color: var(--ink-3);
+  transition: color .12s ease;
+}
+
+.wv2-nav-item:hover .wv2-nav-icon {
+  color: var(--ink-2);
+}
+
+.wv2-nav-item.is-active .wv2-nav-icon {
+  color: var(--terra-deep);
+}
+
+.wv2-nav-emoji {
+  flex-shrink: 0;
+  width: 17px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* ── collapsed-rail caption ── a faint label beneath each glyph so the collapsed
+ * rail is legible without a hover. Absolutely positioned INSIDE the icon tile
+ * (its offset parent is .wv2-nav-icon-wrap), so it sits within the highlight box
+ * and — being out of flow — showing/hiding it never collapses the tile's height.
+ * Shown only while the rail is collapsed and fades out slowly as the drawer opens
+ * (the expanded row labels to the right take over). Never in the expanded panel
+ * or the hover-flyout replica. */
+.wv2-nav-sublabel {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 4px;
+  text-align: center;
+  font-family: var(--ui);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1;
+  color: var(--ink-4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .4s ease;
+}
+
+.wv2-sidebar:not(.is-open) .wv2-nav .wv2-nav-sublabel {
+  opacity: .72;
+}
+
+.wv2-sidebar:not(.is-open) .wv2-nav .wv2-nav-item:hover .wv2-nav-sublabel {
+  color: var(--ink-2);
+}
+
+.wv2-sidebar:not(.is-open) .wv2-nav .wv2-nav-item.is-active .wv2-nav-sublabel {
+  color: var(--terra-deep);
+}
+
+.wv2-nav-flyout .wv2-nav-sublabel {
+  display: none;
+}
+
+/* ── collapsed rail: a tile per icon (the "icon box") ──
+ * In the 64px collapsed rail the hover/active indicator is a tile that wraps
+ * BOTH the glyph and its caption, not the full-width pill (which is gated to
+ * .is-open above). The 44px tile is centred in the rail. Scoped under .wv2-nav
+ * so the hover flyout — a full-width expanded-row replica that lives OUTSIDE
+ * .wv2-nav — keeps its 20px glyph. */
+/* The tile holds the glyph (toward the top) plus the caption (absolutely
+ * positioned at the bottom, see .wv2-nav-sublabel). Because the caption is out of
+ * flow, fading it on open never collapses the tile. The ROW height is identical
+ * in both states (set on .wv2-nav-item) — opening just swaps this 40px tile for
+ * the 20px inline glyph and fades the caption in/out; the row never changes
+ * height, so nothing reflows or shifts. */
+.wv2-sidebar:not(.is-open) .wv2-nav .wv2-nav-item {
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.wv2-sidebar:not(.is-open) .wv2-nav .wv2-nav-icon-wrap {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 58px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 4px;
+  border: 1px solid transparent;
+  border-radius: var(--r-xs);
+  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.wv2-sidebar:not(.is-open) .wv2-nav .wv2-nav-item:hover .wv2-nav-icon-wrap {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+.wv2-sidebar:not(.is-open) .wv2-nav .wv2-nav-item.is-active .wv2-nav-icon-wrap {
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border-color: color-mix(in srgb, var(--terra) 20%, var(--line-2));
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+/* ── primary / secondary hierarchy within a group ──
+ * Rows are uniform: identical height, text size, weight and colour across both
+ * tiers (all inherited from .wv2-nav-item). The ONLY tier difference is the
+ * icon — secondary renders a smaller glyph (see NavItemInner) and fainter ink.
+ * The icon slot stays 20px wide on both so labels align on one axis. */
+.wv2-nav-item--primary .wv2-nav-icon-wrap {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.wv2-nav-item--primary .wv2-nav-icon {
+  color: var(--ink-2);
+}
+
+.wv2-nav-item--primary.is-active .wv2-nav-icon {
+  color: var(--terra-deep);
+}
+
+.wv2-nav-item--secondary .wv2-nav-icon-wrap {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.wv2-nav-item--secondary .wv2-nav-icon {
+  color: var(--ink-4);
+}
+
+.wv2-nav-item--secondary:hover .wv2-nav-icon {
+  color: var(--ink-3);
+}
+
+.wv2-nav-item--secondary.is-active .wv2-nav-icon {
+  color: var(--terra-deep);
+}
+
+/* ── dimmed row: a destination shown before it's earned ──
+ * A group with `enabledWhen` (e.g. Manuscript before an outline exists) stays in
+ * the rail so the goal is visible, but greyed back like a secondary icon until
+ * its condition is met. Still clickable — it just lands on the empty page. It
+ * brightens a little on hover to signal it's interactive. */
+.wv2-nav-item.is-dimmed {
+  opacity: .45;
+}
+
+.wv2-nav-item.is-dimmed .wv2-nav-icon {
+  color: var(--ink-4);
+}
+
+.wv2-nav-item.is-dimmed:hover {
+  opacity: .7;
+}
+
+/* ── instant per-icon flyout label (collapsed rail only) ──
+ * Placed exactly where the row's label sits once expanded — same typography,
+ * same x/y, no border/shadow — so when the panel arrives nothing shifts. The
+ * left edge is anchored to the icon's right; padding-left = the row's flex gap
+ * so the text lands at the label's true position. Paper backing keeps it legible
+ * over the second rail and matches the panel it hands off to. */
+/* The flyout is a .wv2-nav-item replica; these override only what differs:
+   fixed positioning, full expanded-row width, the hovered-row background, and
+   forcing the label/count visible (they're hidden in the collapsed rail). */
+.wv2-nav-flyout {
+  position: fixed;
+  z-index: 60;
+  margin: 0;
+  width: calc(var(--rail-expanded) - 12px);
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--ink);
+  /* exactly the hovered row: the metallic surface gradient + line border + sheen */
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+  animation: wv2-flyout-in .16s ease-out;
+}
+
+.wv2-nav-flyout .wv2-nav-label {
+  opacity: 1;
+  transform: none;
+}
+
+.wv2-nav-flyout .wv2-nav-count {
+  opacity: 1;
+}
+
+.wv2-nav-flyout .wv2-nav-pip {
+  display: none;
+}
+
+.wv2-nav-flyout .wv2-nav-icon {
+  color: var(--ink-2);
+}
+
+@keyframes wv2-flyout-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wv2-nav-flyout {
+    animation: none;
+  }
+}
+
+/* count pip on the icon — shown only in the collapsed rail */
+.wv2-nav-pip {
+  position: absolute;
+  top: -3px;
+  right: -4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--terra);
+  border: 1.5px solid var(--paper);
+}
+
+.wv2-sidebar.is-open .wv2-nav-pip {
+  display: none;
+}
+
+/* label / count / chevron fade in as the panel opens */
+.wv2-nav-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+.wv2-nav-count {
+  flex: 0 0 auto;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 7px;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+.wv2-nav-item.is-active .wv2-nav-count {
+  color: var(--terra-deep);
+  border-color: color-mix(in srgb, var(--terra) 30%, var(--line));
+}
+
+.wv2-nav-chev {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .14s ease, transform .15s ease, color .12s ease, background .12s ease;
+}
+
+.wv2-nav-chev:hover {
+  color: var(--ink-2);
+  background: rgba(60, 40, 15, .08);
+}
+
+.wv2-nav-chev.is-open {
+  transform: rotate(90deg);
+}
+
+.wv2-sidebar.is-open .wv2-nav-label,
+.wv2-sidebar.is-open .wv2-nav-count,
+.wv2-sidebar.is-open .wv2-nav-chev {
+  opacity: 1;
+}
+
+.wv2-sidebar.is-open .wv2-nav-label {
+  transform: none;
+}
+
+.wv2-nav-child {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.wv2-nav-child:hover {
+  color: var(--ink-2);
+}
+
+/* ---- second rail — contextual sub-list for the active section ----
+ * A normal flex child (unlike the primary rail's absolute panel): it
+ * reserves real width and pushes the main content. Borrows the Night Eyes
+ * visual language — terra→gold accent bar, surface header gradient, glyph
+ * tile, serif titles, left-accent active rows. z-index sits below the
+ * primary rail so its hover-expand panel overlays it, as it does content. */
+.wv2-rail2 {
+  --rail-pad: 10px;
+  position: relative;
+  flex: 0 0 auto;
+  /* default width is set inline by SecondRail (resizable + persisted); this
+     fallback matches its 212px default — chosen so collapsed-primary (64) +
+     rail2 (212) totals the same 276px that a pinned primary alone would. */
+  width: 212px;
+  display: flex;
+  flex-direction: column;
+  /* Flat paper, matching the topbar and primary rail. A subtle hairline on the
+     left edge divides the icon strip from the second rail — the only seam in the
+     nav chrome that gets a drawn line (the panel's right edge stays a colour
+     step). */
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  overflow: hidden;
+  z-index: 20;
+}
+
+/* header — glyph tile + uppercase eyebrow + serif title.
+   Doubles as a link back to the section's base page, so it resets the anchor
+   defaults and lifts on hover to read as clickable. */
+.wv2-rail2-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 11px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background .12s ease;
+}
+
+.wv2-rail2-head:hover {
+  background: color-mix(in srgb, var(--ink) 4%, var(--paper));
+}
+
+.wv2-rail2-head:hover .wv2-rail2-title {
+  color: var(--terra-deep);
+}
+
+.wv2-rail2-head:hover .wv2-rail2-glyph {
+  box-shadow: var(--sh-2);
+}
+
+.wv2-rail2-glyph {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border: 1px solid var(--line-2);
+  display: grid;
+  place-items: center;
+  color: var(--terra-deep);
+  box-shadow: var(--sh-1);
+}
+
+.wv2-rail2-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wv2-rail2-eyebrow {
+  font-family: var(--ui);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1;
+}
+
+.wv2-rail2-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* body — scroll region with a thin Night-Eyes scrollbar */
+.wv2-rail2-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px 0 22px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-3) transparent;
+}
+
+.wv2-rail2-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.wv2-rail2-body::-webkit-scrollbar-thumb {
+  background: var(--line-3);
+  border-radius: 4px;
+}
+
+.wv2-rail2-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── generic sub-list rows (people / threads / lenses) — modern card rows ── */
+.wv2-rail2 .wv2-sublist {
+  margin: 0;
+  padding: 0 var(--rail-pad);
+  border-left: 0;
+  gap: 2px;
+}
+
+.wv2-rail2 .wv2-sublist-item {
+  position: relative;
+  gap: 9px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+
+.wv2-rail2 .wv2-sublist-item:hover {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.wv2-rail2 .wv2-sublist-item.is-active {
+  background: var(--surface);
+  border-color: var(--line-2);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: var(--sh-1);
+}
+
+/* active left accent — the Night Eyes pill motif */
+.wv2-rail2 .wv2-sublist-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--terra), var(--terra-deep));
+}
+
+.wv2-rail2 .wv2-sublist-nm {
+  font-size: 12.5px;
+}
+
+/* thread / lens swatch — slightly larger dot */
+.wv2-rail2 .wv2-sublist-swatch {
+  width: 8px;
+  height: 8px;
+  flex-basis: 8px;
+}
+
+/* thread gap count → pill badge */
+.wv2-rail2 .wv2-sublist-gap {
+  height: 16px;
+  line-height: 15px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(180, 60, 30, .08);
+  border: 1px solid rgba(180, 60, 30, .2);
+  color: var(--terra-deep);
+  font-size: 9px;
+}
+
+/* lens status → pill badge */
+.wv2-rail2 .wv2-sublist-badge {
+  min-width: 16px;
+  height: 16px;
+  line-height: 15px;
+  padding: 0 5px;
+  text-align: center;
+  border-radius: 999px;
+  font-size: 9px;
+}
+
+.wv2-rail2 .wv2-sublist-badge--pass {
+  background: rgba(95, 140, 95, .12);
+  border: 1px solid rgba(95, 140, 95, .24);
+}
+
+.wv2-rail2 .wv2-sublist-badge--gap {
+  background: rgba(180, 60, 30, .08);
+  border: 1px solid rgba(180, 60, 30, .2);
+}
+
+.wv2-rail2 .wv2-sublist-loading,
+.wv2-rail2 .wv2-sublist-empty {
+  padding: 8px 12px;
+}
+
+/* ── People rail — cast grouped by role; Lenses rail reuses the group shell ── */
+.wv2-rail2 .wv2-cast,
+.wv2-rail2 .wv2-lenses {
+  gap: 0;
+}
+
+.wv2-cast-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.wv2-cast-group+.wv2-cast-group {
+  margin-top: 14px;
+}
+
+/* section header — plain eyebrow matching the main nav's .wv2-nav-group-label
+ * (same size / weight / spacing / colour). The colour-dot + dotted-rule + role
+ * tint were dropped so the rail sub-lists read as the same family as the main
+ * nav; only the right-aligned count is kept. */
+.wv2-role-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 14px 12px 5px;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* dot retired — kept in markup but hidden so the eyebrow stays plain text */
+.wv2-role-dot {
+  display: none;
+}
+
+.wv2-role-lbl {
+  line-height: 1;
+}
+
+/* invisible spacer — pushes the count to the right edge (no dotted rule) */
+.wv2-role-rule {
+  flex: 1;
+}
+
+.wv2-role-count {
+  flex: 0 0 auto;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+
+/* per-role accents retired — the dot is hidden and the label stays plain
+ * --ink-3 across every role, so the rail eyebrows match the main nav. Role
+ * identity still reads through the row's avatar + name. */
+
+/* person row — avatar + two-line text */
+.wv2-prow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 11px;
+  /* reserve a transparent border so the active border adds no layout shift */
+  border: 1px solid transparent;
+  border-radius: 9px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+}
+
+/* hover matches the primary sidebar (.wv2-nav-item:hover): the surface
+ * elevation gradient, line border, and top sheen */
+.wv2-prow:hover {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+/* active row borrows the primary sidebar's treatment (.wv2-nav-item.is-active):
+ * the terra elevation gradient, line border, and inset sheen — same chrome as a
+ * selected primary-nav item (role colours still read via the name + avatar) */
+.wv2-prow.is-active {
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border-color: color-mix(in srgb, var(--terra) 20%, var(--line-2));
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+/* avatar + corner role badge */
+.wv2-prow-av {
+  position: relative;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.wv2-prow-badge {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 8px;
+  line-height: 1;
+  color: #fff;
+  border: 1.5px solid var(--paper);
+  box-shadow: 0 1px 1.5px rgba(20, 25, 35, .25);
+}
+
+.wv2-prow-badge--protagonist {
+  background: var(--gold);
+}
+
+.wv2-prow-badge--antagonist {
+  background: var(--clay);
+}
+
+/* text block */
+.wv2-prow-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.wv2-prow-nm {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  line-height: 1.2;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-prow-role {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  line-height: 1.2;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* role-tinted names — protagonist warm, antagonist clay, supporting muted */
+.wv2-prow--protagonist .wv2-prow-nm {
+  color: var(--terra-deep);
+}
+
+.wv2-prow--antagonist .wv2-prow-nm {
+  color: var(--clay);
+}
+
+.wv2-prow--supporting .wv2-prow-nm {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+/* trailing plot-thread indicator — Spline glyph + count.
+   has-threads → tinted pill; is-none → muted ghost (count reads 0). */
+.wv2-prow-threads {
+  flex: 0 0 auto;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px 2px 5px;
+  border-radius: 999px;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.wv2-prow-threads svg {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+}
+
+.wv2-prow-threads.has-threads {
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 13%, transparent);
+}
+
+.wv2-prow-threads.is-none {
+  color: var(--ink-4);
+  opacity: .55;
+}
+
+/* ── Lenses rail — each lens reads like a little instrument ── */
+.wv2-lens {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 11px;
+  /* reserve a transparent border so the active border adds no layout shift */
+  border: 1px solid transparent;
+  border-radius: 9px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+}
+
+/* backend tint feeds the sparkbar + active accent via currentcolor proxy */
+.wv2-lens.k-arc {
+  --lens-c: var(--teal);
+}
+
+.wv2-lens.k-cover {
+  --lens-c: var(--sage);
+}
+
+.wv2-lens.k-track {
+  --lens-c: var(--terra);
+}
+
+.wv2-lens.k-promise {
+  --lens-c: var(--mauve);
+}
+
+.wv2-lens.is-descrip {
+  --lens-c: var(--ink-4);
+}
+
+/* hover matches the primary sidebar (.wv2-nav-item:hover): the surface
+ * elevation gradient, line border, and top sheen */
+.wv2-lens:hover {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+/* active row borrows the primary sidebar's treatment (.wv2-nav-item.is-active):
+ * the terra elevation gradient, line border, and inset sheen (backend tint
+ * still reads via the glyph + sparkbar + verdict dot) */
+.wv2-lens.is-active {
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border-color: color-mix(in srgb, var(--terra) 20%, var(--line-2));
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+/* backend glyph — no tile: the bare glyph sits on the rail, brightened toward
+ * its backend tint (--lens-c) so the bevel reads as polished, anodised metal */
+.wv2-lens-glyph {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  color: color-mix(in srgb, var(--lens-c) 82%, #fff);
+}
+
+/* 3D metallic glyph — lit from above: a crisp light echo along the top edge, a
+ * darker tinted echo on the base, and a soft cast shadow lifting the stroke. */
+.wv2-lens-glyph svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(0 -0.5px 0 rgba(255, 255, 255, .8)) drop-shadow(0 0.5px 0 color-mix(in srgb, var(--lens-c) 45%, #000)) drop-shadow(0 1.5px 1.5px rgba(0, 0, 0, .25));
+}
+
+/* threads: a scope mark + heading + a beat rail of dots (solid = covered,
+   hollow-dashed = gap), matching the plot-thread page. Tinted per-thread
+   via --thr-c (inline). The lead column holds the scope's avatar/icon. */
+.wv2-thr {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 11px;
+  /* reserve a transparent border so the active border adds no layout shift */
+  border: 1px solid transparent;
+  border-radius: 9px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+}
+
+/* hover matches the primary sidebar (.wv2-nav-item:hover): the surface
+ * elevation gradient, line border, and top sheen */
+.wv2-thr:hover {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+/* active row borrows the primary sidebar's treatment (.wv2-nav-item.is-active):
+ * the terra elevation gradient, line border, and inset sheen — so a selected
+ * thread reads with the same chrome as a selected primary-nav item. */
+.wv2-thr.is-active {
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border-color: color-mix(in srgb, var(--terra) 20%, var(--line-2));
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .45);
+}
+
+.wv2-thr-lead {
+  flex: 0 0 26px;
+  width: 26px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: end;
+}
+
+/* Non-character scope marks are now glossy <EntityMark> solids tinted in the
+ * thread colour (see ThreadRow.tsx / components/EntityMark.tsx) — they carry
+ * their own gloss + drop-shadow, so the old `.wv2-thr-icon` embossed-line
+ * treatment was removed with that change. */
+.wv2-thr-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-thr-nm {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  line-height: 1.2;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-thr-scope {
+  margin-top: 1px;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  line-height: 1.2;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Thread HEADING scope prefix — "<mark> {Name}'s plot thread" shown before a
+ * thread's title (ThreadBlock header + the new-thread creation preview). The
+ * scope name reads emphasised; "'s plot thread" stays muted. Used wherever a
+ * thread title appears with its scope, so it lives in the global sheet. */
+.wv2-thr-head-scope {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.wv2-thr-head-mk {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  color: var(--ink-3);
+}
+
+.wv2-thr-head-lbl {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  letter-spacing: .01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-thr-head-nm {
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.wv2-beats {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+  min-height: 4px;
+}
+
+.wv2-beat {
+  flex: 0 0 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  /* 3d gradient background */
+  /* background: var(--thr-c);  */
+  background: linear-gradient(180deg, var(--thr-c) 0%, color-mix(in srgb, var(--thr-c) 45%, #6565658f) 100%);
+}
+
+.wv2-beat.gap {
+  flex-basis: 8px;
+  width: 8px;
+  height: 8px;
+  background: transparent;
+  border: 1.5px dashed var(--thr-c);
+}
+
+.wv2-beats-more {
+  margin-left: 1px;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 1px;
+  color: var(--ink-3);
+}
+
+.wv2-beats-empty {
+  font-size: 9.5px;
+  font-style: italic;
+  color: var(--ink-3);
+}
+
+/* text column */
+.wv2-lens-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.wv2-lens-nm {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  line-height: 1.2;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-lens-metric {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  line-height: 1;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* signal sparkbar — thin & quiet; filled cells in the backend tint, gaps clay */
+.wv2-lens-bar {
+  display: flex;
+  gap: 1.5px;
+  margin-top: 5px;
+  height: 2.5px;
+}
+
+.wv2-lens-bar i {
+  flex: 1;
+  height: 2.5px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--line-2) 60%, transparent);
+  transition: background .12s;
+}
+
+.wv2-lens-bar i.f {
+  background: color-mix(in srgb, var(--lens-c) 65%, transparent);
+}
+
+.wv2-lens.is-warn .wv2-lens-bar i:not(.f),
+.wv2-lens.is-open .wv2-lens-bar i:not(.f) {
+  background: color-mix(in srgb, var(--clay) 26%, transparent);
+}
+
+/* verdict dot — pulses when it wants attention */
+.wv2-lens-dot {
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  align-self: flex-start;
+  margin-top: 3px;
+  background: var(--ink-4);
+}
+
+.wv2-lens.is-holds .wv2-lens-dot {
+  background: var(--sage);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sage) 18%, transparent);
+}
+
+.wv2-lens.is-warn .wv2-lens-dot {
+  background: var(--clay);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--clay) 20%, transparent);
+  animation: wv2-lens-pulse 2s ease-in-out infinite;
+}
+
+.wv2-lens.is-open .wv2-lens-dot {
+  background: var(--terra);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 20%, transparent);
+  animation: wv2-lens-pulse 2.4s ease-in-out infinite;
+}
+
+.wv2-lens.is-noting .wv2-lens-dot {
+  background: var(--ink-4);
+}
+
+@keyframes wv2-lens-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.4);
+    opacity: .55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wv2-lens-dot {
+    animation: none !important;
+  }
+}
+
+/* ── chapters inside rail2 — card rows, comfortable hit targets ── */
+.wv2-rail2 .wv2-chap-list {
+  padding: 0 var(--rail-pad);
+  gap: 3px;
+}
+
+.wv2-rail2 .wv2-chap-row {
+  padding: 8px 9px;
+  border-radius: 9px;
+}
+
+.wv2-rail2 .wv2-chap-row:hover {
+  background: var(--surface);
+  border-color: var(--line);
+}
+
+.wv2-rail2 .wv2-chap-row.is-current {
+  background: var(--surface);
+  border-color: var(--line-2);
+}
+
+.wv2-rail2 .wv2-chap-add {
+  margin: 8px 0 0;
+}
+
+.wv2-nav-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 8px var(--rail-pad);
+}
+
+/* ---- collapsible sublists (children under an expanded door) ---- */
+.wv2-sublist {
+  margin: 2px 6px 4px 26px;
+  padding-left: 10px;
+  border-left: 1.5px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.wv2-sublist-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  color: var(--ink-2);
+  font-size: 12px;
+  border-radius: var(--r-xs);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  line-height: 1.3;
+  transition: background .12s, color .12s;
+}
+
+.wv2-sublist-item:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink);
+}
+
+.wv2-sublist-item.is-active {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.wv2-sublist-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex: 0 0 5px;
+  background: var(--ink-4);
+}
+
+.wv2-sublist-swatch {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 7px;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .6);
+}
+
+.wv2-sublist-nm {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-sublist-meta {
+  font-size: 9.5px;
+  color: var(--ink-3);
+  flex: 0 0 auto;
+  white-space: nowrap;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-sublist-gap {
+  font-size: 9.5px;
+  color: var(--terra-deep);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.wv2-sublist-loading,
+.wv2-sublist-empty {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-style: italic;
+  padding: 4px 8px;
+}
+
+.wv2-sublist-divider {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 8px 8px 2px;
+}
+
+.wv2-sublist-badge {
+  flex: 0 0 auto;
+  font-size: 9.5px;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.wv2-sublist-badge--pass {
+  color: var(--sage-deep, var(--sage));
+}
+
+.wv2-sublist-badge--gap {
+  color: var(--terra-deep);
+  font-weight: 700;
+}
+
+
+/* ---- chapter list — full-width, no indent ---- */
+.wv2-chap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px var(--rail-pad);
+}
+
+/* chapter block wraps row + expanded scene list */
+.wv2-chap-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-chap-block+.wv2-chap-block {
+  margin-top: 2px;
+}
+
+/* chapter row — grid: toggle? | glyph | text+sub | spark */
+.wv2-chap-row {
+  display: grid;
+  grid-template-columns: 16px auto 1fr auto;
+  align-items: center;
+  column-gap: 7px;
+  row-gap: 1px;
+  padding: 7px 8px 8px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  background: transparent;
+  font-family: var(--ui);
+  width: 100%;
+  transition: background .12s, border-color .12s;
+}
+
+.wv2-chap-row:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+/* expand/collapse toggle */
+.wv2-chap-toggle {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color .12s, background .12s;
+}
+
+.wv2-chap-toggle:hover {
+  color: var(--ink);
+  background: rgba(80, 55, 15, .08);
+}
+
+/* book-spine glyph */
+.wv2-chap-glyph {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: 22px;
+  height: 28px;
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(45deg,
+      color-mix(in srgb, var(--ink) 8%, transparent) 0 2px,
+      transparent 2px 8px),
+    linear-gradient(165deg, var(--surface) 0%, var(--line-3) 100%);
+  border: 1px solid var(--line-2);
+  position: relative;
+  flex: 0 0 22px;
+  box-shadow: 0 1px 1px color-mix(in srgb, var(--ink) 8%, transparent),
+    1px 0 0 color-mix(in srgb, var(--ink) 12%, transparent) inset;
+  display: grid;
+  place-items: center;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 10.5px;
+  color: color-mix(in srgb, var(--ink) 45%, transparent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .04em;
+}
+
+.wv2-chap-glyph::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 3px;
+  bottom: 3px;
+  width: 2px;
+  background: var(--ink-4);
+  border-radius: 0 1px 1px 0;
+  opacity: .5;
+}
+
+.wv2-chap-row.is-current .wv2-chap-glyph::before {
+  background: linear-gradient(180deg, var(--terra), var(--terra-deep));
+  opacity: 1;
+}
+
+.wv2-chap-row.is-drafted .wv2-chap-glyph::before {
+  background: linear-gradient(180deg, var(--sage), color-mix(in srgb, var(--sage) 70%, #000));
+  opacity: .85;
+}
+
+.wv2-chap-row.is-planned .wv2-chap-glyph {
+  opacity: .7;
+}
+
+.wv2-chap-row.is-planned .wv2-chap-glyph {
+  font-style: italic;
+}
+
+/* chapter name */
+.wv2-chap-nm {
+  grid-column: 3;
+  grid-row: 1;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.wv2-chap-row.is-planned .wv2-chap-nm,
+.wv2-chap-row.is-empty .wv2-chap-nm {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* subtitle line */
+.wv2-chap-sub {
+  grid-column: 3;
+  grid-row: 2;
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.wv2-chap-dot {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  flex: 0 0 2px;
+}
+
+.wv2-chap-stat {
+  color: var(--ink-3);
+}
+
+.wv2-chap-row.is-current .wv2-chap-stat {
+  color: var(--terra-deep);
+  font-weight: 600;
+}
+
+/* active row */
+.wv2-chap-row.is-current {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: var(--sh-1);
+}
+
+.wv2-chap-row.is-current:hover {
+  background: var(--surface);
+}
+
+/* sparkline */
+.wv2-chap-spark {
+  grid-column: 4;
+  grid-row: 1 / span 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 16px;
+}
+
+.wv2-chap-spark i {
+  width: 2px;
+  border-radius: 1px;
+  background: var(--line-2);
+  display: inline-block;
+}
+
+.wv2-chap-spark i.f {
+  background: var(--ink-3);
+}
+
+.wv2-chap-row.is-current .wv2-chap-spark i.f {
+  background: var(--terra);
+}
+
+.wv2-chap-row.is-drafted .wv2-chap-spark i.f {
+  background: var(--sage);
+}
+
+/* ---- expanded scene list ---- */
+.wv2-scene-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 2px 0 6px 38px;
+  /* align with chapter name (toggle 16 + gap 7 + glyph-center) */
+  padding-left: 10px;
+  border-left: 1.5px solid var(--line);
+}
+
+.wv2-scene-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--r-xs);
+  background: transparent;
+  font: inherit;
+  font-size: 11px;
+  color: var(--ink-2);
+  cursor: pointer;
+  text-align: left;
+  transition: background .12s, color .12s;
+}
+
+.wv2-scene-row:hover {
+  background: rgba(80, 55, 15, .05);
+  color: var(--ink);
+}
+
+.wv2-scene-num {
+  flex: 0 0 auto;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  width: 14px;
+  text-align: center;
+}
+
+.wv2-scene-nm {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-scene-words {
+  flex: 0 0 auto;
+  font-size: 9.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* add chapter */
+.wv2-chap-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  margin: 6px 2px 0;
+  padding: 7px 8px;
+  border: 1.5px dashed var(--line-3);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color .12s, border-color .12s;
+}
+
+.wv2-chap-add:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+.wv2-sidebar-footer {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  border-top: 1px solid var(--line);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, .015));
+}
+
+.wv2-theme-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 38px;
+  padding: 0 10px 0 18px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease;
+}
+
+.wv2-theme-btn svg {
+  flex: 0 0 auto;
+  color: var(--ink-3);
+  transition: color .12s ease;
+}
+
+.wv2-theme-btn:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink);
+}
+
+.wv2-theme-btn:hover svg {
+  color: var(--ink-2);
+}
+
+.wv2-theme-btn:active {
+  background: rgba(60, 40, 15, .09);
+}
+
+/* ---- main ---- */
+.wv2-main {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  /* margin: 5px; */
+}
+
+.wv2-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 60px;
+  flex-shrink: 0;
+  padding: 0 26px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-bottom: 1px solid var(--line-2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), var(--sh-1);
+}
+
+.wv2-header-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  color: var(--terra);
+  border-radius: var(--r-sm);
+  background: linear-gradient(180deg, var(--paper), var(--paper-2));
+  border: 1px solid var(--line-2);
+  box-shadow: var(--bevel-up);
+}
+
+.wv2-header-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.wv2-crumb {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--ink-3);
+}
+
+.wv2-header-title {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -.01em;
+}
+
+.wv2-content {
+  flex: 1;
+  overflow-y: auto;
+  /* belt-and-braces: clip any rail bleed at the content edge so it never adds
+     a horizontal scrollbar. */
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+/* ---- page layout (main + right rail) ----
+   Two columns: a flexible reading area on the left and the right rail pinned to
+   the far right. The reading column caps at --read-max and CENTERS within its
+   column, so it sits centered between the left rail (the page's left edge) and
+   the right rail — NOT centered against the whole screen. When a page has no
+   right rail, column 2 collapses and the reading column centers in the full
+   width. Pages override --read-max (or .wv2-page-main's max-width) to widen. */
+.wv2-root .wv2-page {
+  display: grid;
+  /* One reading column by default; the reading area centers in the full width.
+     A second track is added below ONLY when the page has its own in-page panel
+     (thread map, marginalia, person sidebar…). The universal suggestions rail is
+     gone — its content now lives in the Night Eyes panel. */
+  grid-template-columns: minmax(0, 1fr);
+  /* single full-height row (auto min, so tall content never clips) so the
+     panel's align-self:stretch reaches the bottom edge. */
+  grid-template-rows: 1fr;
+  align-items: start;
+  /* gap: 26px; */
+  /* padding: 26px 28px 60px; */
+  /* fill the scroll viewport even when content is short. */
+  min-height: 100%;
+
+  /* background: var(--surface); */
+
+}
+
+/* When the page carries its own in-page panel, grow a second track for it:
+   reading column | page panel. */
+.wv2-root .wv2-page:has(> .wv2-page-rail--panel) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.wv2-root .wv2-page-main {
+  grid-column: 1;
+  width: 100%;
+  max-width: var(--read-max);
+  margin-inline: auto;
+  /* centre the reading column within its track */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  container-type: inline-size;
+}
+
+/* The page panel takes the second track. */
+.wv2-root .wv2-page>.wv2-page-rail--panel {
+  grid-column: 2;
+}
+
+/* PageRail — width set inline by the component (flex: 0 0 <w>px).
+   These rules handle column layout, sticky option, responsive hide,
+   and the minimal "Night Eyes spacer" variant. */
+.wv2-root .wv2-page-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-left: auto;
+  /* hug the right edge — extra space sits between main and rail */
+}
+
+/* When it carries real content (not the minimal spacer) it reads as part of the
+   page: a hairline seam on its left edge + breathing room that also clears the
+   resize handle. Distinct from the suggestions rail's paper-panel chrome. */
+.wv2-root .wv2-page-rail--panel {
+  position: relative;
+  /* anchor the left-edge resize handle */
+  align-self: stretch;
+  padding-left: 20px;
+  border-left: 1px solid var(--line);
+}
+
+/* left-edge drag handle — mirrors the suggestions rail's (.wv2-rr-resize) */
+.wv2-root .wv2-page-rail-resize {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 9px;
+  cursor: col-resize;
+  z-index: 25;
+}
+
+.wv2-root .wv2-page-rail-resize::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: transparent;
+  transition: background .12s ease;
+}
+
+.wv2-root .wv2-page-rail-resize:hover::after {
+  background: var(--terra);
+}
+
+/* Page panels (threads' map, person's list) lay their own heads + scroll
+   regions out as a flex column — they used to get this from .wv2-rr-child. */
+.wv2-root .wv2-page-rail--panel>.thr-rail,
+.wv2-root .wv2-page-rail--panel>.chr-rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.wv2-root .wv2-page-rail--sticky {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.wv2-root .wv2-page-rail--minimal {
+  /* invisible spacer — keeps Night Eyes FAB from overlapping content */
+  pointer-events: none;
+}
+
+/* Narrow viewports: drop the in-page panel (the reading column keeps the floor). */
+@media (max-width: 860px) {
+  .wv2-root .wv2-page-rail {
+    display: none;
+  }
+}
+
+.wv2-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.wv2-placeholder-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 6px;
+  color: var(--ink-3);
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--surface), var(--surface-3));
+  border: 1px solid var(--line-2);
+  box-shadow: var(--bevel-up), var(--sh-2);
+}
+
+.wv2-placeholder-title {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.wv2-placeholder-note {
+  font-size: 13.5px;
+  color: var(--ink-3);
+  margin: 0;
+}
+
+/* ---- buttons (shared chrome) ---- */
+.wv2-root .wv2-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  font-size: 12.5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+}
+
+.wv2-root .wv2-btn svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.wv2-root .wv2-btn-sm {
+  padding: 5px 10px;
+  font-size: 11.5px;
+}
+
+.wv2-root .wv2-btn-sm svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* flat, modern fills — no glossy bevels/gradients; a subtle press for feedback */
+.wv2-root .wv2-btn:active {
+  transform: translateY(.5px);
+}
+
+.wv2-root .wv2-btn-primary {
+  background: var(--terra);
+  color: #fff;
+  border-color: transparent;
+}
+
+.wv2-root .wv2-btn-primary:hover {
+  background: var(--terra-deep);
+}
+
+.wv2-root .wv2-btn-subtle {
+  background: transparent;
+  color: var(--ink-2);
+  border-color: var(--line-2);
+}
+
+.wv2-root .wv2-btn-subtle:hover {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  color: var(--ink);
+  border-color: var(--line-3);
+}
+
+.wv2-root .wv2-btn-subtle.is-on {
+  border-color: var(--terra);
+  color: var(--terra-deep);
+}
+
+.wv2-root .wv2-btn-ghost {
+  background: transparent;
+  color: var(--ink-3);
+}
+
+.wv2-root .wv2-btn-ghost:hover {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  color: var(--ink);
+}
+
+.wv2-root .wv2-btn-ai {
+  color: var(--gold, #b89030);
+  background: rgba(180, 144, 48, 0.06);
+  border-color: rgba(180, 144, 48, 0.25);
+}
+
+.wv2-root .wv2-btn-ai:hover:not(:disabled) {
+  background: rgba(180, 144, 48, 0.12);
+  border-color: rgba(180, 144, 48, 0.4);
+}
+
+.wv2-root .wv2-btn-ai:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.wv2-root .wv2-btn .wv2-spark {
+  font-size: 13px;
+  color: var(--gold);
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, 0.4));
+}
+
+.wv2-root .wv2-btn-sm .wv2-spark {
+  font-size: 12px;
+}
+
+/* ---- segmented switch (wv2-seg) — the one either/or toggle ----
+ * Soft pill-track + a raised active chip. Replaces outline's .ol-zoom and the
+ * braindumps .view-toggle; drives Beats/Scenes, Stream/Canvas, All/Pinned, … */
+.wv2-root .wv2-seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  border-radius: 9px;
+}
+
+.wv2-root .wv2-seg button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  padding: 5px 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-weight: 600;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .12s ease, color .12s ease, box-shadow .12s ease;
+}
+
+.wv2-root .wv2-seg button svg {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+}
+
+.wv2-root .wv2-seg button:hover:not(.is-on) {
+  color: var(--ink-2);
+}
+
+.wv2-root .wv2-seg button.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+
+/* ---- add affordance (wv2-add) — one dashed-ghost "start another" button ----
+ * Page/section-level adds (a new storyline, a new act). In-tree micro-adds keep
+ * their own denser .ol-add-child. */
+.wv2-root .wv2-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: flex-start;
+  background: transparent;
+  border: 1.5px dashed var(--line-3);
+  border-radius: var(--r-lg);
+  color: var(--ink-3);
+  padding: 11px 14px;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .12s ease, color .12s ease, background .12s ease;
+}
+
+.wv2-root .wv2-add:hover {
+  border-color: var(--terra);
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 4%, transparent);
+}
+
+.wv2-root .wv2-add svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.wv2-root .wv2-add b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* ---- page header (wv2-phead) — one layout for every page (PageHeader.tsx) ---- */
+.wv2-root .wv2-phead {
+  padding: 20px;
+  width: 100%;
+}
+
+.wv2-root .wv2-phead-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .wv2-phead-lhs {
+  min-width: 0;
+}
+
+.wv2-root .wv2-phead-eyebrow {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1;
+  margin: 0 0 5px;
+}
+
+.wv2-root .wv2-phead-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.wv2-root .wv2-phead-suffix {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--ink-3);
+}
+
+/* lit concept glyph — soft top-light shadow so it shares the entity marks' light */
+.wv2-root .wv2-phead-glyph {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--terra-deep);
+}
+
+.wv2-root .wv2-phead-glyph svg {
+  filter: drop-shadow(0 1px 1px rgba(20, 25, 35, .16));
+}
+
+.wv2-root .wv2-phead-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .wv2-phead-caption {
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-2);
+  font-family: var(--ui);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.wv2-root .wv2-phead-caption b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---- badges (shared chrome) — match the mockup: tiny, tracked, uppercase ---- */
+.wv2-root .wv2-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 3px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.wv2-root .wv2-badge-teal {
+  background: var(--teal-soft);
+  color: var(--teal);
+  border-color: color-mix(in srgb, var(--teal) 35%, var(--line));
+}
+
+/* ==============================================================
+ * INIT / empty-state hero — the shared "first touch" standard.
+ *
+ * ONE pattern for every empty page (People, Braindumps, Manuscript…):
+ * a centred column with an eyebrow, a serif STATEMENT headline (italic
+ * terra-deep accent via <em>), and a serif sub — then the page's own
+ * body (describe field, fork cards, the one box) below it. Base: the
+ * People init (people-init.html). All colour from theme tokens, all
+ * scale from the --init-* knobs below, so every page tracks one source.
+ *
+ * Usage:
+ *   .wv2-init-stage   full-bleed takeover (scrolls, top-aligned + centred)
+ *   └ .wv2-init       the centred content column (also fine inside .wv2-page-main)
+ *     ├ .wv2-init-head  > .wv2-init-eyebrow / .wv2-init-title (em) / .wv2-init-sub
+ *     ├ .wv2-init-seam  labelled divider between sections
+ *     └ <page body>
+ * ============================================================== */
+.wv2-root {
+  /* hero scale — tweak here, every empty page follows */
+  --init-title: 44px;
+  /* heading main */
+  --init-title-sm: 34px;
+  /* heading main, narrow screens */
+  --init-sub: 16px;
+  /* supporting line */
+  --init-eyebrow: 10px;
+  /* tracked eyebrow */
+  --init-max: 640px;
+  /* content column width (→ left/right margin) */
+  --init-pad-top: 40px;
+  /* page top margin on takeover stages */
+  /* hero glyph sizes — one set for all init icons */
+  --init-icon: 34px;
+  /* primary glyph (fork-card / hero icon) */
+  --init-icon-sm: 22px;
+  /* inline / mode glyph */
+  --init-icon-xs: 15px;
+  /* chip / shape glyph */
+}
+
+/* full-bleed takeover: owns the content area, scrolls, content top-aligned
+   and horizontally centred. Plain page surface — no per-page backdrop. */
+.wv2-root .wv2-init-stage {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--init-pad-top) 28px 60px;
+}
+
+/* Init page container. Caps the takeover at the same 1120 width populated
+   pages use and centres it — init pages carry NO right rail, just the centred
+   stage. Mirrors the populated-page block (.wv2-page + the 1120 cap each page
+   repeats) so the stage lands at the same left/right margin. The inner
+   init-stage gives up its takeover sizing since the parent now owns the outer
+   padding and .wv2-content owns the scroll. */
+.wv2-root .wv2-init-page {
+  display: flex;
+  align-items: flex-start;
+  padding: 26px 28px 60px;
+  box-sizing: border-box;
+  min-height: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.wv2-root .wv2-init-page>.wv2-init-stage {
+  flex: 1;
+  min-width: 0;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+@media (max-width: 860px) {
+  .wv2-root .wv2-init-page {
+    display: block;
+    padding: 26px 20px 60px;
+  }
+}
+
+/* the centred content column */
+.wv2-root .wv2-init {
+  width: 100%;
+  max-width: var(--init-max);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- hero ---- */
+.wv2-root .wv2-init-head {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+/* lit concept-glyph badge — the page's identity mark (pageGlyphs.ts), in the
+ * same soft tile as the second-rail header glyph, so the empty state wears the
+ * same mark as the sidebar + page header. */
+.wv2-root .wv2-init-glyph {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 16px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  color: var(--terra-deep);
+  background: linear-gradient(135deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border: 1px solid var(--line-2);
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .5);
+}
+
+.wv2-root .wv2-init-glyph svg {
+  filter: drop-shadow(0 1px 1px rgba(20, 25, 35, .14));
+}
+
+.wv2-root .wv2-init-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ui);
+  font-size: var(--init-eyebrow);
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.wv2-root .wv2-init-eyebrow::before,
+.wv2-root .wv2-init-eyebrow::after {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+  opacity: .5;
+}
+
+.wv2-root .wv2-init-title {
+  font-family: var(--serif);
+  font-size: var(--init-title);
+  line-height: 1.04;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  margin: 0 0 14px;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.wv2-root .wv2-init-title em {
+  font-style: italic;
+  color: var(--terra-deep);
+}
+
+.wv2-root .wv2-init-sub {
+  font-family: var(--serif);
+  font-size: var(--init-sub);
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0 auto;
+  max-width: 46ch;
+  letter-spacing: -.003em;
+}
+
+/* ---- labelled seam between sections ---- */
+.wv2-root .wv2-init-seam {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 2px 13px;
+}
+
+.wv2-root .wv2-init-seam-ln {
+  flex: 1;
+  height: 1px;
+  background: var(--line-2);
+}
+
+.wv2-root .wv2-init-seam-lbl {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .wv2-root {
+    --init-title: var(--init-title-sm);
+  }
+}
+
+/* ---- theme panel ---- */
+.wv2-panel-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(10, 14, 22, .38);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.wv2-panel {
+  width: 348px;
+  max-width: 92vw;
+  height: 100%;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border-left: 1px solid var(--line-3);
+  box-shadow: var(--sh-4);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.wv2-panel-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border-bottom: 1px solid var(--line-2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4);
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.wv2-panel-section {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.wv2-panel-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--ink-3);
+}
+
+.wv2-panel-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+/* a labelled on/off switch (theme settings — e.g. the diamond accent) */
+.wv2-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.wv2-toggle-hint {
+  margin: 5px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--ink-3);
+  max-width: 30ch;
+}
+
+.wv2-diamond-mark {
+  font-family: var(--serif);
+  color: var(--gold);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold) 55%, transparent));
+}
+
+.wv2-switch {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: 1px solid var(--line-2);
+  background: var(--surface-3);
+  box-shadow: var(--bevel-in);
+  position: relative;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.wv2-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: var(--bevel-up), var(--sh-1);
+  transition: transform .2s cubic-bezier(.2, .7, .2, 1);
+}
+
+.wv2-switch.is-on {
+  background: var(--terra);
+  border-color: var(--terra-deep);
+}
+
+.wv2-switch.is-on .wv2-switch-knob {
+  transform: translateX(18px);
+}
+
+.wv2-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.wv2-icon-btn:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
+.wv2-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.wv2-theme-swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: linear-gradient(180deg, var(--paper), var(--paper-2));
+  cursor: pointer;
+  font: inherit;
+  box-shadow: var(--bevel-up);
+  transition: border-color .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+
+.wv2-theme-swatch:hover {
+  filter: brightness(1.03);
+  border-color: var(--line-3);
+}
+
+.wv2-theme-swatch.is-active {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px var(--terra-soft), var(--bevel-up);
+}
+
+.wv2-swatch-chips {
+  display: flex;
+  gap: 4px;
+}
+
+.wv2-swatch-chips i {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--r-xs);
+  border: 1px solid rgba(0, 0, 0, .12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+
+.wv2-swatch-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+}
+
+.wv2-reset-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: var(--terra);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.wv2-reset-all:hover {
+  text-decoration: underline;
+}
+
+.wv2-token-group {
+  margin-top: 14px;
+}
+
+.wv2-token-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+
+.wv2-token-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.wv2-token-row input[type='color'] {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: var(--bevel-up);
+}
+
+.wv2-token-name {
+  font-size: 12px;
+  color: var(--ink-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.wv2-token-value {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.wv2-token-reset {
+  width: 22px;
+  height: 22px;
+}
+
+/* ---- scrollbars (thin, metallic) ---- */
+/* ---- page-level heading icon (faint, inline) ---- */
+.wv2-page-icon {
+  opacity: 0.45;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+/* ---- scrollbars (thin, metallic) ---- */
+.wv2-nav::-webkit-scrollbar,
+.wv2-content::-webkit-scrollbar,
+.wv2-panel::-webkit-scrollbar {
+  width: 9px;
+}
+
+.wv2-nav::-webkit-scrollbar-thumb,
+.wv2-content::-webkit-scrollbar-thumb,
+.wv2-panel::-webkit-scrollbar-thumb {
+  background: var(--line-3);
+  border: 2px solid transparent;
+  background-clip: content-box;
+  border-radius: 9px;
+}
+
+.wv2-nav::-webkit-scrollbar-thumb:hover,
+.wv2-content::-webkit-scrollbar-thumb:hover,
+.wv2-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-4);
+  background-clip: content-box;
+}
+
+.wv2-nav::-webkit-scrollbar-track,
+.wv2-content::-webkit-scrollbar-track,
+.wv2-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
