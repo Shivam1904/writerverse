@@ -1,0 +1,42 @@
+/* lensDetail.css — interaction-only styling for the redesigned gauge detail
+ * (/lens/:id). Base look (color, border, bg, layout) is set INLINE on the
+ * elements via the --lens-* tokens (mirroring the attach-box kit); this file
+ * carries ONLY what inline styles can't express: :hover states, the rubric /
+ * menu transitions, and the re-scan pulse keyframe. Everything is scoped under
+ * .lens-root so it rides the lens design language and touches nothing else. */
+
+/* hover lifts ------------------------------------------------------------- */
+.lens-root .ld-iconbtn { transition: color .15s, border-color .15s, background .15s; }
+.lens-root .ld-iconbtn:hover { color: var(--lens-ink-soft); border-color: var(--lens-line-2); background: var(--lens-paper); }
+
+.lens-root .ld-btn { transition: border-color .15s, color .15s; }
+.lens-root .ld-btn:hover { color: var(--lens-ink); border-color: color-mix(in srgb, var(--lens-ink) 24%, var(--lens-line)); }
+
+.lens-root .ld-ghostlink { transition: color .15s; }
+.lens-root .ld-ghostlink:hover { color: var(--lens-ink); }
+
+.lens-root .ld-seg-btn { transition: background .15s, color .15s; }
+.lens-root .ld-seg-btn:not(.is-on):hover { color: var(--lens-ink-soft); }
+
+.lens-root .ld-helptoggle { transition: background .15s, border-color .15s, color .15s; }
+.lens-root .ld-helptoggle:hover,
+.lens-root .ld-helptoggle.is-on { background: color-mix(in srgb, var(--lens-ink) 7%, transparent); border-color: var(--lens-line); color: var(--lens-ink); }
+
+.lens-root .ld-menu-edit { transition: background .15s; }
+.lens-root .ld-menu-edit:hover { background: var(--lens-purple-wash); }
+
+.lens-root .ld-beat { transition: border-color .15s, box-shadow .15s, transform .12s; }
+.lens-root .ld-beat:hover { border-color: var(--lens-line-2); box-shadow: 0 5px 14px rgba(40, 28, 70, .08); }
+
+.lens-root .ld-rescan.is-ready { transition: filter .15s, box-shadow .15s; }
+.lens-root .ld-rescan.is-ready:hover { filter: brightness(.98); box-shadow: 0 3px 10px color-mix(in srgb, var(--lens-purple) 18%, transparent); }
+
+/* re-scan pulse dot (only when there are pending changes) ------------------ */
+.lens-root .ld-rdot--pulse { animation: ld-rpulse 1.4s ease-in-out infinite; }
+@keyframes ld-rpulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--lens-gold) 40%, transparent); }
+  50% { box-shadow: 0 0 0 4px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lens-root .ld-rdot--pulse { animation: none; }
+}

@@ -1,0 +1,59 @@
+/* lens.css — design tokens + utility classes for the Lenses section.
+ *
+ * Faithful to the Claude-Design "Lenses Exploration" handoff: its purple / gold /
+ * green palette + Spectral serif live here as NEW app tokens (--lens-*), so the
+ * cards read exactly like the mockup without clobbering the page's wv2 tokens.
+ * The components reference these via inline styles (mirroring the prototype). */
+
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap');
+
+.lens-root {
+  /* ink + neutrals */
+  --lens-ink: #3a3340;
+  --lens-ink-soft: #5f5869;
+  --lens-muted: #9b93a8;
+  --lens-muted-2: #c0b9cc;
+  --lens-faint: #d8d2e2;
+  --lens-line: rgba(74, 54, 108, .12);
+  --lens-line-2: rgba(74, 54, 108, .20);
+  /* purple — the primary accent */
+  --lens-purple: #6d57a6;
+  --lens-purple-deep: #574488;
+  --lens-purple-soft: #cabbe9;
+  --lens-purple-wash: #efe9f7;
+  --lens-purple-wash-2: #e7defa;
+  /* gold — Night Eyes / invent */
+  --lens-gold: #b0862f;
+  --lens-gold-soft: #e7d3a3;
+  --lens-gold-wash: #f7efdc;
+  /* green — attached */
+  --lens-green: #4f7a52;
+  --lens-green-deep: #3c5e3f;
+  --lens-green-wash: #e8f0e6;
+  /* rust — flags */
+  --lens-rust: #b0573f;
+  --lens-rust-wash: #f6e7e1;
+  --lens-paper: #ffffff;
+  --lens-serif: 'Spectral', Georgia, serif;
+  --lens-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  color: var(--lens-ink);
+  font-family: var(--lens-serif);
+}
+
+/* small helpers carried over from the prototype */
+.lens-root .ui { font-family: var(--lens-sans); }
+.lens-root .kicker {
+  font-family: var(--lens-sans); font-size: 10.5px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--lens-muted);
+}
+.lens-root button { font-family: var(--lens-sans); cursor: pointer; color: inherit; }
+.lens-root .focusring:focus-visible { outline: 2px solid var(--lens-purple); outline-offset: 2px; }
+.lens-root .lenscard { transition: box-shadow .18s, transform .18s, border-color .18s; }
+.lens-root .lenscard:hover { box-shadow: 0 10px 26px -16px rgba(60, 40, 100, .4); }
+.lens-root .lenschip { transition: box-shadow .15s; }
+.lens-root .lenschip:hover { box-shadow: 0 4px 14px -8px rgba(60, 40, 100, .45); }
+
+/* horizontal scroller for the shelf — hide the scrollbar, keep the swipe */
+.lens-root .lens-shelf-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.lens-root .lens-shelf-scroll::-webkit-scrollbar { display: none; }

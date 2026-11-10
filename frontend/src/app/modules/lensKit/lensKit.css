@@ -1,0 +1,78 @@
+/* lensKit.css — the inline lens-box styling, relocated verbatim from the old
+ * arnKit.css (which had relocated it from sectionLens.css). Rides on the --lens-*
+ * tokens + .ui/.kicker/.focusring helpers from modules/lens/lens.css (import it
+ * alongside). No NEW styling is invented here — it's relocated handoff CSS.
+ *
+ * (The digital-eye indicator + ghost AI diamond CSS stays in modules/arnKit/arnKit.css,
+ * with the heading atoms that use it.) */
+
+.sl-report {
+  max-width: 640px;
+  margin-top: 12px;
+}
+
+.sl-box {
+  max-width: 640px;
+}
+
+.sl-box-card {
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid var(--lens-line-2);
+  box-shadow: 0 6px 18px -14px rgba(60, 40, 100, .4);
+  padding: 13px 15px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.sl-box-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sl-box-title {
+  font-family: var(--lens-serif);
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.sl-box-sub {
+  font-size: 11.5px;
+  color: var(--lens-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.sl-box-x {
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: var(--lens-muted-2);
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.sl-box-x:hover {
+  color: var(--lens-ink);
+}
+
+.sl-box-empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--lens-muted);
+  font-style: italic;
+}
+
+/* verdict face */
+.sl-verdict-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  margin-top: 5px;
+  background: var(--lens-green);
+}
