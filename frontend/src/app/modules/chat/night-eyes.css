@@ -1,0 +1,2621 @@
+/* ==============================================================
+ * Night Eyes — the floating AI reader companion (slice 1: shell).
+ *
+ * Ported from the Claude-Design mockup (writerverse/Night Eyes.html
+ * + night-eyes.css). Visibility is React-driven (orb vs panel), not
+ * the mockup's body classes. All color tokens resolve through the
+ * app theme system (theme/themes.ts).
+ *
+ * Slice 1 covers: relocated pointer, orb, panel, header, thread,
+ * greeting, page-mark, messages, thinking trace, proposal card,
+ * quick chips, input, walking toast. Pills/stack/sheet/ping/history/
+ * dock land in later slices.
+ * ============================================================== */
+
+@keyframes ne-twinkle {
+
+  0%,
+  100% {
+    opacity: .7;
+    transform: scale(.92) rotate(0deg)
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08) rotate(8deg)
+  }
+}
+
+@keyframes ne-soft-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1)
+  }
+
+  50% {
+    opacity: .5;
+    transform: scale(.85)
+  }
+}
+
+@keyframes ne-blink {
+  50% {
+    opacity: 0
+  }
+}
+
+@keyframes ne-spin {
+  to {
+    transform: rotate(360deg)
+  }
+}
+
+@keyframes ne-walk-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px)
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
+}
+
+/* The in-page reader column is relocated into Night Eyes — a tiny pointer
+ * is left where the column used to be (World / Outline / Threads rails). */
+.ne-relocated {
+  padding: 14px 12px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.6;
+  letter-spacing: .005em;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.ne-relocated:hover {
+  color: var(--ink-2)
+}
+
+.ne-relocated b {
+  color: var(--ink-2);
+  font-weight: 600
+}
+
+.ne-relocated .arr {
+  display: inline-block;
+  color: var(--gold);
+  filter: drop-shadow(0 0 4px rgba(180, 140, 20, .5));
+  margin-left: 3px;
+}
+
+/* ===================== THE ORB (idle) ===================== */
+.ne-orb {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  height: 56px;
+  padding: 0;
+  background: linear-gradient(165deg, var(--paper) 0%, var(--paper-2) 100%);
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  box-shadow: var(--sh-3), inset 0 1px 0 rgba(255, 255, 255, .6);
+  cursor: pointer;
+  font-family: var(--ui);
+  overflow: hidden;
+  transition: padding .22s ease, transform .12s ease;
+}
+
+.ne-orb--hovered {
+  transform: scale(1.05);
+  box-shadow: var(--sh-4), inset 0 1px 0 rgba(56, 43, 43, 0.6)
+}
+
+.ne-orb-eye {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  color: var(--terra-deep);
+}
+
+.ne-orb-eye::before {
+  content: '✦';
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--gold);
+  line-height: 1;
+  filter: drop-shadow(0 0 6px rgba(180, 140, 20, .55));
+  animation: ne-twinkle 3.4s ease-in-out infinite;
+}
+
+.ne-orb-pip {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--sage);
+  border: 1.5px solid var(--paper);
+  animation: ne-soft-pulse 2.4s infinite;
+}
+
+.ne-orb-lbl {
+  max-width: 0;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  opacity: 0;
+  padding: 0;
+  transition: max-width .22s ease, opacity .18s ease, padding .22s ease;
+}
+
+.ne-orb-lbl small {
+  display: block;
+  font-family: var(--ui);
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+  margin-top: 1px;
+}
+
+.ne-orb--hovered .ne-orb-lbl {
+  max-width: 200px;
+  opacity: 1;
+  padding: 0 18px 0 4px
+}
+
+.ne-orb--hovered .ne-orb-lbl small {
+  color: var(--ink-2);
+}
+
+.ne-orb-badge {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--clay);
+  color: #fff;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(140, 40, 10, .3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- the edge strip — a petite line rising from the orb to the top, merged
+   with it as one extruded piece. The wrapper spans the right column but is
+   click-through; its single `filter: drop-shadow` envelopes BOTH the strip and
+   the orb (overlapping, same paper gradient, no per-element borders) so they
+   read as one object. ---- */
+.ne-edge {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  width: 56px;
+  padding: 60px;
+  z-index: 90;
+  filter: drop-shadow(0 5px 16px rgba(40, 28, 8, .16)) drop-shadow(0 0 .6px rgba(70, 50, 20, .45));
+}
+
+/* the orb, re-homed inside the wrapper: drop its own border + outer shadow
+   (the wrapper owns the shadow now), keep only the glossy inset highlight. */
+.ne-edge .ne-orb {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: auto;
+  border: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+}
+
+.ne-edge .ne-orb:hover {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6)
+}
+
+.ne-edge-strip {
+  position: absolute;
+  right: 25.5px;
+  top: 0;
+  bottom: 28px;
+  width: 5px;
+  z-index: 1;
+  pointer-events: auto;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(165deg, var(--paper) 0%, var(--paper-2) 100%);
+  border-radius: 6px 6px 0 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+  transition: width .2s ease, transform .12s ease;
+}
+
+.ne-edge-strip:hover {
+  width: 26px
+}
+
+/* lift the whole pin (strip + orb) together when either part is hovered */
+.ne-edge:has(:hover) .ne-orb,
+.ne-edge:has(:hover) .ne-edge-strip {
+  transform: translateY(-1px)
+}
+
+.ne-edge-lbl {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--ink);
+  letter-spacing: .01em;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .18s ease .04s;
+}
+
+.ne-edge-strip:hover .ne-edge-lbl {
+  opacity: 1
+}
+
+/* ===================== THE PANEL ===================== */
+.ne-panel {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  width: 432px;
+  height: min(680px, calc(100vh - 120px));
+  z-index: 91;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  overflow: hidden;
+  font-family: var(--ui);
+}
+
+.ne-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 2;
+}
+
+/* ---- header ---- */
+.ne-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  /* border-bottom: 1px solid var(--line-2); */
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.ne-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+  border: 1px solid var(--line-2);
+  display: grid;
+  place-items: center;
+  color: var(--terra-deep);
+  position: relative;
+  box-shadow: var(--sh-1);
+}
+
+.ne-avatar::before {
+  content: '✦';
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--gold);
+  filter: drop-shadow(0 0 5px rgba(180, 140, 20, .55));
+  animation: ne-twinkle 3.4s ease-in-out infinite;
+}
+
+.ne-meta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden
+}
+
+.ne-name {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.ne-status {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.3;
+  font-family: var(--ui);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.ne-status>span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.ne-page-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 7px 1px 5px;
+  color: var(--ink-2);
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: .005em;
+  white-space: nowrap;
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+
+.ne-page-chip .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--terra)
+}
+
+.ne-acts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin-left: auto
+}
+
+.ne-iconbtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  position: relative;
+}
+
+.ne-iconbtn:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink)
+}
+
+.ne-iconbtn svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+/* accented "new chat" — the primary header action */
+.ne-iconbtn--new {
+  color: var(--terra-deep);
+  background: var(--terra-soft)
+}
+
+.ne-iconbtn--new:hover {
+  background: var(--terra-soft);
+  color: var(--terra-deep);
+  filter: brightness(.97)
+}
+
+.ne-iconbtn--new:disabled {
+  opacity: .4;
+  cursor: default
+}
+
+/* history — same size as new chat, slightly muted */
+.ne-iconbtn--history {
+  opacity: .6
+}
+
+.ne-iconbtn--history:hover {
+  opacity: 1
+}
+
+.ne-count {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  min-width: 13px;
+  height: 13px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 11px;
+  text-align: center;
+}
+
+/* window controls — dock + minimize, grouped tight and small */
+.ne-winctl {
+  display: flex;
+  align-items: center;
+  gap: 1px
+}
+
+.ne-winctl .ne-iconbtn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-xs)
+}
+
+.ne-winctl .ne-iconbtn svg {
+  width: 12px;
+  height: 12px
+}
+
+/* ---- thread ---- */
+.ne-thread {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--paper);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-3) transparent;
+}
+
+.ne-thread::-webkit-scrollbar {
+  width: 8px
+}
+
+.ne-thread::-webkit-scrollbar-thumb {
+  background: var(--line-3);
+  border-radius: 4px
+}
+
+.ne-thread::-webkit-scrollbar-track {
+  background: transparent
+}
+
+.ne-greet {
+  padding: 18px 14px;
+  text-align: center
+}
+
+.ne-greet-glyph {
+  font-family: var(--serif);
+  font-size: 36px;
+  color: var(--gold);
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(180, 140, 20, .45));
+  margin-bottom: 8px;
+}
+
+.ne-greet h3 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--ink);
+  margin: 0 0 6px;
+  letter-spacing: -.005em
+}
+
+.ne-greet p {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin: 0 auto;
+  max-width: 30ch;
+  line-height: 1.5;
+  font-style: italic
+}
+
+.ne-page-mark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 700;
+}
+
+.ne-page-mark::before,
+.ne-page-mark::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-image: linear-gradient(to right, var(--line-2) 50%, transparent 50%);
+  background-size: 6px 1px;
+  background-repeat: repeat-x;
+}
+
+.ne-page-mark .ne-arrow {
+  color: var(--terra);
+  margin: 0 2px;
+  font-size: 11px;
+  line-height: 1
+}
+
+.ne-page-mark b {
+  color: var(--ink-3);
+  font-weight: 700;
+  font-family: var(--serif);
+  text-transform: none;
+  letter-spacing: -.005em;
+  font-size: 11px
+}
+
+/* user message */
+.ne-msg.user {
+  align-self: flex-end;
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px
+}
+
+.ne-bubble {
+  background: linear-gradient(180deg, var(--terra-soft) 0%, #f0d2b3 100%);
+  border: 1px solid #e7c9a8;
+  border-radius: var(--r-lg) var(--r-lg) var(--r-xs) var(--r-lg);
+  padding: 8px 12px;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  box-shadow: var(--sh-1);
+}
+
+/* assistant prose */
+.ne-msg.assistant {
+  align-self: flex-start;
+  max-width: 96%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px
+}
+
+.ne-body {
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+  letter-spacing: -.003em
+}
+
+.ne-body p {
+  margin: 0 0 .65em
+}
+
+.ne-body p:last-child {
+  margin-bottom: 0
+}
+
+.ne-body b,
+.ne-body strong {
+  font-weight: 600
+}
+
+.ne-body i,
+.ne-body em {
+  font-style: italic;
+  color: var(--terra-deep)
+}
+
+.ne-body ul,
+.ne-body ol {
+  margin: 0 0 .65em;
+  padding-left: 1.2em
+}
+
+.ne-body li {
+  margin: 0 0 .2em
+}
+
+.ne-body code {
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 11.5px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 4px;
+}
+
+.ne-caret {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background: var(--terra);
+  vertical-align: -2px;
+  margin-left: 1px;
+  animation: ne-blink 1.05s steps(1) infinite;
+}
+
+.ne-msg-error {
+  align-self: flex-start;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--clay);
+  background: rgba(180, 60, 30, .07);
+  border: 1px solid rgba(180, 60, 30, .2);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+/* thinking trace */
+.ne-steps {
+  align-self: flex-start;
+  max-width: 96%;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  background: rgba(80, 55, 15, .025);
+  padding: 6px 10px;
+  font-family: var(--ui);
+}
+
+.ne-steps-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.ne-think-ic {
+  font-size: 11px;
+  color: var(--gold);
+  line-height: 1;
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, .4))
+}
+
+.ne-think-chev {
+  font-size: 11px;
+  color: var(--ink-3);
+  transition: transform .15s;
+  line-height: 1;
+  margin-left: auto
+}
+
+.ne-steps.open .ne-think-chev {
+  transform: rotate(90deg)
+}
+
+.ne-steps-body {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--line-2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px
+}
+
+.ne-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: 11px;
+  color: var(--ink-2);
+  font-family: var(--ui);
+  line-height: 1.4;
+  padding: 2px 0
+}
+
+.ne-step-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%
+}
+
+.ne-step-ic {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #dde5dc;
+  border: 1px solid #bdc9bd;
+  display: grid;
+  place-items: center;
+  color: var(--sage);
+  font-size: 10px;
+}
+
+.ne-step-ic svg {
+  width: 9px;
+  height: 9px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+.ne-step-name {
+  font-family: var(--ui);
+  font-weight: 600;
+  color: var(--ink-2)
+}
+
+.ne-step-arg {
+  color: var(--ink-3);
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 10px;
+  background: var(--surface-2);
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: -.005em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 140px;
+}
+
+.ne-step-tail {
+  margin-left: auto;
+  color: var(--ink-3);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px
+}
+
+.ne-step-chev {
+  margin-left: auto;
+  color: var(--ink-3);
+  font-size: 10px;
+  flex: 0 0 auto
+}
+
+.ne-step-result {
+  margin: 5px 0 3px 24px;
+  padding: 6px 8px;
+  border-radius: var(--r-xs);
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 10px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.ne-tool-running {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ai-bg);
+  border: 1px solid #e2d2ad;
+  border-radius: 999px;
+  padding: 5px 12px 5px 9px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.ne-tool-running .ne-spin {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-soft);
+  border-top-color: var(--gold);
+  animation: ne-spin .9s linear infinite;
+}
+
+.ne-tool-running b {
+  color: var(--ink);
+  font-weight: 600
+}
+
+/* note line (accepted/rejected aftermath) */
+.ne-note {
+  align-self: flex-start;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  letter-spacing: .02em;
+  padding: 1px 2px;
+}
+
+/* ---- proposal pills in the thread (slice 2) ---- */
+.ne-pill {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-left: 3px solid var(--terra);
+  border-radius: var(--r-sm);
+  padding: 7px 10px 7px 11px;
+  font-family: var(--ui);
+  box-shadow: var(--sh-1);
+  transition: background .15s, border-color .15s;
+}
+
+.ne-pill[data-kind="add_character"] {
+  border-left-color: var(--teal)
+}
+
+.ne-pill[data-kind="add_plot_thread"],
+.ne-pill[data-kind="generate_thread"] {
+  border-left-color: var(--gold)
+}
+
+.ne-pill[data-kind="add_worldbuilding"] {
+  border-left-color: var(--sage)
+}
+
+.ne-pill[data-kind="run_merge_rough_into_grand"] {
+  border-left-color: var(--teal)
+}
+
+.ne-pill-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 18px;
+  cursor: pointer
+}
+
+.ne-pill-glyph {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: var(--r-xs);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-family: var(--serif);
+  font-size: 11px;
+  color: var(--terra-deep);
+  line-height: 1;
+}
+
+.ne-pill-kind {
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  flex: 0 0 auto;
+  letter-spacing: -.005em;
+}
+
+.ne-pill-title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-left: 1px;
+}
+
+.ne-pill-stat {
+  flex: 0 0 auto;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--clay);
+  background: rgba(180, 60, 30, .08);
+  border: 1px solid rgba(180, 60, 30, .18);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.ne-pill-toggle {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--ink-3);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.ne-pill-toggle:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink)
+}
+
+.ne-pill.expanded .ne-pill-toggle {
+  transform: rotate(90deg)
+}
+
+.ne-pill-body {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--line-2);
+  font-family: var(--serif);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  letter-spacing: -.003em;
+}
+
+.ne-pill-body em {
+  font-style: italic;
+  color: var(--terra-deep)
+}
+
+.ne-pill-acts {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px
+}
+
+.ne-pill.collapsed .ne-pill-acts {
+  margin-top: 0;
+  margin-left: auto
+}
+
+.ne-pill-iact {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  border-radius: var(--r-xs);
+  color: var(--ink-3);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  transition: background .12s, color .12s, border-color .12s;
+}
+
+.ne-pill-iact:hover {
+  background: var(--paper);
+  border-color: var(--line-3);
+  color: var(--ink)
+}
+
+.ne-pill-iact.accept {
+  background: var(--terra);
+  color: #fff;
+  border-color: var(--terra-deep)
+}
+
+.ne-pill-iact.accept:hover {
+  background: var(--terra-deep)
+}
+
+.ne-pill-iact.reject:hover {
+  color: var(--clay);
+  border-color: rgba(180, 60, 30, .4)
+}
+
+.ne-pill-iact:disabled {
+  opacity: .5;
+  cursor: default
+}
+
+.ne-pill-iact svg {
+  width: 11px;
+  height: 11px
+}
+
+.ne-pill-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--terra-deep);
+  background: transparent;
+  border: 0;
+  padding: 4px 8px;
+  border-radius: var(--r-xs);
+  cursor: pointer;
+  letter-spacing: .005em;
+}
+
+.ne-pill-view:hover {
+  background: rgba(180, 90, 30, .08)
+}
+
+.ne-pill-view svg {
+  width: 10px;
+  height: 10px
+}
+
+/* accepted / rejected — thin aftermath line */
+.ne-pill.accepted,
+.ne-pill.rejected {
+  border-left-color: transparent;
+  background: transparent;
+  border: 1px dashed var(--line-2);
+  box-shadow: none;
+  padding: 5px 10px 5px 11px;
+}
+
+.ne-pill.accepted .ne-pill-head,
+.ne-pill.rejected .ne-pill-head {
+  cursor: default
+}
+
+.ne-pill.accepted .ne-pill-glyph,
+.ne-pill.rejected .ne-pill-glyph {
+  background: transparent;
+  border: 0;
+  color: var(--sage);
+  font-size: 13px
+}
+
+.ne-pill.rejected .ne-pill-glyph {
+  color: var(--clay)
+}
+
+.ne-pill.accepted .ne-pill-title,
+.ne-pill.rejected .ne-pill-title {
+  font-weight: 500;
+  color: var(--ink-3);
+  font-size: 11.5px
+}
+
+.ne-pill.rejected .ne-pill-title {
+  text-decoration: line-through;
+  text-decoration-color: var(--line-3)
+}
+
+.ne-pill.accepted .ne-pill-stat,
+.ne-pill.rejected .ne-pill-stat {
+  background: transparent;
+  border: 0;
+  color: var(--sage);
+  font-weight: 500;
+  letter-spacing: .04em;
+  text-transform: none;
+  padding: 0
+}
+
+.ne-pill.rejected .ne-pill-stat {
+  color: var(--clay)
+}
+
+.ne-btn {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background .12s, border-color .12s, color .12s, transform .08s;
+}
+
+.ne-btn:hover {
+  background: var(--paper-2);
+  border-color: var(--line-3)
+}
+
+.ne-btn:active {
+  transform: translateY(.5px)
+}
+
+.ne-btn:disabled {
+  opacity: .5;
+  cursor: default
+}
+
+.ne-btn.accept {
+  background: var(--terra);
+  color: #fff;
+  border-color: var(--terra-deep);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18) inset
+}
+
+.ne-btn.accept:hover {
+  background: var(--terra-deep)
+}
+
+.ne-btn.subtle {
+  background: transparent;
+  border: 0;
+  color: var(--ink-3);
+  font-weight: 500;
+  padding: 5px 8px
+}
+
+.ne-btn.subtle:hover {
+  color: var(--ink-2);
+  background: rgba(60, 40, 15, .05)
+}
+
+/* ---- "N proposals waiting" stack summary (slice 2) ---- */
+.ne-stack {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 7px 14px;
+  border: 0;
+  border-top: 1px solid var(--line-2);
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--paper-2) 0%, var(--surface-2) 100%);
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.ne-stack:hover {
+  background: var(--surface-2)
+}
+
+.ne-stack-dots {
+  display: flex;
+  align-items: center
+}
+
+.ne-stack-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: -2px;
+  border: 1.5px solid var(--paper-2)
+}
+
+.ne-stack-dot:nth-child(1) {
+  background: var(--teal)
+}
+
+.ne-stack-dot:nth-child(2) {
+  background: var(--terra)
+}
+
+.ne-stack-dot:nth-child(3) {
+  background: var(--gold)
+}
+
+.ne-stack-dot:nth-child(4) {
+  background: var(--sage)
+}
+
+.ne-stack-lbl {
+  flex: 1;
+  min-width: 0;
+  text-align: left
+}
+
+.ne-stack-lbl b {
+  font-weight: 600;
+  color: var(--ink)
+}
+
+.ne-stack-act {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--terra-deep);
+  letter-spacing: .005em
+}
+
+.ne-stack-chev {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-left: 2px
+}
+
+/* ---- bottom suggestions bar (proposals + hints; above the composer) ---- */
+.ne-sugbar {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line-2);
+  background: linear-gradient(180deg, var(--paper-2) 0%, var(--surface-2) 100%);
+}
+
+/* inline preview of the current item — reuses the exact rail cards */
+.ne-sugbar-preview {
+  padding: 11px 12px 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px
+}
+
+/* ‹ 2 of 3 › stepper, shown above the card when multiple proposals are fresh */
+.ne-sugbar-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 0 1px
+}
+
+.ne-sugbar-pager-lbl {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  min-width: 48px;
+  text-align: center
+}
+
+.ne-sugbar-pager-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  color: var(--ink-2);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.ne-sugbar-pager-btn:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--ink)
+}
+
+.ne-sugbar-pager-btn:disabled {
+  opacity: .35;
+  cursor: default
+}
+
+.ne-sugbar-count {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 7px 14px;
+  border: 0;
+  cursor: pointer;
+  background: transparent;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2);
+}
+
+.ne-sugbar.is-open .ne-sugbar-count {
+  border-top: 1px solid var(--line-2)
+}
+
+.ne-sugbar-count:hover {
+  background: var(--surface-2)
+}
+
+.ne-sugbar-dots {
+  display: flex;
+  align-items: center
+}
+
+.ne-sugbar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: -2px;
+  border: 1.5px solid var(--paper-2)
+}
+
+.ne-sugbar-dot:nth-child(1) {
+  background: var(--teal)
+}
+
+.ne-sugbar-dot:nth-child(2) {
+  background: var(--terra)
+}
+
+.ne-sugbar-dot:nth-child(3) {
+  background: var(--gold)
+}
+
+.ne-sugbar-dot:nth-child(4) {
+  background: var(--sage)
+}
+
+.ne-sugbar-lbl {
+  flex: 1;
+  min-width: 0;
+  text-align: left
+}
+
+.ne-sugbar-lbl b {
+  font-weight: 600;
+  color: var(--ink)
+}
+
+.ne-sugbar-act {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--terra-deep);
+  letter-spacing: .005em
+}
+
+.ne-sugbar-chev {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-left: 2px
+}
+
+/* ---- slide-in "main view" sheet (slice 2) ---- */
+@keyframes ne-fadein {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes ne-sheet-in {
+  from {
+    transform: translateX(20px);
+    opacity: 0
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1
+  }
+}
+
+.ne-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 94;
+  background: rgba(40, 28, 8, .18);
+  backdrop-filter: blur(1.5px);
+  animation: ne-fadein .18s ease-out;
+}
+
+.ne-sheet {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  bottom: 14px;
+  width: min(540px, calc(100vw - 28px));
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  box-shadow: 0 30px 80px rgba(40, 28, 8, .22), 0 1px 0 rgba(255, 255, 255, .5) inset;
+  overflow: hidden;
+  font-family: var(--ui);
+  animation: ne-sheet-in .26s cubic-bezier(.2, .7, .2, 1);
+}
+
+.ne-sheet::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--terra) 0%, var(--gold) 50%, var(--terra) 100%)
+}
+
+.ne-sheet-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 16px 16px 14px;
+  position: relative;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-bottom: 1px solid var(--line-2);
+}
+
+.ne-sheet-glyph {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--terra-deep);
+  margin-top: 1px;
+}
+
+.ne-sheet-meta {
+  flex: 1;
+  min-width: 0
+}
+
+.ne-sheet-kind {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 3px
+}
+
+.ne-sheet-kind code {
+  font-family: 'JetBrains Mono', 'Menlo', monospace;
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-2)
+}
+
+.ne-sheet-stat {
+  color: var(--clay);
+  background: rgba(180, 60, 30, .08);
+  border: 1px solid rgba(180, 60, 30, .18);
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: .08em
+}
+
+.ne-sheet-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--ink);
+  letter-spacing: -.01em;
+  line-height: 1.3;
+  margin: 0
+}
+
+.ne-sheet-sub {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-top: 4px;
+  font-style: italic;
+  line-height: 1.4;
+  letter-spacing: -.003em
+}
+
+.ne-sheet-close {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink-3);
+  display: grid;
+  place-items: center
+}
+
+.ne-sheet-close:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink)
+}
+
+.ne-sheet-close svg {
+  width: 14px;
+  height: 14px
+}
+
+.ne-sheet-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px 16px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-3) transparent
+}
+
+/* the suggestions drawer hosts <SuggestionsRail> directly — it's the only thing
+   in the sheet, so drop the list's rail-specific top border/inset. */
+.ne-sheet-body--suggestions .wv2-rr-sug {
+  border-top: 0;
+  padding-top: 0
+}
+
+.ne-sheet-body::-webkit-scrollbar {
+  width: 8px
+}
+
+.ne-sheet-body::-webkit-scrollbar-thumb {
+  background: var(--line-3);
+  border-radius: 4px
+}
+
+.ne-sheet-section {
+  margin-bottom: 14px
+}
+
+.ne-sheet-section:last-child {
+  margin-bottom: 0
+}
+
+.ne-sheet-section-h {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px
+}
+
+.ne-sheet-section-h::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-image: linear-gradient(to right, var(--line-2) 50%, transparent 50%);
+  background-size: 5px 1px;
+  background-repeat: repeat-x
+}
+
+.ne-sheet-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 5px 12px
+}
+
+.ne-sheet-field {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--line-2);
+  font-family: var(--ui);
+  font-size: 12px;
+  line-height: 1.45
+}
+
+.ne-sheet-field:last-child {
+  border-bottom: 0
+}
+
+.ne-sheet-field dt {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-top: 2px
+}
+
+.ne-sheet-field dd {
+  margin: 0;
+  font-family: var(--serif);
+  color: var(--ink);
+  font-size: 13px;
+  letter-spacing: -.003em
+}
+
+.ne-sheet-refs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px
+}
+
+.ne-sheet-ref {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2)
+}
+
+.ne-sheet-ref-num {
+  flex: 0 0 auto;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--ink-3);
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums
+}
+
+.ne-sheet-ref-where {
+  flex: 0 0 auto;
+  font-family: var(--serif);
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 12px
+}
+
+.ne-sheet-ref-snip {
+  flex: 1;
+  min-width: 0;
+  color: var(--ink-3);
+  font-style: italic;
+  font-family: var(--serif);
+  font-size: 11.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.ne-sheet-foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px 12px;
+  background: var(--paper-2);
+  border-top: 1px solid var(--line-2)
+}
+
+.ne-sheet-foot .ne-btn.accept {
+  margin-left: auto;
+  padding: 7px 14px;
+  font-size: 12.5px
+}
+
+/* ---- quick chips ---- */
+.ne-quick {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 5px;
+  padding: 8px 14px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-top: 1px dashed var(--line-2);
+  background: var(--paper);
+}
+
+.ne-quick::-webkit-scrollbar {
+  display: none
+}
+
+.ne-qchip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.2;
+  transition: background .12s, border-color .12s, color .12s;
+}
+
+.ne-qchip:hover {
+  background: var(--surface);
+  border-color: var(--line-3);
+  color: var(--ink)
+}
+
+.ne-qchip .gl {
+  color: var(--gold);
+  font-size: 10px;
+  line-height: 1;
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, .4))
+}
+
+/* ---- input ---- */
+.ne-input-wrap {
+  flex: 0 0 auto;
+  padding: 10px 12px 12px;
+  background: var(--paper);
+  border-top: 1px solid var(--line-2)
+}
+
+.ne-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 7px 8px 7px 11px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), var(--sh-1);
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.ne-input:focus-within {
+  border-color: var(--ink-4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 0 0 3px rgba(180, 140, 20, .08)
+}
+
+.ne-input textarea {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  resize: none;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  padding: 2px 0 1px;
+  max-height: 126px;
+  min-height: 22px;
+}
+
+.ne-input textarea::placeholder {
+  color: var(--ink-3);
+  font-style: italic
+}
+
+.ne-input-send {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--terra);
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18) inset, 0 1px 2px rgba(120, 50, 0, .18);
+  transition: background .12s;
+}
+
+.ne-input-send:hover {
+  background: var(--terra-deep)
+}
+
+.ne-input-send:disabled {
+  opacity: .5;
+  cursor: default
+}
+
+.ne-input-send svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+/* While Night Eyes is streaming the send button parks as a spinner — disabled
+   (can't send) but kept at full strength so it reads as an active indicator. */
+.ne-input-send.is-working {
+  opacity: 1;
+  cursor: default;
+  background: var(--terra)
+}
+
+.ne-input-send .ne-spin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, .4);
+  border-top-color: #fff;
+  animation: ne-spin .9s linear infinite;
+}
+
+.ne-input-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 0 4px;
+  font-size: 9.5px;
+  color: var(--ink-3);
+  letter-spacing: .02em
+}
+
+.ne-input-hint kbd {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border: 1px solid var(--line-2);
+  border-bottom-width: 1.5px;
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--ink-2);
+}
+
+/* ---- walking-with-you toast ---- */
+.ne-walking {
+  position: fixed;
+  right: 22px;
+  bottom: 90px;
+  z-index: 89;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  padding: 6px 14px 6px 8px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2);
+  letter-spacing: .005em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--sh-3);
+  animation: ne-walk-in .35s ease-out;
+}
+
+.ne-walking-eye {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--ai-bg), var(--terra-soft));
+  border: 1px solid var(--line-2);
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  font-family: var(--serif);
+  font-size: 12px;
+  filter: drop-shadow(0 0 4px rgba(180, 140, 20, .5));
+}
+
+.ne-walking b {
+  color: var(--ink);
+  font-weight: 600
+}
+
+.ne-walking i {
+  font-style: italic;
+  color: var(--terra-deep);
+  font-weight: 500
+}
+
+/* ---- "Ask Night Eyes" selection (slice 5) ---- */
+/* attached-quote chip above the input */
+.ne-input-sel {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--terra);
+  border-radius: 0 6px 6px 0;
+  padding: 5px 8px;
+  font-family: var(--serif);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-style: italic;
+  line-height: 1.4;
+  max-width: 100%;
+}
+
+.ne-input-sel-lbl {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-style: normal;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+  background: var(--terra-soft);
+  border: 1px solid #e7c9a8;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.ne-input-sel-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap
+}
+
+.ne-input-sel-x {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--ink-3);
+  cursor: pointer;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+.ne-input-sel-x:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink)
+}
+
+/* floating "Ask Night Eyes" toolbar over a page selection */
+.ne-seltool {
+  position: fixed;
+  z-index: 96;
+  transform: translate(-50%, calc(-100% - 6px));
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: var(--ink);
+  color: var(--paper);
+  border: 0;
+  border-radius: var(--r-md);
+  padding: 0;
+  box-shadow: var(--sh-4);
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .005em;
+  white-space: nowrap;
+}
+
+.ne-seltool.ne-seltool-bar {
+  padding: 0
+}
+
+.ne-seltool::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--ink);
+}
+
+.ne-seltool-btn {
+  background: transparent;
+  color: inherit;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.ne-seltool-btn:first-child {
+  border-radius: var(--r-md) 0 0 var(--r-md)
+}
+
+.ne-seltool-btn:last-of-type {
+  border-radius: 0 8px 8px 0
+}
+
+.ne-seltool-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, .08)
+}
+
+.ne-seltool-btn.is-open {
+  background: rgba(255, 255, 255, .12)
+}
+
+.ne-seltool-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed
+}
+
+.ne-seltool-sep {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(255, 255, 255, .12)
+}
+
+.ne-seltool-glyph {
+  color: var(--gold);
+  font-size: 12px;
+  filter: drop-shadow(0 0 4px rgba(220, 170, 30, .6))
+}
+
+.ne-seltool-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 220px;
+  max-width: 280px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-3);
+  padding: 6px;
+  font-weight: 500;
+}
+
+.ne-seltool-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  outline: 0;
+}
+
+.ne-seltool-search:focus {
+  border-color: var(--gold)
+}
+
+.ne-seltool-list {
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px
+}
+
+.ne-seltool-option {
+  text-align: left;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: var(--r-xs);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.ne-seltool-option:hover {
+  background: rgba(60, 40, 15, .06)
+}
+
+.ne-seltool-empty {
+  padding: 8px;
+  color: var(--ink-3);
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center
+}
+
+/* ---- surface ping (slice 3) — pinned above the input, thread scrolls ---- */
+@keyframes ne-shimmer {
+  from {
+    background-position: 200% 0
+  }
+
+  to {
+    background-position: -200% 0
+  }
+}
+
+.ne-ping {
+  flex: 0 0 auto;
+  position: relative;
+  border-top: 1px solid var(--line-2);
+  background: linear-gradient(180deg, var(--ai-bg) 0%, #e9dcb8 100%);
+  padding: 10px 14px 11px;
+  font-family: var(--ui);
+}
+
+.ne-ping::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(180, 140, 20, 0) 0%, rgba(180, 140, 20, .55) 30%, rgba(180, 140, 20, .85) 50%, rgba(180, 140, 20, .55) 70%, rgba(180, 140, 20, 0) 100%);
+  background-size: 200% 100%;
+  animation: ne-shimmer 2.4s linear infinite;
+}
+
+.ne-ping-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.ne-ping-head .gl {
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--gold);
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, .5))
+}
+
+.ne-ping-head .ne-ping-dots {
+  margin-left: auto;
+  font-size: 9px;
+  color: var(--ink-3);
+  font-weight: 500;
+  letter-spacing: .04em
+}
+
+.ne-ping-q {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  line-height: 1.45;
+  margin-bottom: 7px;
+}
+
+.ne-ping-q em {
+  font-style: italic;
+  color: var(--terra-deep)
+}
+
+.ne-ping-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px
+}
+
+.ne-ping-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1.4;
+  transition: background .12s, border-color .12s;
+}
+
+.ne-ping-opt:hover {
+  background: var(--paper);
+  border-color: var(--ink-4)
+}
+
+.ne-ping-opt:disabled {
+  opacity: .5;
+  cursor: default
+}
+
+.ne-ping-opt .ne-ping-key {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.ne-ping-foot {
+  margin-top: 8px;
+  display: flex;
+  align-items: center
+}
+
+.ne-ping-typehint {
+  font-size: 9.5px;
+  color: var(--ink-3);
+  font-style: italic
+}
+
+/* ---- action error toast — sticky, dismissed by user ---- */
+.ne-action-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 10px 6px;
+  padding: 10px 12px;
+  background: #fff0ee;
+  border: 1px solid #e8a89e;
+  border-radius: var(--r-md);
+  font-family: var(--ui);
+  font-size: 12px;
+  color: #6b2a1a;
+  line-height: 1.4;
+  animation: ne-walk-in .2s ease-out;
+}
+
+.ne-action-error-icon {
+  font-size: 14px;
+  flex-shrink: 0
+}
+
+.ne-action-error-msg {
+  flex: 1;
+  min-width: 0;
+  font-weight: 500
+}
+
+.ne-action-error-acts {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0
+}
+
+.ne-action-error-btn {
+  padding: 4px 10px;
+  border-radius: var(--r-xs);
+  border: 1px solid #e8a89e;
+  background: #fff;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b2a1a;
+  cursor: pointer;
+  transition: background .12s;
+}
+
+.ne-action-error-btn:hover {
+  background: #fde8e4
+}
+
+.ne-action-error-btn.dismiss {
+  border-color: transparent;
+  background: transparent;
+  color: #9a6050
+}
+
+.ne-action-error-btn.dismiss:hover {
+  background: rgba(107, 42, 26, .06)
+}
+
+/* ---- dock mode (slice 7) — right-edge sidebar, flush under the topbar.
+   The shell reserves --ne-dock-w on .wv2-body so this sits beside the content
+   rather than overlaying it. ---- */
+.ne-panel.ne-dock {
+  /* Clear the topbar's FULL footprint: 5px top margin + 44px height + 5px
+     bottom margin = 54px (where .wv2-body content actually begins). The old
+     44px ignored the card margins and rose 10px into the topbar band. */
+  top: 54px;
+  right: 5px;
+  bottom: 5px;
+  /* width: var(--ne-dock-w, 380px); */
+  height: auto;
+}
+
+.ne-panel.ne-dock::before {
+  display: none
+}
+
+/* ---- history drawer (slice 6) — overlays the panel ---- */
+.ne-history {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border-radius: var(--r-lg);
+}
+
+.ne-panel.ne-dock .ne-history {
+  border-radius: 0
+}
+
+.ne-history-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 14px 12px;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+}
+
+.ne-history-back {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink-3);
+  display: grid;
+  place-items: center;
+}
+
+.ne-history-back:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink)
+}
+
+.ne-history-back svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+.ne-history-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  letter-spacing: -.005em
+}
+
+.ne-history-count {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500
+}
+
+.ne-history-search {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 10px 14px 8px;
+  padding: 6px 9px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.ne-history-search svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round
+}
+
+.ne-history-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--ink);
+  outline: none
+}
+
+.ne-history-search input::placeholder {
+  color: var(--ink-3);
+  font-style: italic
+}
+
+.ne-history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 8px 14px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-3) transparent
+}
+
+.ne-history-list::-webkit-scrollbar {
+  width: 8px
+}
+
+.ne-history-list::-webkit-scrollbar-thumb {
+  background: var(--line-3);
+  border-radius: 4px
+}
+
+.ne-history-day {
+  margin: 14px 6px 5px;
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  font-family: var(--ui)
+}
+
+.ne-history-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  padding: 8px 10px 9px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  width: 100%;
+  text-align: left;
+  font-family: var(--ui);
+  transition: background .12s, border-color .12s;
+}
+
+.ne-history-row:hover {
+  background: var(--surface);
+  border-color: var(--line)
+}
+
+.ne-history-row.active {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: var(--sh-1)
+}
+
+.ne-h-title {
+  grid-column: 1;
+  grid-row: 1;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ne-h-meta {
+  grid-column: 1;
+  grid-row: 2;
+  font-size: 10px;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-variant-numeric: tabular-nums
+}
+
+.ne-h-page {
+  color: var(--terra-deep);
+  font-weight: 600
+}
+
+.ne-h-time {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: 9.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em
+}
+
+.ne-history-empty {
+  padding: 24px 14px;
+  text-align: center;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-style: italic
+}
