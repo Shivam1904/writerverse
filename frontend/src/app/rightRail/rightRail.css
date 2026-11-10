@@ -1,0 +1,1104 @@
+/* ════════════════════════════════════════════════════════════════════
+   RightRail — generic right-rail wrapper (.wv2-rr*)
+   A right-edge column: a page child on top, a suggestions section below.
+   Both flow at their natural height; the page scrolls if the rail is
+   taller than the viewport. Width is resizable (left-edge handle) and
+   persisted per route.
+   ════════════════════════════════════════════════════════════════════ */
+.wv2-root .wv2-rr {
+  /* page paddings this rail bleeds into so its paper panel reaches the page
+     edges — MUST match .wv2-page / .wv2-init-page padding (26px 28px 60px). */
+  --rr-bleed-r: 28px;
+  --rr-bleed-t: 26px;
+  --rr-bleed-b: 60px;
+  position: relative;           /* anchor for the left-edge resize handle */
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;          /* fill the page's full height, not just content */
+  margin-left: auto;            /* hug the right edge, like the old PageRail */
+  /* Bleed the paper panel out to the page's right + top + bottom edges by
+     cancelling .wv2-page's padding, then re-add right/top as padding so the
+     rail's CONTENT keeps its original inset. The flex-basis (set inline) is
+     grown by --rr-bleed-r to match, so the main column never shifts. */
+  margin-top: calc(var(--rr-bleed-t) * -1);
+  margin-right: calc(var(--rr-bleed-r) * -1);
+  margin-bottom: calc(var(--rr-bleed-b) * -1);
+  padding-top: var(--rr-bleed-t);
+  padding-right: var(--rr-bleed-r);
+  background: var(--paper);     /* matches the topbar + left rails — one paper-toned
+                                   chrome frame around the surface-toned canvas */
+}
+
+/* (Removed the old 100vw paper bleed-strip: the right rail is now the page
+   grid's far-right column and reaches the true content edge on its own, so
+   there's no centered-slab right margin left to paint over.) */
+
+/* left-edge drag handle */
+.wv2-rr-resize {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 7px;
+  cursor: col-resize;
+  z-index: 25;
+}
+.wv2-rr-resize::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 2px;
+  background: transparent;
+  transition: background .12s ease;
+}
+.wv2-rr-resize:hover::after { background: var(--terra); }
+
+/* body stacks the child + suggestions. No height clamp — both flow at their
+   natural height and the page scrolls if the column is taller than the
+   viewport. */
+.wv2-rr-body {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;           /* clear the resize handle */
+  gap: 14px;
+}
+
+/* page child — natural height, flows with the rail. */
+.wv2-rr-child {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Page-specific rails (threads' map, person's list) stay flex-columns so their
+   own internal structure keeps working. */
+.wv2-rr-child > .thr-rail,
+.wv2-rr-child > .chr-rail {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── suggestions section — sits below the page-child. Natural height; the
+   whole rail scrolls with the page. ── */
+.wv2-rr-sug {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.wv2-rr-sug-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  background: var(--paper);
+  padding-bottom: 8px;
+}
+.wv2-rr-sug-head span:first-child {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.wv2-rr-sug-ct {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.wv2-rr-sug-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Resting state ────────────────────────────────────────────────────────────
+   With nothing to suggest, the section would collapse and the rail reads as
+   blank. Instead it RESTS: a dimmed, slowly-breathing ✦ (the same mark proposals
+   wear) + a calm, reassuring line — Night Eyes is watching, just quiet.
+   Borderless (no divider hanging over an empty column) and centred. */
+.wv2-rr-sug.wv2-rr-rest {
+  border-top: none;
+  padding-top: 0;
+}
+.wv2-rr-rest-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 5px;
+  padding: 36px 22px;
+}
+.wv2-rr-rest-spark {
+  font-size: 22px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--gold, #b89030) 60%, var(--ink-4));
+  animation: wv2-rest-breathe 3.6s ease-in-out infinite;
+}
+@keyframes wv2-rest-breathe {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.06);
+  }
+}
+.wv2-rr-rest-head {
+  margin: 3px 0 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.wv2-rr-rest-sub {
+  margin: 0;
+  max-width: 30ch;
+  font-family: var(--ui);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-4);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wv2-rr-rest-spark {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+.wv2-rr-sug-card {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md, 10px);
+  padding: 10px 12px;
+  box-shadow: var(--sh-1);
+}
+.wv2-rr-sug-card-h {
+  margin: 0 0 4px;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.wv2-rr-sug-card-t {
+  margin: 0 0 6px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.wv2-rr-sug-card-src {
+  margin: 0;
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: .02em;
+  color: var(--ink-4);
+}
+
+/* ── Proposals group — pending proposals at the top of the rail (moved here
+   from the old floating bottom-right toast). Richer than a suggestion card:
+   a kind tag, a capability-specific detail block, and accept/dismiss. ── */
+.wv2-rr-prop-group {
+  display: flex;
+  flex-direction: column;
+}
+.wv2-rr-prop-group + .wv2-rr-sug-head {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.wv2-rr-prop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Walk-along list — in-place action cards (modules/hint/walkAlongHints).
+   The ONLY hint group above the proposals: stacked at the very TOP of the
+   suggestions. A dashed divider sits between it and whatever follows (the
+   proposals group, or — when nothing's pending — the initialize / hint list). ── */
+.wv2-rr-walk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wv2-rr-walk-list + .wv2-rr-prop-group,
+.wv2-rr-walk-list + .wv2-rr-initz-list,
+.wv2-rr-walk-list + .wv2-rr-hint-list {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+
+/* ── Initialize-hints list — bespoke milestone cards (modules/hint/
+   initializeHints) stacked BELOW the proposals, above the ambient hints. A
+   dashed divider sits between it and whatever precedes it (the proposals group,
+   or the walk-along list when nothing's pending). ── */
+.wv2-rr-initz-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wv2-rr-prop-group + .wv2-rr-initz-list,
+.wv2-rr-initz-list + .wv2-rr-hint-list {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+
+/* ── Hints list — <HintRailCard>s (modules/hint) — the bottom-most group, below
+   the proposals and the initialize list. A dashed divider sits above it when a
+   proposals group precedes it directly (no initialize list in between). ── */
+.wv2-rr-hint-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wv2-rr-prop-group + .wv2-rr-hint-list {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+
+/* ── Rail entrance choreography ───────────────────────────────────────────────
+   Cards don't all land at once — they arrive with intent:
+     • walk-along cards (the in-place move to make) fade up slowly, right away;
+     • every OTHER hint (milestone + next-step nudges) waits a beat, then
+       trickles in one by one, top to bottom — first after ~2.5s;
+     • proposals pop in with a small bounce — fresh AI output worth a glance.
+   `.wv2-enter` carries the shared timing; the variant picks the keyframes. The
+   per-card delay (the pause + stagger) rides in on the inline --enter-delay
+   custom prop set in SuggestionsRail. All of it stands down under
+   prefers-reduced-motion. */
+.wv2-enter {
+  animation-duration: var(--enter-dur, 0.5s);
+  animation-delay: var(--enter-delay, 0s);
+  animation-fill-mode: both;
+  animation-timing-function: ease;
+}
+.wv2-enter-slow {
+  animation-name: wv2-enter-rise;
+  --enter-dur: 0.72s;
+}
+.wv2-enter-delayed {
+  animation-name: wv2-enter-rise;
+  --enter-dur: 0.6s;
+}
+.wv2-enter-pop {
+  animation-name: wv2-enter-pop;
+  --enter-dur: 0.42s;
+  /* overshoot past 1 then settle — the "bounce" */
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes wv2-enter-rise {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes wv2-enter-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.045);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wv2-enter {
+    animation: none;
+  }
+}
+
+/* ── Proposal card EXIT animations ────────────────────────────────────────────
+   A proposal card plays its OWN animation before the store unmounts it (the
+   real accept/reject is held until animationend — see ProposalRailCard):
+     • ACCEPTED — a quick confirming pop (a soft green ring at the peak), then
+       the card lifts and fades away as it's committed and we navigate to where
+       the change lands;
+     • REJECTED — it "smokes out": blurs, drifts up, and dissolves, then its
+       space collapses so the cards below close the gap.
+   Reduced-motion users skip the animation entirely (the JS calls the action
+   straight away), so there's nothing to disable here. */
+.wv2-prop-card.is-accepting {
+  pointer-events: none;
+  overflow: hidden;
+  animation: wv2-prop-accept 0.46s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.wv2-prop-card.is-rejecting {
+  pointer-events: none;
+  overflow: hidden;
+  animation: wv2-prop-smoke 0.46s ease forwards;
+}
+@keyframes wv2-prop-accept {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  32% {
+    transform: scale(1.035);
+    box-shadow: 0 0 0 2px rgba(52, 140, 90, 0.55), 0 6px 18px rgba(52, 140, 90, 0.18);
+  }
+  100% {
+    transform: translateY(-10px) scale(0.97);
+    opacity: 0;
+  }
+}
+@keyframes wv2-prop-smoke {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1) translateY(0);
+    max-height: 500px;
+  }
+  55% {
+    opacity: 0;
+    filter: blur(7px);
+    transform: scale(1.05) translateY(-6px);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(7px);
+    transform: scale(1.05) translateY(-6px);
+    max-height: 0;
+    margin-top: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+/* A proposal card is faintly GREEN-shaded (sage) — paired against the warm/gold
+   walk-along cards above, so "a change to accept" (green) reads starkly apart
+   from "a move to make" (yellow) at a glance. --prop-edge is the green border,
+   reused by the explore variant. The green echoes the accept button + accept
+   animation's green ring. */
+.wv2-prop-card {
+  --prop-edge: color-mix(in srgb, var(--sage) 42%, #d3ddcf);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--sage) 7%, #fcfefb) 0%,
+    color-mix(in srgb, var(--sage) 15%, #eef4ec) 100%);
+  border: 1px solid var(--prop-edge);
+  border-radius: var(--r-lg);
+  padding: 10px 12px;
+  box-shadow: var(--sh-1);
+}
+.wv2-prop-card-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.wv2-prop-spark {
+  color: var(--sage);
+  font-size: 12px;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--sage) 50%, transparent));
+}
+/* Glossy entity mark leading the card head — the world-rail family (EntityMark)
+   stamped on the proposal so it reads as "a character / item / rule / thread"
+   at a glance. The mark carries its own size + drop-shadow inline. */
+.wv2-prop-mark {
+  flex: 0 0 auto;
+  margin: -1px 0;
+}
+.wv2-prop-title {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.wv2-prop-kind {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
+/* ── Grouped proposal card — 3+ same-kind proposals collapsed into one. A count
+   badge + a one-line summary; clicking the header expands the group in place to
+   reveal the individual cards (each with its own accept/dismiss). The group
+   itself only navigates ("Show me") or dismisses all — it never accepts.
+
+   Formatting is inverted relative to a single card: the GROUP is the flat,
+   recessed tray (plain surface, neutral border, no shadow) and the individual
+   cards inside it keep the full, rich proposal-card look (gradient + green
+   border + shadow) — the same look as a standalone <ProposalRailCard>. ── */
+.wv2-prop-group-card {
+  background: var(--surface-2);
+  border-color: var(--line);
+  box-shadow: none;
+}
+.wv2-prop-group-head {
+  align-items: center;
+  margin-bottom: 0;
+  cursor: pointer;
+  user-select: none;
+}
+.wv2-prop-group-head:hover .wv2-prop-group-chevron { color: var(--ink); }
+.wv2-prop-group-count {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: #fff;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 1px rgba(180, 140, 20, 0.35);
+}
+.wv2-prop-group-chevron {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--ink-3);
+  transition: transform .15s ease, color .12s ease;
+}
+.wv2-prop-group-card.is-expanded .wv2-prop-group-chevron { transform: rotate(90deg); }
+
+/* expanded children — the real individual cards, nested under the summary. A
+   dashed rule separates them from the header; the nested cards keep the normal
+   rich proposal-card styling so they pop out of the flat group tray. */
+.wv2-prop-group-children {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+
+/* detail blocks */
+.wv2-prop-detail {
+  font-family: var(--ui);
+}
+.wv2-prop-lede {
+  margin: 0 0 5px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.wv2-prop-lede--field {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.wv2-prop-field-verb {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.wv2-prop-field-name {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--asp-proposals) 65%, var(--ink));
+}
+.wv2-prop-tag {
+  margin-left: 6px;
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.wv2-prop-snippet {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.wv2-prop-snippet--proposal {
+  background: color-mix(in srgb, var(--asp-proposals) 9%, transparent);
+  border-radius: var(--r-sm);
+  padding: 7px 9px;
+}
+/* scene prose edit — the paragraph's old text struck through above the new prose */
+.wv2-prop-prose {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wv2-prop-prose-old,
+.wv2-prop-prose-new {
+  margin: 0;
+  font-family: var(--serif, var(--ui));
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.wv2-prop-prose-old {
+  color: var(--ink-3);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+.wv2-prop-prose-new {
+  color: var(--ink-1);
+}
+/* merge-rough-into-grand: sentence-formatted preview */
+.wv2-prop-merge-line {
+  color: var(--ink-3);
+}
+.wv2-prop-merge-count {
+  font-weight: 700;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.wv2-prop-merge-title {
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink);
+}
+/* ── Sentence-title emphasis grammar ─────────────────────────────────────────
+   Every proposal title is one sentence built from four word-roles, each with its
+   own treatment so the eye parses act → subject → qualifier at a glance:
+     em-act  — the ACTION (watch / welcome / weave…): the gold AI shimmer, the
+               same accent as the ✦ spark.
+     em-ent  — a glossy story ENTITY (person/item/place/rule/thread): a metallic,
+               kind-tinted 3D noun whose colour matches its leading EntityMark.
+     em-name — the proper NAME of a flat concept artifact (a lens, a beat, the
+               whole story): flat bold ink — the headline.
+     em-tag  — a quiet TYPE/role qualifier (protagonist, section…): muted italic.
+   Connective words (on / across / for / into) keep the plain card ink. */
+.wv2-prop-em-act {
+  font-weight: 600;
+  color: var(--gold);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--gold) 22%, transparent);
+}
+.wv2-prop-em-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+.wv2-prop-em-tag {
+  font-style: italic;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+/* Glossy metallic entity — a vertical gradient (light top → tinted core → shaded
+   foot) clipped to the glyphs, plus a hairline highlight for the embossed, 3D
+   coin feel. Tinted per kind via --ent so the name echoes its mark's colour. */
+.wv2-prop-em-ent {
+  font-weight: 700;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ent) 70%, #fff) 0%,
+    var(--ent) 48%,
+    color-mix(in srgb, var(--ent) 68%, #000) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 0.5px 0 color-mix(in srgb, #fff 55%, transparent));
+}
+.wv2-prop-em-ent--person { --ent: var(--terra); }
+.wv2-prop-em-ent--item { --ent: var(--teal); }
+.wv2-prop-em-ent--location { --ent: var(--teal); }
+.wv2-prop-em-ent--rule { --ent: var(--sage); }
+.wv2-prop-em-ent--thread { --ent: var(--mauve); }
+/* the whole story isn't a tinted entity — a neutral graphite metallic */
+.wv2-prop-em-ent--story { --ent: var(--ink-2); }
+
+/* Beat list (generate_thread / run_user_wishes_rough) — mild styling:
+   small uppercase phase labels, dot-bullet text rows, italic-muted placeholders. */
+.wv2-prop-beats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  /* Backstop: even after the BeatsDetail digest caps how much renders, never let
+     a pathological payload grow the card unbounded — clip with a scroll. */
+  max-height: 320px;
+  overflow-y: auto;
+}
+.wv2-prop-beat-head {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-top: 6px;
+}
+.wv2-prop-beats > .wv2-prop-beat-head:first-child {
+  margin-top: 0;
+}
+.wv2-prop-beat {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--ink-2);
+  position: relative;
+  padding-left: 11px;
+}
+.wv2-prop-beat::before {
+  content: '·';
+  position: absolute;
+  left: 3px;
+  top: -1px;
+  color: var(--ink-4);
+  font-weight: 700;
+}
+.wv2-prop-beat--ph {
+  font-style: italic;
+  color: var(--ink-3);
+  opacity: .8;
+}
+/* Digest mode — phase skeleton: each heading row carries a per-phase beat count
+   chip on the right, and a summary line ("4 phases · 18 beats — open to review")
+   sits below. Used when a rough outline is too big to render in full. */
+.wv2-prop-beats--digest { gap: 4px; }
+.wv2-prop-beat-head--digest {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 0;
+}
+.wv2-prop-beat-head-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wv2-prop-beat-ct {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-4);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.wv2-prop-beats-more {
+  margin: 6px 0 0;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-style: italic;
+  color: var(--ink-3);
+}
+/* element glyphs — character avatar, item/story icons before the name */
+.wv2-prop-lede--withicon {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.wv2-prop-lede-name {
+  min-width: 0;
+}
+.wv2-prop-avatar {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 16%, transparent);
+}
+.wv2-prop-glyph {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+}
+.wv2-prop-fields {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.wv2-prop-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.wv2-prop-field dt {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.wv2-prop-field dd {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.wv2-prop-cost {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.wv2-prop-cost-dot { color: var(--terra); font-size: 8px; }
+.wv2-prop-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.wv2-prop-chip {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+/* ── Lens suggestions ──────────────────────────────────────────────────────
+   A suggested lens is its own proposal. The SINGLE card swaps the gold spark
+   for the lens's own glyph and shows why-it-fits + a quiet fit bar; the GROUP
+   card (run by ProposalGroupCard) is grouped by the subject TYPE it watches and
+   leads with a type badge + a row of the lens glyphs it carries. */
+
+/* single card — lens glyph in place of the spark */
+.wv2-prop-lensmark {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--gold);
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, 0.35));
+}
+.wv2-prop-lensmark svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* single lens card — stack the "Suggested"/"Invented" kicker above the title */
+.wv2-prop-lens-headmain {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* the kind eyebrow — which BANK this lens came from. "Suggested" (a library fit)
+   vs "✦ Invented" (a bespoke spec). Shape (the spark) over hue: the word + spark
+   carry the distinction, the text stays neutral. Shared by single + group cards. */
+.wv2-prop-lens-kicker {
+  font-family: var(--ui);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.wv2-prop-kicker-spark {
+  color: var(--sage);
+  font-size: 9px;
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--sage) 50%, transparent));
+}
+/* fit-strength — a thin track + a tabular percent. One accent, no hue games. */
+.wv2-prop-fit {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+}
+.wv2-prop-fit-track {
+  flex: 1 1 auto;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.wv2-prop-fit-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--gold);
+}
+.wv2-prop-fit-num {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+.wv2-prop-fit-num small { font-weight: 600; opacity: 0.7; }
+
+/* group card — type badge | (title + subjects + glyphs) | count | chevron */
+.wv2-prop-lens-group .wv2-prop-group-head {
+  align-items: flex-start;
+  gap: 9px;
+}
+.wv2-prop-group-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.wv2-prop-lens-subjects {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wv2-prop-lens-glyphs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+.wv2-prop-lensglyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #fffdfa;
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+}
+.wv2-prop-lensglyph svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* leading badges */
+.wv2-prop-lens-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+.wv2-prop-lens-concept { color: var(--ink-3); }
+.wv2-prop-lens-concept svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* cast — overlapping glossy avatar coins */
+.wv2-prop-avastack {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1px;
+}
+.wv2-prop-avastack-i {
+  margin-left: -7px;
+  background: #fffdfa;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1.5px var(--surface-2);
+}
+.wv2-prop-avastack-i:first-child { margin-left: 0; }
+
+/* actions */
+.wv2-prop-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 9px;
+}
+/* destination indicator — the glyph of the page this card opens, pinned to the
+   bottom-left while the Dismiss/Accept buttons stay right. */
+.wv2-prop-dest {
+  margin-right: auto;
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-3);
+  opacity: 0.7;
+}
+.wv2-prop-btn {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+.wv2-prop-btn:hover { background: rgba(0,0,0,.06); color: var(--ink-2); }
+.wv2-prop-btn--primary {
+  background: transparent;
+  color: var(--ink);
+  font-weight: 700;
+}
+.wv2-prop-btn--primary:hover { background: rgba(0,0,0,.06); color: var(--ink); }
+
+/* "Explore" CTA — the lone accent-filled action among the flat proposal
+   buttons. Worn by explore proposals (a plot thread to open & develop), tinted
+   to the thread mark's mauve so card + button read as one. The fill is deepened
+   toward near-black so white text stays legible whatever the theme makes
+   --mauve, and on the card's always-cream background. */
+.wv2-prop-btn--explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  font-weight: 700;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--mauve) 80%, #1a1622) 0%,
+    color-mix(in srgb, var(--mauve) 58%, #1a1622) 100%);
+  border: 1px solid color-mix(in srgb, var(--mauve) 45%, #000);
+  box-shadow: 0 1px 2px rgba(20, 25, 35, 0.18);
+}
+.wv2-prop-btn--explore:hover {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--mauve) 88%, #1a1622) 0%,
+    color-mix(in srgb, var(--mauve) 66%, #1a1622) 100%);
+  color: #fff;
+}
+.wv2-prop-btn--explore svg { margin-right: -2px; }
+
+/* The explore card itself — a whisper of the thread mauve in its border + a
+   faint top wash, so it reads as a slightly different KIND of card (an
+   invitation to explore) before you even reach the button. */
+.wv2-prop-card--explore {
+  border-color: color-mix(in srgb, var(--mauve) 45%, var(--prop-edge));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--mauve) 8%, transparent) 0%, transparent 38%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--sage) 7%, #fcfefb) 0%,
+      color-mix(in srgb, var(--sage) 15%, #eef4ec) 100%);
+}
+
+/* ── Hints — ambient, headingless tips below the proposals. Softer than a
+   proposal card: a glowing tip glyph + a single muted line each. ── */
+.wv2-rr-hints {
+  list-style: none;
+  margin: 0;
+  padding: 2px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+/* a faint dashed divider only when proposals sit above (no text heading) */
+.wv2-rr-prop-group + .wv2-rr-hints {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.wv2-rr-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 6px 8px;
+  border-radius: var(--r-md);
+  transition: background .14s ease;
+}
+.wv2-rr-hint:hover {
+  background: color-mix(in srgb, var(--gold, var(--terra)) 7%, transparent);
+}
+.wv2-rr-hint-ic {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--gold, var(--terra));
+  background: color-mix(in srgb, var(--gold, var(--terra)) 14%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold, var(--terra)) 30%, transparent));
+}
+.wv2-rr-hint-t {
+  font-family: var(--ui);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+/* ── Init hint — the actionable "start adding …" nudge. Terracotta, not gold,
+   so it reads apart from the soft ambient tips, and carries a nav button. ── */
+.wv2-rr-hint--init {
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--terra) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--terra) 22%, transparent);
+}
+.wv2-rr-hint--init:hover {
+  background: color-mix(in srgb, var(--terra) 13%, transparent);
+}
+.wv2-rr-hint--init .wv2-rr-hint-ic {
+  color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 16%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--terra) 32%, transparent));
+}
+.wv2-rr-hint--init .wv2-rr-hint-t {
+  color: var(--ink-2);
+}
+.wv2-rr-hint-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+}
+.wv2-rr-hint-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--terra);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background .12s ease, transform .08s ease;
+}
+.wv2-rr-hint-cta:hover { background: var(--terra-deep); }
+.wv2-rr-hint-cta:active { transform: translateY(1px); }
+
+@media (max-width: 860px) {
+  .wv2-root .wv2-rr { display: none; }
+}
