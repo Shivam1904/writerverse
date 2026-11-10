@@ -1,0 +1,65 @@
+/* arnKit.css — the styling the ARN heading ATOMS reuse: the digital-eye lens
+ * indicator + the ghost AI diamond, PROMOTED from the UI Kit showcase's injected
+ * <style> (DIGITAL_EYE_CSS) so the app reuses the exact specimen. Geometry is
+ * shared across modes; the iris colour follows the button's currentColor; motion
+ * only appears while reading.
+ *
+ * No NEW styling is invented here — it's relocated showcase/handoff CSS. (The inline
+ * lens-box CSS moved to modules/lensKit/lensKit.css with the lens surfaces.) */
+
+/* ════════════ the digital-eye lens indicator ════════════ */
+.lens-eye { overflow: visible; display: block; }
+/* the eye border (frame) is the DARKEST layer — full-strength currentColor */
+.lens-eye .le-frame { fill: none; stroke: currentColor; stroke-width: 6; stroke-linejoin: round; }
+.lens-eye .le-lid-top { opacity: 1; }
+.lens-eye .le-lid-bottom { opacity: 0.65; }
+/* the iris ring is a step LIGHTER than the frame */
+.lens-eye .le-iris { fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; transform-origin: 50px 50px; opacity: .6; stroke-dasharray: 25 15; }
+.lens-eye .le-pupil { fill: currentColor; opacity: .85; }
+.lens-eye .le-shutter { fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; opacity: .55; }
+
+/* relaxed — content / half-lidded: keep the iris clearly readable under the lid */
+.lens-eye.is-relaxed .le-iris { opacity: .7; }
+
+/* stale — the read is old: the whole eye fades, the gaze has drifted off */
+.lens-eye.is-stale .le-frame { opacity: .7; }
+.lens-eye.is-stale .le-iris { opacity: .4; }
+.lens-eye.is-stale .le-pupil { opacity: .55; }
+
+/* live (judging) — the full digital read: spin + saccade + mechanical blink */
+.lens-eye.is-live { animation: digital-blink 5s infinite; }
+.lens-eye.is-live .le-saccade { transform-origin: 50px 50px; animation: darting-eye 4s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+.lens-eye.is-live .le-iris { stroke-dasharray: 25 15; opacity: .9; animation: digital-eye-spin 1.2s linear infinite; }
+
+/* the live reticle breathes while the read is on */
+@keyframes lens-reticle-breathe { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.lens-reticle-live { animation: lens-reticle-breathe 1.7s ease-in-out infinite; }
+
+/* keyframes the eye uses */
+@keyframes digital-eye-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes darting-eye {
+  0%, 10% { transform: translate(0, 0); }
+  15%, 25% { transform: translate(-12px, -4px); }
+  30%, 40% { transform: translate(8px, 2px); }
+  45%, 55% { transform: translate(14px, -2px); }
+  60%, 75% { transform: translate(-6px, 6px); }
+  80%, 100% { transform: translate(0, 0); }
+}
+@keyframes digital-blink {
+  0%, 95% { transform: scaleY(1); transform-origin: center; }
+  97% { transform: scaleY(0.05); transform-origin: center; }
+  100% { transform: scaleY(1); transform-origin: center; }
+}
+
+/* ════════════ 2 · the ghost AI diamond ════════════ */
+.ghost-diamond { position: relative; display: grid; place-items: center; padding: 0; border: 0; border-radius: 999px; background: transparent; cursor: pointer; transition: opacity .18s ease, transform .18s ease, background .18s ease; }
+.ghost-diamond .gd-spark { position: relative; line-height: 1; }
+.ghost-diamond:hover { transform: scale(1.12); }
+.ghost-diamond.is-quiet { opacity: .26; }
+.ghost-diamond.is-hover { opacity: 1; transform: scale(1.12); }
+.ghost-diamond.is-open { opacity: 1; background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--gold) 18%, var(--surface)), color-mix(in srgb, var(--gold) 6%, transparent) 72%); }
+.ghost-diamond .gd-halo { position: absolute; width: 78%; height: 78%; border-radius: 999px; background: radial-gradient(circle, color-mix(in srgb, var(--gold) 28%, transparent), transparent 70%); pointer-events: none; }
+
+/* a row / block whose hover blooms its otherwise-quiet diamond */
+.gd-row:hover .ghost-diamond.is-quiet { opacity: 1; }
+.group\/block:hover .ghost-diamond.is-quiet { opacity: 1; }

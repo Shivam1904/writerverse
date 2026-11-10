@@ -1,0 +1,878 @@
+/* ── Hint card ──────────────────────────────────────────────────────────────
+   A lighter, borderless cousin of the proposal card (.wv2-prop-card). Same
+   header → body → footer rhythm and radius/padding feel, but: NO tan border,
+   NO cream gradient, NO drop shadow — just a near-flat, faintly tinted nudge.
+
+   Accent flows from a single custom property, --hint-accent, set per-intent on
+   the card root (terra for 'start', gold for 'tip'). A per-page tint can later
+   override it via [data-page] without touching this rule set. Kept in its own
+   file so proposal.css / rightRail.css stay untouched. */
+
+.wv2-hint-card {
+  --hint-accent: var(--gold); /* overridden inline per intent */
+  font-family: var(--ui);
+  background: color-mix(in srgb, var(--hint-accent) 5%, transparent);
+  border: none;
+  border-radius: var(--r-md);
+  padding: 9px 11px;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+.wv2-hint-card:hover {
+  background: color-mix(in srgb, var(--hint-accent) 10%, transparent);
+}
+.wv2-hint-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--hint-accent) 45%, transparent);
+  outline-offset: 1px;
+}
+
+/* header — the target page's glyph (tinted, faintly glowing square) + title */
+.wv2-hint-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 5px;
+}
+.wv2-hint-ic {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--hint-accent);
+  background: color-mix(in srgb, var(--hint-accent) 14%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--hint-accent) 28%, transparent));
+}
+.wv2-hint-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+/* body — per-page template content */
+.wv2-hint-body {
+  font-family: var(--ui);
+}
+.wv2-hint-line {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+/* characters template — initial-avatar roster */
+.wv2-hint-roster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wv2-hint-avatar {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 16%, transparent);
+}
+.wv2-hint-roster-more {
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+/* outline template — act / chapter pills */
+.wv2-hint-shape {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.wv2-hint-pill {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+/* world / chapters templates — small inline tag */
+.wv2-hint-tag {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 9.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+/* braindumps template — muted, rule-bordered excerpt */
+.wv2-hint-excerpt {
+  margin: 5px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--ink-3);
+  border-left: 2px solid color-mix(in srgb, var(--hint-accent) 30%, transparent);
+  padding-left: 8px;
+}
+
+/* footer — go-affordance (tip) on the left, actions (start CTA / dismiss) right */
+.wv2-hint-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.wv2-hint-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--hint-accent) 70%, var(--ink-3));
+  opacity: 0.8;
+  transition: opacity 0.14s ease, gap 0.14s ease;
+}
+.wv2-hint-card:hover .wv2-hint-go {
+  opacity: 1;
+  gap: 7px;
+}
+.wv2-hint-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wv2-hint-cta {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  background: var(--hint-accent);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: filter 0.12s;
+}
+.wv2-hint-cta:hover {
+  filter: brightness(1.06);
+}
+.wv2-hint-dismiss {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-4);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.wv2-hint-dismiss:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--ink-3);
+}
+
+/* ── Initialize hint card ───────────────────────────────────────────────────
+   The second hint species (modules/hint/initializeHints), shown ABOVE the
+   ambient hint list. Where .wv2-hint-card is borderless and near-flat, an
+   initialize card is a deliberate milestone nudge: a faint tinted panel with a
+   left accent rule, so a "you've reached X, now do Y" step reads as more
+   intentional than a soft tip. The whole card navigates (no button) — when it
+   carries role=button it's clickable and shows a quiet "Open <page> →" cue.
+   Each card supplies its own body; these rules are the shared chrome. Accent
+   flows from --initz-accent (terra). */
+.wv2-initz-card {
+  --initz-accent: var(--terra);
+  font-family: var(--ui);
+  background: color-mix(in srgb, var(--initz-accent) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--initz-accent) 20%, transparent);
+  border-left: 2.5px solid var(--initz-accent);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  transition: background 0.14s ease;
+}
+.wv2-initz-card[role='button'] {
+  cursor: pointer;
+}
+.wv2-initz-card[role='button']:hover {
+  background: color-mix(in srgb, var(--initz-accent) 12%, transparent);
+}
+.wv2-initz-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--initz-accent) 45%, transparent);
+  outline-offset: 1px;
+}
+.wv2-initz-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+.wv2-initz-ic {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--initz-accent);
+  background: color-mix(in srgb, var(--initz-accent) 14%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--initz-accent) 28%, transparent));
+}
+.wv2-initz-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.wv2-initz-body {
+  font-family: var(--ui);
+}
+.wv2-initz-line {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.wv2-initz-line strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+/* footer — a quiet, non-button "Open <page> →" cue that the whole card navigates */
+.wv2-initz-foot {
+  margin-top: 9px;
+  display: flex;
+  align-items: center;
+}
+.wv2-initz-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--initz-accent) 70%, var(--ink-3));
+  opacity: 0.85;
+  transition: opacity 0.14s ease, gap 0.14s ease;
+}
+.wv2-initz-card:hover .wv2-initz-go {
+  opacity: 1;
+  gap: 7px;
+}
+
+/* ── Walk-along hint card ────────────────────────────────────────────────────
+   The THIRD hint species (modules/hint/walkAlongHints), shown ABOVE the
+   initialize list. The other two species POINT you at a page; a walk-along card
+   keeps you put and runs the move IN PLACE. It opens collapsed — a soft
+   one-line invitation — and expands the SAME card (is-open) into a heavier panel
+   with a button that runs the action. Themed gold (--walk-accent) to match the
+   AI action it fires (the same --gold the .wv2-btn-ai uses).
+
+   The SURFACE is the warm cream/gold the proposal card used to wear — a real
+   gradient + a defined gold border + a soft shadow, so the card POPS instead of
+   sitting flat. Proposals are now GREEN; walk-alongs are this YELLOW, a stark
+   pairing in the same rail. */
+.wv2-walk-card {
+  --walk-accent: var(--gold, #b89030);
+  font-family: var(--ui);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--walk-accent) 9%, #fffdf5) 0%,
+    color-mix(in srgb, var(--walk-accent) 17%, #f6eed6) 100%);
+  border: 1px solid color-mix(in srgb, var(--walk-accent) 50%, #e7d3a0);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-1);
+  transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.wv2-walk-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--walk-accent) 45%, transparent);
+  outline-offset: 1px;
+}
+
+/* shared glyph square (collapsed + expanded headers) */
+.wv2-walk-ic {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--walk-accent);
+  background: color-mix(in srgb, var(--walk-accent) 14%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--walk-accent) 28%, transparent));
+}
+
+/* collapsed — one clickable invitation row */
+.wv2-walk-card:not(.is-open) {
+  cursor: pointer;
+  padding: 9px 11px;
+}
+.wv2-walk-card:not(.is-open):hover {
+  border-color: color-mix(in srgb, var(--walk-accent) 64%, #e7d3a0);
+  box-shadow: var(--sh-2);
+}
+.wv2-walk-invite {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wv2-walk-prompt {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.wv2-walk-chev {
+  flex: 0 0 auto;
+  color: color-mix(in srgb, var(--walk-accent) 70%, var(--ink-3));
+  transition: transform 0.16s ease;
+}
+.wv2-walk-card:not(.is-open):hover .wv2-walk-chev {
+  transform: translateY(2px);
+}
+
+/* expanded — the heavier panel */
+.wv2-walk-card.is-open {
+  padding: 11px 12px 12px;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--walk-accent) 12%, #fffdf5) 0%,
+    color-mix(in srgb, var(--walk-accent) 21%, #f4ecd0) 100%);
+  border-color: color-mix(in srgb, var(--walk-accent) 58%, #e7d3a0);
+  animation: wv2-walk-open 0.18s ease;
+}
+@keyframes wv2-walk-open {
+  from {
+    opacity: 0.55;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.wv2-walk-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.wv2-walk-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.wv2-walk-body {
+  font-family: var(--ui);
+}
+.wv2-walk-line {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.wv2-walk-line strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.wv2-walk-foot {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wv2-walk-back {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-4);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.wv2-walk-back:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--ink-3);
+}
+
+/* Walk-along NOTE — a purely informational/encouraging variant. No action,
+   no expand/collapse, no cursor. Flatter than the action shell so it reads
+   as ambient encouragement rather than something to click. */
+.wv2-walk-note {
+  --walk-accent: var(--gold, #b89030);
+  font-family: var(--ui);
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  /* Same warm yellow as the action card, but kept flatter — a dashed border and
+     NO shadow — so it reads as ambient encouragement, not something to click. */
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--walk-accent) 7%, #fffdf5) 0%,
+    color-mix(in srgb, var(--walk-accent) 13%, #f7f0db) 100%);
+  border: 1px dashed color-mix(in srgb, var(--walk-accent) 48%, #e0caa0);
+  border-radius: var(--r-md);
+}
+.wv2-walk-note .wv2-walk-ic {
+  margin-top: 1px;
+}
+.wv2-walk-note-body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.wv2-walk-note-head {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.wv2-walk-note-sub {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+.wv2-walk-note-sub strong {
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+/* Walk-along WEAVE — the navigating variant of the walk-along family. The action
+   shell + note both KEEP you put and are gold (the AI accent); this one POINTS at
+   another page with a real CTA, so it's themed terracotta (--terra) like the other
+   navigation nudges and never reads as an AI action. Same chrome/feel as the rest
+   of the family; the button reuses the .wv2-hint-cta look. */
+.wv2-walk-weave {
+  --weave-accent: var(--terra);
+  font-family: var(--ui);
+  background: color-mix(in srgb, var(--weave-accent) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--weave-accent) 26%, transparent);
+  border-radius: var(--r-md);
+  padding: 11px 12px 12px;
+}
+.wv2-walk-weave-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.wv2-walk-weave-ic {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--weave-accent);
+  background: color-mix(in srgb, var(--weave-accent) 14%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--weave-accent) 28%, transparent));
+}
+.wv2-walk-weave-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.wv2-walk-weave-line {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.wv2-walk-weave-line strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.wv2-walk-weave-foot {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+.wv2-walk-weave-cta {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #fff;
+  background: var(--weave-accent);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: filter 0.12s ease, gap 0.14s ease;
+}
+.wv2-walk-weave-cta:hover {
+  filter: brightness(1.06);
+  gap: 7px;
+}
+.wv2-walk-weave-cta:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--weave-accent) 45%, transparent);
+  outline-offset: 1px;
+}
+
+/* Walk-along MERGE — the threads-side mirror of the weave card. Buttonless and
+   visual-led: beats stream along a dashed track from a thread node into an
+   outline node, so the card SHOWS the move it describes (drag the beats across).
+   Themed gold (--merge-accent) — the beats in motion are the one accent; both
+   endpoints stay neutral so SHAPE (thread glyph vs outline glyph), not hue,
+   tells them apart. */
+.wv2-walk-merge {
+  --merge-accent: var(--gold, #b89030);
+  font-family: var(--ui);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--merge-accent) 9%, #fffdf5) 0%,
+    color-mix(in srgb, var(--merge-accent) 17%, #f6eed6) 100%);
+  border: 1px solid color-mix(in srgb, var(--merge-accent) 50%, #e7d3a0);
+  border-radius: var(--r-md);
+  padding: 12px 12px 11px;
+  box-shadow: var(--sh-1);
+}
+.wv2-walk-merge-viz {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 9px;
+}
+.wv2-walk-merge-node {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+/* destination (outline) — a faint gold ring marks where the beats land */
+.wv2-walk-merge-node.is-dest {
+  border-color: color-mix(in srgb, var(--merge-accent) 45%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--merge-accent) 12%, transparent);
+}
+.wv2-walk-merge-track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 18px;
+}
+.wv2-walk-merge-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1.5px dashed color-mix(in srgb, var(--merge-accent) 38%, transparent);
+}
+.wv2-walk-merge-beat {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 999px;
+  background: var(--merge-accent);
+  box-shadow: 0 0 5px color-mix(in srgb, var(--merge-accent) 55%, transparent);
+  animation: wv2-merge-travel 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.5s);
+}
+@keyframes wv2-merge-travel {
+  0% {
+    left: 2%;
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  82% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    left: 90%;
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+.wv2-walk-merge-line {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.wv2-walk-merge-line strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* Respect reduced-motion: drop the travel loop, settle the beats along the track. */
+@media (prefers-reduced-motion: reduce) {
+  .wv2-walk-merge-beat {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .wv2-walk-merge-beat:nth-child(1) {
+    left: 22%;
+  }
+  .wv2-walk-merge-beat:nth-child(2) {
+    left: 50%;
+  }
+  .wv2-walk-merge-beat:nth-child(3) {
+    left: 78%;
+  }
+}
+
+/* Walk-along TAG — braindumps only. Teaches the in-place categorize gesture
+   (hover an idea → "+ tag" → pick a colour/label). Keeps you put, no button. The
+   chrome is deliberately NEUTRAL (no family gold/terra) so the real colour
+   swatches — the very feature it teaches — carry the only colour on the card. */
+.wv2-walk-tag {
+  font-family: var(--ui);
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 12px 12px;
+}
+.wv2-walk-tag-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.wv2-walk-tag-ic {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.wv2-walk-tag-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.wv2-walk-tag-line {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.wv2-walk-tag-line strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+/* inline mimic of the real "+ tag" button that sits on each idea row */
+.wv2-walk-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  padding: 0 5px;
+  white-space: nowrap;
+}
+/* the actual colour palette (IDEA_COLORS), shown so the swatch row is familiar */
+.wv2-walk-tag-swatches {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+.wv2-walk-tag-sw {
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.14s ease;
+}
+/* a gentle staggered lift on hover — the swatches feel pickable */
+.wv2-walk-tag:hover .wv2-walk-tag-sw {
+  transform: translateY(-2px);
+  transition-delay: calc(var(--sw-i) * 0.03s);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wv2-walk-tag:hover .wv2-walk-tag-sw {
+    transform: none;
+  }
+}
+
+/* ── Night-Eyes nudge card ───────────────────────────────────────────────────
+   A walk-along variant unique to the World page: where the action shell runs an
+   op in place and the weave card points elsewhere, this card's WHOLE surface
+   opens Night Eyes pre-loaded with a starter prompt — the chat is where filling
+   in project meta / fleshing out the world actually happens. Gold (--ne-accent)
+   + an honest ✦ (it truly opens the AI, matching the "Ask Night Eyes" button). */
+.wv2-ne-card {
+  --ne-accent: var(--gold, #b89030);
+  font-family: var(--ui);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--ne-accent) 9%, #fffdf5) 0%,
+    color-mix(in srgb, var(--ne-accent) 17%, #f6eed6) 100%);
+  border: 1px solid color-mix(in srgb, var(--ne-accent) 50%, #e7d3a0);
+  border-radius: var(--r-md);
+  padding: 11px 12px 12px;
+  cursor: pointer;
+  box-shadow: var(--sh-1);
+  transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+.wv2-ne-card:hover {
+  border-color: color-mix(in srgb, var(--ne-accent) 64%, #e7d3a0);
+  box-shadow: var(--sh-2);
+}
+.wv2-ne-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ne-accent) 45%, transparent);
+  outline-offset: 1px;
+}
+.wv2-ne-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.wv2-ne-ic {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--ne-accent);
+  background: color-mix(in srgb, var(--ne-accent) 14%, transparent);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--ne-accent) 28%, transparent));
+}
+.wv2-ne-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.wv2-ne-body {
+  font-family: var(--ui);
+}
+.wv2-ne-line {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.wv2-ne-line strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+/* progressive checklist — synopsis / genre / tone (+ perspective/tense/audience) */
+.wv2-ne-check {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+}
+.wv2-ne-check-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+.wv2-ne-check-item.is-done {
+  color: color-mix(in srgb, var(--ne-accent) 70%, var(--ink-3));
+}
+.wv2-ne-check-box {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1.5px solid color-mix(in srgb, var(--ink-4) 55%, transparent);
+  color: var(--ne-accent);
+}
+.wv2-ne-check-item.is-done .wv2-ne-check-box {
+  border-color: color-mix(in srgb, var(--ne-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--ne-accent) 14%, transparent);
+}
+.wv2-ne-foot {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+.wv2-ne-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--ne-accent) 75%, var(--ink-3));
+  opacity: 0.9;
+  transition: opacity 0.14s ease, gap 0.14s ease;
+}
+.wv2-ne-card:hover .wv2-ne-go {
+  opacity: 1;
+  gap: 7px;
+}
