@@ -1,0 +1,920 @@
+/* ThreadsList / ThreadBlock — reusable thread view (.tl-* namespace).
+ * Uses the app theme tokens; structure/feel follows the handoff Outline
+ * design. Scoped under .wv2-root so the tokens resolve. */
+
+.wv2-root .tl-root {
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-root .tl-spacer {
+  flex: 1 1 auto;
+}
+
+/* ---- header ---- */
+.wv2-root .tl-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.wv2-root .tl-head-lbl {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.wv2-root .tl-head-count {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .tl-head-actions {
+  display: inline-flex;
+  gap: 7px;
+  margin-right: 4px;
+}
+
+.wv2-root .tl-seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface-2);
+  margin-top: 16px;
+}
+
+.wv2-root .tl-seg-btn {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: transparent;
+  border: none;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+
+.wv2-root .tl-seg-btn+.tl-seg-btn {
+  border-left: 1px solid var(--line);
+}
+
+.wv2-root .tl-seg-btn.is-on {
+  background: var(--terra);
+  color: #fff;
+}
+
+/* ---- list ---- */
+.wv2-root .tl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wv2-root .tl-loading,
+.wv2-root .tl-empty {
+  font-family: var(--ui);
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-style: italic;
+  padding: 16px 2px;
+}
+
+/* ---- block ---- */
+.wv2-root .tl-block {
+  border-top: 1px dashed var(--line);
+  transition: background-color .4s ease, box-shadow .4s ease, border-color .4s ease;
+}
+
+.wv2-root .tl-block.is-focused {
+  border-color: color-mix(in srgb, var(--terra) 40%, var(--line));
+}
+
+.wv2-root .tl-block.is-analysis.is-focused {
+  border-color: color-mix(in srgb, var(--gold) 40%, var(--line));
+}
+
+.wv2-root .tl-block-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  padding-left: 11px;
+  padding-right: 11px;
+  cursor: pointer;
+}
+
+.wv2-root .tl-block-head.is-focused {
+  padding-bottom: 0px;
+}
+
+/* the header toggles on click but its text stays selectable (drag-select doesn't
+   fire a click, so selecting never collapses the block) */
+.wv2-root .tl-block-title,
+.wv2-root .tl-block-meta,
+.wv2-root .tl-block-tag {
+  user-select: text;
+}
+
+.wv2-root .tl-block-glyph {
+  flex: 0 0 auto;
+  color: var(--terra);
+  display: inline-flex;
+}
+
+.wv2-root .tl-block.is-analysis .tl-block-glyph {
+  color: var(--gold);
+}
+
+.wv2-root .tl-block-title {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wv2-root .tl-block-tag {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.wv2-root .tl-block-meta {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.wv2-root .tl-block-chev {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.wv2-root .tl-block-body {
+  padding: 0 14px 14px;
+}
+
+/* per-block write/analysis switch */
+.wv2-root .tl-switch {
+  display: inline-flex;
+  gap: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 2px;
+}
+
+.wv2-root .tl-switch-btn {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--r-sm) - 2px);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.wv2-root .tl-switch-btn.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--sh-1, 0 1px 2px rgba(0, 0, 0, .1));
+}
+
+/* inline rename input (header title → input) */
+.wv2-root .tl-block-title-input {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 0;
+  flex: 0 1 auto;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--terra) 45%, var(--line));
+  border-radius: var(--r-sm);
+  padding: 2px 7px;
+  outline: none;
+}
+
+/* top-right kebab menu (Rename / Delete) */
+.wv2-root .tl-block-menu {
+  flex: 0 0 auto;
+  position: relative;
+  display: inline-flex;
+}
+
+.wv2-root .tl-kebab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-sm);
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.wv2-root .tl-kebab:hover {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+.wv2-root .tl-block-menu.open .tl-kebab {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.wv2-root .tl-menu-pop {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 150px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-2, 0 6px 20px rgba(0, 0, 0, .14));
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wv2-root .tl-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 6px 9px;
+  cursor: pointer;
+}
+
+.wv2-root .tl-menu-item:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.wv2-root .tl-menu-item.danger {
+  color: var(--clay);
+}
+
+.wv2-root .tl-menu-item.danger:hover {
+  background: color-mix(in srgb, var(--clay) 12%, var(--surface));
+  color: var(--clay);
+}
+
+/* block actions */
+.wv2-root .tl-block-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+/* analysis box (stub) */
+.wv2-root .tl-analysis {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px 13px;
+  margin-bottom: 12px;
+  background: color-mix(in srgb, var(--gold) 4%, var(--surface));
+}
+
+.wv2-root .tl-analysis-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wv2-root .tl-analysis-mk {
+  color: var(--gold);
+}
+
+.wv2-root .tl-analysis-kicker {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.wv2-root .tl-analysis-modes {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 4px;
+}
+
+.wv2-root .tl-analysis-mode {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  cursor: pointer;
+  transition: color .12s, border-color .12s, background .12s;
+}
+
+.wv2-root .tl-analysis-mode:hover {
+  color: var(--ink-2);
+}
+
+.wv2-root .tl-analysis-mode.is-on {
+  color: var(--ink);
+  border-color: var(--line-2);
+  background: color-mix(in srgb, var(--gold) 7%, var(--surface));
+}
+
+.wv2-root .tl-analysis-count {
+  margin-left: auto;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--ink-3);
+}
+
+.wv2-root .tl-analysis-note {
+  margin: 8px 0 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* the per-lens chart lanes (reused <LensLane>, styled by studio.css cst-lane*) */
+.wv2-root .tl-analysis-lanes {
+  margin-top: 10px;
+}
+
+.wv2-root .tl-analysis-lanes .cst-lane:first-child {
+  border-top: none;
+}
+
+/* ---- buttons ---- */
+.wv2-root .tl-btn-primary,
+.wv2-root .tl-btn-gold,
+.wv2-root .tl-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  padding: 7px 13px;
+  border: 1px solid transparent;
+}
+
+.wv2-root .tl-btn-sm {
+  padding: 5px 11px;
+  font-size: 11.5px;
+}
+
+.wv2-root .tl-btn-primary {
+  background: var(--terra);
+  color: #fff;
+}
+
+.wv2-root .tl-btn-gold {
+  border-color: color-mix(in srgb, var(--gold) 45%, var(--line));
+  background: color-mix(in srgb, var(--gold) 9%, var(--surface));
+  color: var(--gold);
+}
+
+.wv2-root .tl-btn-gold:hover {
+  background: color-mix(in srgb, var(--gold) 16%, var(--surface));
+}
+
+.wv2-root .tl-btn-ghost {
+  border-color: var(--line-2);
+  background: var(--surface);
+  color: var(--ink-2);
+}
+
+.wv2-root .tl-btn-ghost:hover {
+  border-color: var(--terra);
+  color: var(--ink);
+}
+
+.wv2-root .tl-mk {
+  color: currentColor;
+}
+
+.wv2-root .tl-mk-plus {
+  color: var(--terra);
+}
+
+/* "✦ ask Night Eyes" — gold pill in the block header (mirrors studio .cst-ask) */
+.wv2-root .tl-ask {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--gold);
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, var(--line));
+  background: color-mix(in srgb, var(--gold) 7%, transparent);
+  border-radius: 999px;
+  padding: 4px 11px;
+}
+
+.wv2-root .tl-ask:hover {
+  background: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+.wv2-root .tl-ask-mk {
+  font-size: .92em;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * MERGE VIEW — a FULL-PAGE takeover (rendered into <body>): left = threads at
+ * their natural size (NO smushing), right = the grand outline. Each column
+ * scrolls independently inside the fixed overlay; the page never scrolls under.
+ * ════════════════════════════════════════════════════════════════════════════ */
+/* Box (top/left/width/height) comes from an inline style measured off the shell
+ * so it covers ONLY main. z sits above main (2) but below
+ * Night Eyes (90), the first sidebar (30) and the top bar (10). */
+.wv2-root .tl-merge-overlay {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-left: 1px solid var(--line);
+  animation: tl-overlay-in .18s ease both;
+}
+
+@keyframes tl-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.wv2-root .tl-merge-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: var(--sh-1, 0 1px 3px rgba(0, 0, 0, .06));
+}
+
+.wv2-root .tl-merge-bar-title {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.wv2-root .tl-merge-bar-kicker {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.wv2-root .tl-merge-bar-h {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.wv2-root .tl-merge-cols {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  gap: 18px;
+  padding: 18px 24px 24px;
+}
+
+.wv2-root .tl-merge-threads {
+  flex: 1 1 50%;
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* "merging" block — FULL size (no smushing), with a drag handle + numbered beats.
+   No border on the RIGHT edge (it faces the outline) so the two columns read as
+   one continuous workspace. */
+.wv2-root .tl-block--merging {
+  cursor: pointer;
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.wv2-root .tl-block--merging.is-focused {
+  border-color: color-mix(in srgb, var(--terra) 45%, var(--line));
+}
+
+/* the grand-outline drawer (right half). No border on the LEFT edge (it faces the
+   thread column) so the threads flow straight into the outline. */
+.wv2-root .tl-drawer {
+  flex: 1 1 50%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--terra) 30%, var(--line));
+  border-radius: var(--r-lg);
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  background: color-mix(in srgb, var(--terra) 4%, var(--surface));
+  box-shadow: -3px 0 30px -18px rgba(0, 0, 0, .4);
+  animation: tl-drawer-in .28s ease both;
+}
+
+@keyframes tl-drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(34px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.wv2-root .tl-drawer-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
+}
+
+.wv2-root .tl-drawer-pill {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.wv2-root .tl-drawer-head-note {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.wv2-root .tl-drawer-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px 16px 24px;
+}
+
+.wv2-root .tl-drawer-hint {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.45;
+}
+
+.wv2-root .tl-drop {
+  padding: 6px 0;
+}
+
+.wv2-root .tl-drop-line {
+  display: block;
+  height: 0;
+  border-top: 1.5px dashed var(--line-2);
+  border-radius: 6px;
+}
+
+.wv2-root .tl-drawer-empty {
+  margin-top: 16px;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+  font-style: italic;
+  text-align: center;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * BASE OUTLINE PICKER — the right column BEFORE a base spine exists. Ported from
+ * the handoff "Start with a base outline" design; mapped to app tokens.
+ * ──────────────────────────────────────────────────────────────────────────── */
+.wv2-root .tl-base {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 20px 28px;
+}
+
+.wv2-root .tl-base-art {
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+}
+
+.wv2-root .tl-base-intro {
+  text-align: center;
+  max-width: 320px;
+  margin: 0 auto 20px;
+}
+
+.wv2-root .tl-base-kicker {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--terra);
+  margin-bottom: 6px;
+}
+
+.wv2-root .tl-base-h {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.wv2-root .tl-base-sub {
+  margin: 7px 0 0;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.wv2-root .tl-base-seclbl {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 9px;
+}
+
+/* 1 — select a structure */
+.wv2-root .tl-base-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-bottom: 22px;
+}
+
+.wv2-root .tl-base-preset {
+  text-align: left;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 11px 12px;
+  cursor: pointer;
+  transition: border-color .12s, background .12s, box-shadow .12s;
+}
+
+.wv2-root .tl-base-preset:hover {
+  border-color: color-mix(in srgb, var(--terra) 45%, var(--line));
+  background: color-mix(in srgb, var(--terra) 4%, var(--surface));
+  box-shadow: var(--sh-1, 0 1px 3px rgba(0, 0, 0, .06));
+}
+
+.wv2-root .tl-base-prev {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.wv2-root .tl-base-prev-top {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.wv2-root .tl-base-prev-top.is-next {
+  color: var(--ink-4);
+  margin-top: 1px;
+}
+
+.wv2-root .tl-base-prev-unit {
+  margin-left: 11px;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .tl-base-prev-dot {
+  flex: 0 0 auto;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--terra) 45%, transparent);
+}
+
+/* 2 — create your own */
+.wv2-root .tl-base-custom {
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  padding: 13px 14px;
+  margin-bottom: 24px;
+}
+
+.wv2-root .tl-base-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wv2-root .tl-base-input {
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--ui);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  padding: 7px 10px;
+  outline: none;
+}
+
+.wv2-root .tl-base-input:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 12%, transparent);
+}
+
+.wv2-root .tl-base-chev {
+  flex: 0 0 auto;
+  color: var(--ink-4);
+  font-size: 15px;
+}
+
+.wv2-root .tl-base-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 14px 0 7px;
+}
+
+.wv2-root .tl-base-count-lbl {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.wv2-root .tl-base-count-lbl b {
+  color: var(--terra-deep);
+  font-size: 13px;
+}
+
+.wv2-root .tl-base-count-note {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-4);
+}
+
+.wv2-root .tl-base-range {
+  width: 100%;
+  accent-color: var(--terra);
+}
+
+.wv2-root .tl-base-go {
+  margin-top: 13px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* 3 — receded: use an existing thread as the spine */
+.wv2-root .tl-base-fromthread {
+  padding-top: 2px;
+}
+
+.wv2-root .tl-base-fromthread-lbl {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+
+.wv2-root .tl-base-thread-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-root .tl-base-thread {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 7px 2px;
+  cursor: pointer;
+  color: var(--ink-2);
+  border-radius: var(--r-sm);
+}
+
+.wv2-root .tl-base-thread:hover {
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  color: var(--ink);
+}
+
+.wv2-root .tl-base-thread-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wv2-root .tl-base-thread-n {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-4);
+  white-space: nowrap;
+}
+
+.wv2-root .tl-base-thread-go {
+  color: var(--ink-4);
+  font-size: 12px;
+}
+
+/* stack the two halves on narrow widths */
+@media (max-width: 760px) {
+  .wv2-root .tl-merge-cols {
+    flex-direction: column;
+  }
+
+  .wv2-root .tl-merge-threads,
+  .wv2-root .tl-drawer {
+    flex: 1 1 auto;
+  }
+}
