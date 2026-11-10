@@ -1,0 +1,91 @@
+/* ==============================================================
+ * Margin library — reusable gutter-block + off-screen overlay.
+ *
+ * Mechanism ONLY: the 2-column block layout, the sticky gutter,
+ * and the fixed overlay shell. Each page styles its OWN entry
+ * component (its glyphs, labels, the `.wm` look, …) however it
+ * likes — this file never touches the entry's appearance.
+ *
+ * Scoped under .wv2-root to stay inside the app shell.
+ * A page sets --wm-gutter / --wm-gap on any ancestor to size the
+ * gutter column; the fallbacks keep the layout working without.
+ * ============================================================== */
+
+/* per-block 2-column grid: [ sticky gutter | content ] */
+.wv2-root .wm-block {
+  display: grid;
+  grid-template-columns: var(--wm-gutter) minmax(0, 1fr);
+  align-items: start;
+}
+
+/* the gutter (first child, whatever entry the page supplies). It is NOT sticky:
+   it scrolls naturally, and the off-screen overlay parks a ghost copy at the
+   edge when it leaves the viewport (see MarginOverlay.tsx). */
+.wv2-root .wm-block> :first-child {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  overflow: hidden;
+}
+
+/* the body fills column 2 */
+.wv2-root .wm-block>.wm-body {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+/* ---- off-screen overlay shell ----
+ * A fixed column with a top rail and a bottom rail. Both rails render EVERY
+ * entry up front (hidden) so each parked copy has a stable, measurable Y;
+ * <MarginOverlay> reveals the right copy as the in-flow heading scrolls onto it.
+ * It sets left/width/top inline from the anchor. */
+.wv2-root .wmo {
+  position: fixed;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  /* padding: 12px 0; */
+}
+
+/* the rails never intercept pointer events — only a revealed ghost does */
+.wv2-root .wmo-stack {
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.wv2-root .wmo-bottom {
+  margin-top: auto;
+}
+
+/* a parked copy: hidden until the overlay reveals it. It carries its OWN
+   surface so a revealed copy occludes what's beneath (the stack has none), and
+   becomes clickable only while visible (visibility:hidden also kills hit-testing). */
+.wv2-root .wmo-ghost {
+  visibility: hidden;
+  pointer-events: auto;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  margin-bottom: 5px;
+}
+
+/* Collapses the left margin / gutter column on narrow containers */
+@container (max-width: 720px) {
+  .wv2-root .wm-block {
+    --wm-gutter: 0px !important;
+  }
+
+  .wv2-root .wmock-scene-block,
+  .wv2-root .wmock-chapter-head,
+  .wv2-root .wmock-header-wrap,
+  .wv2-root .wmock-addscene-row {
+    --cm-gutter: 0px !important;
+  }
+
+  .wv2-root .scm {
+    display: none !important;
+  }
+}
