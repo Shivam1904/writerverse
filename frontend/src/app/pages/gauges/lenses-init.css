@@ -1,0 +1,587 @@
+/* ============================================================
+ * LENSES — INIT (first reading).  Ported from the design handoff
+ * writerverse/lenses-init.html.
+ *
+ * A lens is a READER WITH ONE OBSESSION — one watches the tension,
+ * one hunts contradictions, one keeps track of who's where. It just
+ * needs SOMETHING to read — an outline, your scenes, or a thread.
+ *
+ * Two roads in:
+ *   · THE READER (gold ✦) recommends where to look.
+ *   · You pick a lens yourself; Continue opens its scope dialog
+ *     (the reused ConfigureLensModal).
+ *
+ * Accent: SEE/lenses = TEAL. The reader/AI = GOLD ✦.
+ * Lens families keep canon colors:
+ *   Feeling=teal · Loose-end=mauve · Tracking=terra · Fair=sage
+ *
+ * Reuses the shared init scaffolding (.wv2-init / .wv2-init-head /
+ * .wv2-init-seam from app.css); everything below is the
+ * lenses-init-specific dressing, prefixed .li- and scoped to
+ * .li-lenses so it can't collide with the lenses bank (.lens-*).
+ * ============================================================ */
+
+.wv2-root .wv2-init.li-lenses {
+  --lens: var(--teal);
+  --lens-deep: #214f4a;
+  --lens-soft: var(--teal-soft);
+  --lens-bg-2: color-mix(in srgb, var(--teal) 4%, var(--surface));
+  --lens-line: color-mix(in srgb, var(--teal) 30%, var(--line-2));
+  --lens-line-2: color-mix(in srgb, var(--teal) 18%, var(--line-2));
+  /* keep this column a touch wider than the default init body — the lens
+     grid is two columns of cards. */
+  max-width: 660px;
+}
+
+/* ---- recolour the shared init head to the lens accent (teal, not terra) ---- */
+.wv2-root .li-lenses .wv2-init-eyebrow { color: var(--lens-deep); }
+.wv2-root .li-lenses .wv2-init-title em { color: var(--lens-deep); }
+.wv2-root .li-lenses .wv2-init-glyph {
+  color: var(--lens-deep);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--teal-soft) 100%);
+}
+
+/* the offhand line about what a lens reads. When there's nothing for a lens to
+   read yet (.li-needs), it lifts into a quiet highlighted cue and the Suggest
+   button is disabled. */
+.wv2-root .li-aside {
+  margin: 15px auto 0;
+  max-width: 52ch;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  transition: background .22s, border-color .22s, color .22s, padding .22s;
+}
+.wv2-root .li-aside .d {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lens);
+  flex: 0 0 6px;
+  opacity: .7;
+}
+.wv2-root .li-aside b { color: var(--ink-2); font-weight: 600; }
+.wv2-root .li-aside.li-needs {
+  color: var(--ink-2);
+  padding: 7px 16px;
+  background: color-mix(in srgb, var(--teal) 9%, var(--surface));
+  border-color: var(--lens-line-2);
+  box-shadow: 0 1px 2px rgba(48, 110, 105, .06);
+}
+.wv2-root .li-aside.li-needs .d { opacity: 1; animation: li-dotping 2.2s ease-in-out infinite; }
+.wv2-root .li-aside.li-needs b { color: var(--lens-deep); }
+.wv2-root .li-add-one {
+  color: var(--lens-deep);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  border: 0;
+  background: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 42%, transparent);
+  margin-left: 3px;
+  cursor: pointer;
+  font: inherit;
+}
+.wv2-root .li-add-one:hover { color: var(--teal); }
+@keyframes li-dotping {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(48, 110, 105, .5); }
+  60% { box-shadow: 0 0 0 5px rgba(48, 110, 105, 0); }
+}
+
+/* ============================================================ */
+/* HERO · the reader recommends where to look (gold ✦)          */
+/* ============================================================ */
+.wv2-root .li-caster {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background:
+    radial-gradient(150% 130% at 0% 0%, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 52%),
+    linear-gradient(166deg, var(--ai-bg) 0%, var(--ai-bg-2) 120%);
+  border: 1px solid #e2d2ad;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 1px 2px rgba(60, 40, 15, .05), 0 22px 50px -28px rgba(80, 60, 15, .4);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.wv2-root .li-caster::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), #caa358, var(--gold));
+}
+.wv2-root .li-caster::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 251, 238, .5) 50%, transparent 62%);
+  transform: translateX(-130%);
+  animation: li-sheen 7.5s ease-in-out infinite;
+}
+@keyframes li-sheen {
+  0%, 16% { transform: translateX(-130%); }
+  46%, 100% { transform: translateX(130%); }
+}
+.wv2-root .li-orb {
+  flex: 0 0 50px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #fff7e2, var(--ai-bg) 64%, #e7d6ab);
+  border: 1px solid #ddc78f;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  position: relative;
+  box-shadow: 0 4px 14px -6px rgba(140, 103, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .6);
+}
+.wv2-root .li-orb svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wv2-root .li-orb .li-spk {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 13px;
+  color: var(--gold);
+  filter: drop-shadow(0 0 5px rgba(180, 140, 20, .6));
+}
+.wv2-root .li-ctext { flex: 1; min-width: 0; }
+.wv2-root .li-clabel {
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.wv2-root .li-ctitle {
+  font-family: var(--serif);
+  font-size: 18.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.012em;
+  line-height: 1.2;
+}
+.wv2-root .li-cbody {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin-top: 4px;
+  letter-spacing: -.003em;
+  max-width: 43ch;
+}
+.wv2-root .li-cbody b { color: var(--ink); font-weight: 600; }
+.wv2-root .li-cbody-err { color: var(--clay, #a64628); }
+.wv2-root .li-cact {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+}
+.wv2-root .li-btn-cast {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: .005em;
+  color: #fff;
+  background: linear-gradient(180deg, #b08a17, #8a6700);
+  border: 1px solid #6f5200;
+  padding: 10px 17px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .22) inset, 0 6px 16px -7px rgba(120, 90, 0, .6);
+  transition: transform .1s, filter .14s, box-shadow .14s;
+}
+.wv2-root .li-btn-cast svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wv2-root .li-btn-cast:hover { filter: brightness(1.06); box-shadow: 0 1px 0 rgba(255, 255, 255, .22) inset, 0 8px 20px -7px rgba(120, 90, 0, .7); }
+.wv2-root .li-btn-cast:active { transform: translateY(1px); }
+.wv2-root .li-btn-cast[disabled] {
+  cursor: not-allowed;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  border-color: var(--line-2);
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+.wv2-root .li-btn-cast[disabled] svg { opacity: .55; }
+.wv2-root .li-btn-cast[disabled]:hover { filter: none; box-shadow: none; }
+.wv2-root .li-clink {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-weight: 600;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+.wv2-root .li-clink:hover { color: var(--gold); }
+
+/* ============================================================ */
+/* THE EYES — lens cards. Pick one; Continue opens its scope.   */
+/* ============================================================ */
+.wv2-root .li-eyes { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.wv2-root .li-card {
+  position: relative;
+  text-align: left;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  padding: 13px 14px;
+  box-shadow: var(--sh-1);
+  font-family: var(--ui);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: border-color .14s, box-shadow .14s, transform .1s, background .14s;
+}
+.wv2-root .li-card:hover { border-color: var(--line-3); transform: translateY(-2px); box-shadow: var(--sh-2); }
+.wv2-root .li-card-g {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  flex: 0 0 36px;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+}
+.wv2-root .li-card-g svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wv2-root .li-card-g .li-mk-contra { stroke: var(--clay); }
+/* family tints */
+.wv2-root .li-card.t-feeling .li-card-g { background: var(--teal-soft); border-color: #bdd2ce; color: var(--teal); }
+.wv2-root .li-card.t-loose-end .li-card-g { background: #e6dadf; border-color: #c8b6bd; color: var(--mauve); }
+.wv2-root .li-card.t-tracking .li-card-g { background: var(--terra-soft); border-color: #e7c9a8; color: var(--terra-deep); }
+.wv2-root .li-card.t-fair-share .li-card-g { background: #dde5dc; border-color: #bdc9bd; color: var(--sage); }
+
+.wv2-root .li-card-body { flex: 1; min-width: 0; padding-right: 20px; }
+.wv2-root .li-who { font-family: var(--serif); font-size: 14.5px; font-weight: 600; color: var(--ink); letter-spacing: -.008em; line-height: 1.2; }
+.wv2-root .li-qq { font-size: 11px; color: var(--ink-2); line-height: 1.42; margin-top: 3px; font-style: italic; font-family: var(--serif); }
+.wv2-root .li-kind {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 8.5px;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+.wv2-root .li-kind .li-kd { width: 6px; height: 6px; border-radius: 50%; }
+.wv2-root .li-card.t-feeling .li-kind .li-kd { background: var(--teal); }
+.wv2-root .li-card.t-loose-end .li-kind .li-kd { background: var(--mauve); }
+.wv2-root .li-card.t-tracking .li-kind .li-kd { background: var(--terra); }
+.wv2-root .li-card.t-fair-share .li-kind .li-kd { background: var(--sage); }
+
+/* corner affordance — a quiet "pick" arrow on hover; a tick when chosen */
+.wv2-root .li-go {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+  opacity: 0;
+  transform: translateX(-3px);
+  transition: opacity .14s, transform .14s, color .14s;
+}
+.wv2-root .li-go svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wv2-root .li-go .li-tick { display: none; }
+.wv2-root .li-card:hover .li-go { opacity: 1; transform: none; color: var(--lens); }
+
+.wv2-root .li-card.on { border-color: var(--lens); background: var(--lens-bg-2); box-shadow: 0 0 0 1px var(--lens), var(--sh-2); }
+.wv2-root .li-card.on .li-who { color: var(--lens-deep); }
+.wv2-root .li-card.on .li-go { opacity: 1; transform: none; color: #fff; background: var(--lens); }
+.wv2-root .li-card.on .li-go .li-open { display: none; }
+.wv2-root .li-card.on .li-go .li-tick { display: block; }
+
+/* the reader's recommendation flag (gold) — separate from selection */
+.wv2-root .li-pickflag {
+  position: absolute;
+  top: -8px;
+  left: 14px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--ui);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: #8a6700;
+  background: var(--surface);
+  border: 1px solid #e0d09a;
+  padding: 2px 7px;
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(120, 90, 0, .12);
+}
+.wv2-root .li-pickflag .s { filter: drop-shadow(0 0 3px rgba(180, 140, 20, .4)); }
+.wv2-root .li-card.picked .li-pickflag { display: inline-flex; }
+.wv2-root .li-card.picked { border-color: #e0d09a; background: linear-gradient(180deg, var(--ai-bg) 0%, var(--surface) 72%); }
+.wv2-root .li-card.picked.on { border-color: var(--lens); background: var(--lens-bg-2); }
+.wv2-root .li-card.picked.sweep { animation: li-picked .9s ease-out; }
+@keyframes li-picked {
+  0% { box-shadow: 0 0 0 1px var(--gold), 0 0 0 6px rgba(170, 130, 15, .28); }
+  100% { box-shadow: var(--sh-1); }
+}
+
+.wv2-root .li-shelf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 13px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  flex-wrap: wrap;
+}
+.wv2-root .li-shelf button {
+  color: var(--lens-deep);
+  font-weight: 600;
+  text-decoration: none;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 38%, transparent);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.wv2-root .li-shelf button:hover { color: var(--teal); }
+.wv2-root .li-shelf button svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.wv2-root .li-shelf .li-spk { color: var(--gold); filter: drop-shadow(0 0 3px rgba(180, 140, 20, .4)); }
+
+/* ============================================================ */
+/* NEXT-STEP BAR · pick one, then it asks what to look at.      */
+/* ============================================================ */
+.wv2-root .li-nextbar {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--line-2);
+  border-radius: 13px;
+  padding: 14px 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+  transition: border-color .18s, box-shadow .18s;
+}
+.wv2-root .li-nextbar.ready {
+  border-color: var(--lens-line-2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 14px 36px -26px rgba(48, 110, 105, .4);
+}
+.wv2-root .li-iris {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, var(--lens) 0 22%, var(--surface) 24% 44%, var(--lens) 46% 50%, var(--surface) 52%);
+  display: grid;
+  place-items: center;
+  position: relative;
+  box-shadow: 0 0 0 1px var(--lens-line), inset 0 0 0 1px rgba(255, 255, 255, .4);
+  opacity: .4;
+  transition: opacity .18s;
+}
+.wv2-root .li-nextbar.ready .li-iris { opacity: 1; }
+.wv2-root .li-iris::after { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--lens-deep); box-shadow: 0 0 0 3px var(--surface); }
+.wv2-root .li-nb-txt { flex: 1; min-width: 200px; }
+.wv2-root .li-nb-line { font-family: var(--serif); font-size: 14px; color: var(--ink); letter-spacing: -.005em; line-height: 1.35; }
+.wv2-root .li-nb-line b { color: var(--lens-deep); font-weight: 700; }
+.wv2-root .li-nb-line .muted { color: var(--ink-3); font-weight: 400; }
+.wv2-root .li-nb-meta { font-family: var(--ui); font-size: 10.5px; color: var(--ink-3); margin-top: 3px; }
+.wv2-root .li-nb-meta b { color: var(--ink-2); font-weight: 600; }
+.wv2-root .li-btn-continue {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, var(--teal), var(--lens-deep));
+  border: 1px solid var(--lens-deep);
+  padding: 11px 18px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18) inset, 0 6px 16px -7px rgba(33, 79, 74, .6);
+  transition: transform .1s, filter .14s, opacity .14s;
+}
+.wv2-root .li-btn-continue svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.wv2-root .li-btn-continue:hover { filter: brightness(1.06); }
+.wv2-root .li-btn-continue:active { transform: translateY(1px); }
+.wv2-root .li-btn-continue[disabled] { opacity: .4; cursor: not-allowed; filter: grayscale(.4); }
+
+/* ============================================================ */
+/* THE READER'S PICKS — rich lens-suggestion cards.             */
+/* The body reuses the config dialog's chart + y-item language   */
+/* (lens-drawsvg / lens-rule-line via <LensShapePreview>); the    */
+/* card chrome below is init-local (.li-sugg-). The block frame   */
+/* echoes the gold reader hero (.li-caster) — these ARE its       */
+/* output. Renders only when a suggest run has proposed.          */
+/* ============================================================ */
+.wv2-root .li-sugg { margin-top: 18px; }
+.wv2-root .li-sugg-block {
+  border-radius: var(--r-lg);
+  border: 1px solid #e2d2ad;
+  background: linear-gradient(166deg, var(--ai-bg) 0%, var(--ai-bg-2) 130%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), 0 18px 44px -30px rgba(80, 60, 15, .4);
+  padding: 16px 16px 14px;
+  margin-bottom: 14px;
+}
+.wv2-root .li-sugg-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-family: var(--ui);
+  margin-bottom: 13px;
+}
+.wv2-root .li-sugg-head .li-spk { color: var(--gold); filter: drop-shadow(0 0 4px rgba(180, 140, 20, .5)); }
+.wv2-root .li-sugg-head-t { font-size: 13px; color: var(--ink); font-weight: 600; }
+.wv2-root .li-sugg-head-t b { color: #8a6700; }
+.wv2-root .li-sugg-head-sub { font-size: 11px; color: var(--ink-3); }
+
+.wv2-root .li-sugg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
+  gap: 11px;
+}
+.wv2-root .li-sugg-card {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  padding: 13px 13px 12px;
+  box-shadow: var(--sh-1);
+  font-family: var(--ui);
+  display: flex;
+  flex-direction: column;
+}
+.wv2-root .li-sugg-card-head { display: flex; align-items: flex-start; gap: 8px; }
+.wv2-root .li-sugg-card-id { flex: 1; min-width: 0; }
+.wv2-root .li-sugg-name { font-family: var(--serif); font-size: 14.5px; font-weight: 600; color: var(--ink); line-height: 1.25; letter-spacing: -.008em; }
+.wv2-root .li-sugg-ask { font-size: 10.5px; color: var(--ink-2); margin-top: 2px; font-style: italic; font-family: var(--serif); line-height: 1.35; }
+.wv2-root .li-sugg-type { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 5px; font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; white-space: nowrap; margin-top: 2px; }
+.wv2-root .li-sugg-type-d { width: 7px; height: 7px; border-radius: 50%; flex: 0 0 7px; }
+
+.wv2-root .li-sugg-scope { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.wv2-root .li-sugg-scope-k { color: var(--ink-3); text-transform: uppercase; letter-spacing: .07em; font-size: 8.5px; font-weight: 700; }
+.wv2-root .li-sugg-scope-v { font-size: 10.5px; color: var(--ink); font-weight: 600; background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 7px; }
+.wv2-root .li-sugg-badge { font-size: 8.5px; color: #8a6700; font-weight: 700; letter-spacing: .03em; }
+
+.wv2-root .li-sugg-why { font-family: var(--serif); font-size: 12px; color: var(--ink-2); line-height: 1.45; margin-top: 9px; letter-spacing: -.003em; }
+
+.wv2-root .li-sugg-sec { margin-top: 11px; }
+.wv2-root .li-sugg-sec-t { font-size: 8.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-bottom: 6px; }
+.wv2-root .li-sugg-sec-warn { color: var(--clay); }
+.wv2-root .li-sugg-items { display: flex; flex-wrap: wrap; gap: 4px; }
+.wv2-root .li-sugg-chip { font-size: 10px; color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; }
+
+/* the embedded chart — bump the viewBox label sizes so they stay legible once
+   the 384-wide svg is scaled down into the card. */
+.wv2-root .li-sugg-svg { margin-top: 2px; }
+.wv2-root .li-sugg-svg .lens-ylab { font-size: 12px; }
+.wv2-root .li-sugg-svg .lens-xlab { font-size: 11px; }
+.wv2-root .li-sugg-svg .li-sugg-wrong { fill: none; stroke: var(--clay); stroke-width: 2.1; stroke-dasharray: 5 4; stroke-linecap: round; stroke-linejoin: round; opacity: .92; }
+.wv2-root .li-sugg-svg .li-sugg-wrong-pt { fill: var(--surface); stroke: var(--clay); stroke-width: 2.2; }
+
+.wv2-root .li-sugg-legend { display: flex; gap: 13px; margin-top: 3px; }
+.wv2-root .li-sugg-leg { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; color: var(--ink-3); font-weight: 600; }
+.wv2-root .li-sugg-leg::before { content: ''; width: 14px; height: 2.5px; border-radius: 2px; flex: 0 0 14px; }
+.wv2-root .li-sugg-leg-ok::before { background: var(--teal); }
+.wv2-root .li-sugg-leg-bad::before { background: repeating-linear-gradient(90deg, var(--clay) 0 4px, transparent 4px 7px); }
+
+.wv2-root .li-sugg-cap { font-family: var(--serif); font-size: 11px; color: var(--ink-2); line-height: 1.45; margin: 7px 0 0; font-style: italic; }
+.wv2-root .li-sugg-cap-plain { margin-top: 11px; padding-top: 9px; border-top: 1px dashed var(--line-2); font-style: normal; font-family: var(--ui); }
+.wv2-root .li-sugg-more { margin-top: 9px; font-size: 9.5px; color: var(--ink-3); font-weight: 600; }
+
+/* per-card foot — Skip (left) and Add (right), pinned to the bottom of every
+   card (margin-top auto keeps the row aligned across cards of differing height). */
+.wv2-root .li-sugg-card-foot { margin-top: auto; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.wv2-root .li-sugg-add { gap: 4px; }
+.wv2-root .li-sugg-skip {
+  font-family: var(--ui); font-size: 11px; font-weight: 600;
+  color: var(--ink-3); background: none; border: 0; cursor: pointer; padding: 4px 2px;
+}
+.wv2-root .li-sugg-skip:hover { color: var(--ink-2); text-decoration: underline; }
+
+.wv2-root .li-sugg-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .wv2-root .li-caster::after { animation: none !important; }
+  .wv2-root .li-card.picked.sweep { animation: none; }
+  .wv2-root .li-aside.li-needs .d { animation: none; }
+}
+@media (max-width: 620px) {
+  .wv2-root .li-caster { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .wv2-root .li-cact { flex-direction: row; align-items: center; }
+  .wv2-root .li-eyes { grid-template-columns: 1fr; }
+  .wv2-root .li-sugg-grid { grid-template-columns: 1fr; }
+}

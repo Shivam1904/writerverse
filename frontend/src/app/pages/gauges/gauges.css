@@ -1,0 +1,466 @@
+/* ==============================================================
+ * Gauges — ENRICHMENT styles layered on the forked lens + charts CSS.
+ * Only the new meaning-layer bits live here (descriptions, plain-words
+ * verdicts, the kind-word, the locked AI head). Theme tokens only.
+ * ============================================================== */
+
+/* ── bank card enrichment ──────────────────────────────────────────────── */
+.wv2-root .gz-kindword {
+  margin-left: 8px; font-size: 10px; font-weight: 600; color: var(--ink-3);
+  background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 999px;
+  padding: 1px 7px; vertical-align: middle; white-space: nowrap;
+}
+.wv2-root .gz-card-watches { font-size: 11.5px; line-height: 1.45; color: var(--ink-2); margin-top: 3px; }
+.wv2-root .gz-card-tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.wv2-root .gz-watch-hint {
+  font-family: var(--ui); font-size: 11px; font-weight: 600; color: var(--terra-deep);
+  border: 0; background: transparent; padding: 2px 4px; border-radius: var(--r-xs); cursor: pointer;
+  opacity: 0; transition: opacity .12s ease, background .12s ease; white-space: nowrap;
+}
+.wv2-root .gz-watch-hint:hover { background: color-mix(in srgb, var(--terra) 10%, transparent); }
+.wv2-root .gz-bindings-btn {
+  font-family: var(--ui); font-size: 11px; font-weight: 600; color: var(--terra-deep);
+  border: 1px solid color-mix(in srgb, var(--terra) 30%, transparent);
+  background: color-mix(in srgb, var(--terra) 8%, transparent);
+  padding: 3px 9px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  transition: background .12s ease, border-color .12s ease;
+}
+.wv2-root .gz-bindings-btn:hover { background: color-mix(in srgb, var(--terra) 15%, transparent); border-color: color-mix(in srgb, var(--terra) 50%, transparent); }
+.wv2-root .lens-card:hover .gz-watch-hint, .wv2-root .lens-card:focus-visible .gz-watch-hint { opacity: 1; }
+.wv2-root .gz-status-watching { color: var(--teal); }
+.wv2-root .gz-spotlight .lens-sec-t { color: var(--terra-deep); }
+
+/* ── rule-broken markers across the renderers (config preview + real verdicts) ── */
+.wv2-root .cv-led-cell--breach { outline: 2px solid var(--clay, var(--terra)); outline-offset: 1px; border-radius: 3px; }
+.wv2-root .gz-ticked-row--breach {
+  border-radius: var(--r-xs, 6px);
+  background: color-mix(in srgb, var(--clay, var(--terra)) 7%, transparent);
+  box-shadow: inset 2px 0 0 var(--clay, var(--terra));
+}
+.wv2-root .gz-ticked-row--breach .gz-ticked-where.miss { color: var(--clay, var(--terra-deep)); font-weight: 600; }
+.wv2-root .cv-cov-col--breach .cv-cov-bar--breach { background: color-mix(in srgb, var(--clay, var(--terra)) 22%, transparent); border: 1px solid var(--clay, var(--terra)); }
+.wv2-root .cv-cov-pin--breach { color: var(--clay, var(--terra-deep)); font-weight: 700; }
+.wv2-root .cv-cov-col--breach .cv-cov-name { color: var(--clay, var(--terra-deep)); font-weight: 600; }
+
+/* ── highlight tiers: only PRESETS are highlighted; everything else is white ─
+ * The bank used to carry two highlight layers (white catalogue + tinted
+ * featured). Now the ONE highlighted tier is "your presets" (pinned top); the
+ * invented + suggested + catalogue cards are all white — they differ by SIZE /
+ * info density / a faint mark, never by a coloured fill. */
+
+/* preset — the highlighted tier (wins over .is-watching via the doubled class) */
+.wv2-root .lens-card.lens-card-preset {
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--ai-bg-2) 100%);
+  border-color: color-mix(in srgb, var(--terra) 42%, var(--line));
+  box-shadow: var(--sh-2), inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+.wv2-root .lens-card.lens-card-preset::before {
+  content: ''; position: absolute; top: 12px; bottom: 12px; left: 0; width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--terra), var(--mauve));
+}
+
+/* invented — white, but BIGGER + richer (the info does the talking, no tint) */
+.wv2-root .lens-card-invented {
+  background: var(--surface); border-color: var(--line);
+  padding: 16px 18px;
+}
+.wv2-root .lens-card-invented .lens-card-nm { font-size: 15.5px; }
+.wv2-root .lens-card-invented .lens-card-ask { font-size: 12px; }
+
+/* suggested — white, only a faint uppercase tag marks it (it's already grouped) */
+.wv2-root .lens-card-suggested { background: var(--surface); border-color: var(--line); }
+.wv2-root .gz-suggested-mark {
+  font-size: 8.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--ink-3); opacity: .65;
+}
+
+/* ── scope line — bound (bold, draws the eye) vs scope-possible (subtle) ───── */
+.wv2-root .gz-scope { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; margin-top: 7px; font-size: 11px; }
+.wv2-root .gz-scope-flat { margin-top: 4px; font-size: 10.5px; }
+.wv2-root .gz-scope-lbl { color: var(--ink-3); letter-spacing: .01em; }
+/* bound — terra pills, the attention sink */
+.wv2-root .gz-scope-bound .gz-scope-name {
+  font-weight: 700; color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 11%, transparent);
+  border: 1px solid color-mix(in srgb, var(--terra) 28%, transparent);
+  border-radius: 999px; padding: 1px 9px;
+}
+/* not bound — surface the scope this type CAN watch (a soft dotted hint) */
+.wv2-root .gz-scope-possible .gz-scope-can {
+  font-weight: 600; color: var(--ink-1);
+  border-bottom: 1.5px dotted color-mix(in srgb, var(--ink-3) 55%, transparent);
+}
+/* clickable scope line — the bindings entry point (saved presets only) */
+.wv2-root .gz-scope-link { cursor: pointer; border-radius: 6px; padding: 1px 4px; margin-left: -4px; }
+.wv2-root .gz-scope-link:hover { background: color-mix(in srgb, var(--terra) 8%, transparent); }
+.wv2-root .gz-scope-link .gz-scope-lbl {
+  text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px;
+}
+.wv2-root .gz-scope-link:hover .gz-scope-can,
+.wv2-root .gz-scope-link:hover .gz-scope-name { text-decoration: underline; text-underline-offset: 2px; }
+.wv2-root .gz-scope-link:focus-visible { outline: 2px solid var(--terra); outline-offset: 1px; }
+
+/* ── chart-view: the preset's settings panel ───────────────────────────── */
+.wv2-root .gz-muted { color: var(--ink-3); }
+.wv2-root .gz-settings { margin-top: 14px; }
+.wv2-root .gz-set-head {
+  font-size: 12px; font-weight: 700; color: var(--ink-1);
+  letter-spacing: .01em; margin-bottom: 10px;
+}
+.wv2-root .gz-set-from { font-weight: 500; color: var(--ink-3); }
+.wv2-root .gz-set-grid { display: flex; flex-direction: column; gap: 8px; margin: 0; }
+.wv2-root .gz-set-row {
+  display: grid; grid-template-columns: 116px 1fr; gap: 12px;
+  align-items: baseline; font-size: 12px;
+}
+.wv2-root .gz-set-k { color: var(--ink-3); margin: 0; }
+.wv2-root .gz-set-sub { color: var(--ink-3); opacity: .8; font-size: 11px; }
+.wv2-root .gz-set-v { color: var(--ink-1); margin: 0; }
+.wv2-root .gz-set-chips { display: inline-flex; flex-wrap: wrap; gap: 5px; }
+.wv2-root .gz-set-chip {
+  font-size: 11px; color: var(--ink-1);
+  background: color-mix(in srgb, var(--ink-3) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink-3) 18%, transparent);
+  border-radius: 999px; padding: 1px 8px;
+}
+.wv2-root .gz-set-bindings {
+  margin-top: 12px; padding-top: 10px; font-size: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--ink-3) 14%, transparent);
+}
+.wv2-root .gz-set-bindings-ct { color: var(--ink-2); }
+.wv2-root .gz-set-binding-name {
+  font-weight: 600; color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 11%, transparent);
+  border-radius: 999px; padding: 1px 8px; margin-right: 4px;
+}
+
+/* x-axis legend under each scene-mapped chart — what it walks + the tick grain */
+.wv2-root .gz-xaxis-legend {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 8px; font-size: 11.5px; color: var(--ink-3);
+}
+.wv2-root .gz-xaxis-legend b { color: var(--terra-deep); font-weight: 600; }
+.wv2-root .gz-xaxis-dot {
+  width: 16px; border-top: 2px solid color-mix(in srgb, var(--teal, #306e69) 65%, transparent);
+  display: inline-block;
+}
+
+/* ── 4-section bank: section action + empty states + foundational tag ───── */
+.wv2-root .gz-sec-action { margin-left: auto; }
+.wv2-root .lens-sec-empty {
+  margin: 4px 0 0; padding: 14px 16px;
+  border: 1.5px dashed var(--line-2); border-radius: var(--r-lg);
+  font-size: 12.5px; color: var(--ink-3); background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+.wv2-root .gz-foundational {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: .03em; white-space: nowrap;
+  color: var(--gold); background: var(--gold-soft);
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+  border-radius: 999px; padding: 1px 7px;
+}
+.wv2-root .lens-flat-nm .gz-foundational { margin-left: 8px; vertical-align: middle; }
+
+/* ── charts header (no slug — friendly name · scope) ───────────────────── */
+.wv2-root .gz-chead { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.wv2-root .gz-chead-glyph { flex: 0 0 auto; }
+.wv2-root .gz-chead-body { min-width: 0; }
+.wv2-root .gz-chead-name { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.wv2-root .gz-chead-scope { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+/* what this binding walks (the attached thread / outline) — sits with the scope */
+.wv2-root .gz-chead-walk { color: var(--terra-deep); font-weight: 600; }
+
+/* ── verdict: the "what a wobble means" line + map note ────────────────── */
+.wv2-root .cv-verdict-readas { font-size: 11.5px; line-height: 1.45; color: var(--ink-3); margin-top: 5px; }
+.wv2-root .gz-invariant { font-weight: 600; color: var(--ink-2); }
+.wv2-root .gz-map-note { color: var(--ink-3); font-style: italic; font-weight: 400; }
+
+/* ── per-form description enrichments ──────────────────────────────────── */
+.wv2-root .gz-ylevel { cursor: help; }
+.wv2-root .gz-cov-desc { font-size: 10px; line-height: 1.35; color: var(--ink-4); margin-top: 4px; max-width: 120px; }
+.wv2-root .gz-hanging {
+  margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line-2);
+  font-size: 12px; line-height: 1.5; color: var(--ink-2);
+}
+.wv2-root .gz-hanging b { color: var(--clay); font-weight: 600; }
+.wv2-root .gz-trans-breach {
+  color: var(--clay) !important;
+  background: var(--clay-soft) !important;
+  border-color: color-mix(in srgb, var(--clay) 28%, transparent) !important;
+}
+
+/* ── config modal: editable y-item descriptions + locked AI head ───────── */
+.wv2-root .gz-yitems { display: flex; flex-direction: column; gap: 9px; }
+.wv2-root .gz-yrow { display: flex; flex-direction: column; gap: 4px; }
+.wv2-root .gz-yrow-main { display: flex; align-items: center; gap: 6px; }
+.wv2-root .gz-yrow-val { flex: 1; }
+.wv2-root .gz-yrow-desc {
+  width: 100%; font: inherit; font-size: 11.5px; color: var(--ink-2);
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 5px 9px; margin-left: 22px; outline: none; transition: border-color .12s ease;
+}
+.wv2-root .gz-yrow-desc:focus { border-color: var(--terra); background: var(--surface); }
+.wv2-root .gz-yrow-desc::placeholder { color: var(--ink-4); font-style: italic; }
+
+.wv2-root .gz-locked-head {
+  display: flex; gap: 8px; align-items: flex-start; margin-top: 12px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 9px 11px; font-size: 11.5px; line-height: 1.45; color: var(--ink-3);
+}
+.wv2-root .gz-locked-head b { color: var(--ink-2); font-weight: 600; }
+.wv2-root .gz-lock { flex: 0 0 auto; opacity: .7; }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * A2 — the decide / try-on card (read-only). A light centered modal that
+ * hands off to the config modal (Surface B) via "Try on".
+ * ════════════════════════════════════════════════════════════════════════ */
+.wv2-root .gz-decide {
+  width: min(560px, 94vw); max-height: 88vh; display: flex; flex-direction: column;
+  background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r-xl);
+  box-shadow: var(--sh-4); overflow: hidden;
+}
+.wv2-root .gz-decide-head {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 16px 16px 14px; border-bottom: 1px solid var(--line);
+}
+.wv2-root .gz-decide-titles { flex: 1; min-width: 0; }
+.wv2-root .gz-decide-name { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.wv2-root .gz-decide-watch { font-size: 12.5px; line-height: 1.5; color: var(--ink-2); margin-top: 4px; }
+.wv2-root .gz-decide-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.wv2-root .gz-decide-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 13px 16px; border-top: 1px solid var(--line); background: var(--paper-2);
+}
+
+.wv2-root .gz-decide-label {
+  font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--ink-3); margin-bottom: 8px; display: flex; align-items: baseline; gap: 8px;
+}
+.wv2-root .gz-decide-ex {
+  font-size: 9.5px; font-weight: 600; letter-spacing: .02em; text-transform: none;
+  color: var(--ink-4); background: var(--surface-2); border: 1px dashed var(--line-2);
+  border-radius: 999px; padding: 1px 8px;
+}
+/* the ghosted example — strip the inner chart card chrome, soften it */
+.wv2-root .gz-decide-example {
+  border: 1.5px dashed var(--line-2); border-radius: var(--r-lg);
+  padding: 10px 12px; background: color-mix(in srgb, var(--surface) 55%, transparent);
+}
+.wv2-root .gz-decide-example .cv-chart-card { border: 0; box-shadow: none; background: transparent; padding: 0; }
+.wv2-root .gz-decide-example .cv-chart-head { display: none; }
+.wv2-root .gz-decide-example .cv-svg, .wv2-root .gz-decide-example .cv-dep-svg { opacity: .92; }
+.wv2-root .gz-decide-alts { margin-top: 7px; font-size: 11px; color: var(--ink-3); font-style: italic; }
+
+.wv2-root .gz-decide-verdict { display: flex; flex-direction: column; gap: 7px; }
+.wv2-root .gz-go { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.wv2-root .gz-go .ico { flex: 0 0 auto; margin-top: 1px; display: grid; place-items: center; }
+.wv2-root .gz-go.good .ico { color: var(--teal); }
+.wv2-root .gz-go.off .ico { color: var(--clay); }
+.wv2-root .gz-go.gz-go-map .ico { color: var(--ink-3); }
+.wv2-root .gz-go b { color: var(--ink); font-weight: 600; }
+
+.wv2-root .gz-decide-measures, .wv2-root .gz-decide-catches {
+  font-size: 12px; line-height: 1.5; color: var(--ink-2);
+}
+.wv2-root .gz-decide-measures b, .wv2-root .gz-decide-catches b { color: var(--ink); font-weight: 600; }
+.wv2-root .gz-decide-catches { display: flex; gap: 8px; align-items: flex-start; }
+.wv2-root .gz-decide-catches .ico { flex: 0 0 auto; margin-top: 1px; color: var(--ink-3); }
+
+.wv2-root .gz-setup {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11.5px; color: var(--ink-2);
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 8px 10px;
+}
+.wv2-root .gz-setup .ico { color: var(--ink-3); flex: 0 0 auto; display: grid; place-items: center; }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Visual switch + the alternate checklist / map / report renderers
+ * ════════════════════════════════════════════════════════════════════════ */
+
+/* "Show as ▾" — the per-binding visual picker (runtime pick) */
+.wv2-root .gz-showas { display: flex; align-items: center; justify-content: flex-end; gap: 9px; margin: 4px 0 6px; }
+.wv2-root .gz-showas-lbl { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+
+/* the report kind tint (the glyph) */
+.wv2-root .lens-g-report { color: var(--clay); }
+
+/* ── checklist · ticked list (the row-list visual) ─────────────────────── */
+.wv2-root .gz-ticked { display: flex; flex-direction: column; }
+.wv2-root .gz-ticked-row { display: flex; align-items: center; gap: 11px; padding: 9px 2px; border-bottom: 1px solid var(--line); }
+.wv2-root .gz-ticked-row:last-child { border-bottom: 0; }
+.wv2-root .gz-ticked-mark { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 999px; display: grid; place-items: center; }
+.wv2-root .gz-ticked-mark.hit { background: var(--teal-soft); color: var(--teal); }
+.wv2-root .gz-ticked-mark.miss { color: var(--ink-4); border: 1.5px dashed var(--line-3); }
+.wv2-root .gz-ticked-body { flex: 1; min-width: 0; }
+.wv2-root .gz-ticked-name { font-size: 13px; color: var(--ink); font-weight: 500; }
+.wv2-root .gz-ticked-row.is-miss .gz-ticked-name { color: var(--ink-3); }
+.wv2-root .gz-ticked-desc { font-size: 11px; color: var(--ink-4); margin-top: 1px; }
+.wv2-root .gz-ticked-where { font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wv2-root .gz-ticked-where.miss { color: var(--clay); }
+
+/* ── checklist · progress ring ─────────────────────────────────────────── */
+.wv2-root .gz-ring-card { display: flex; align-items: center; gap: 20px; padding: 12px 6px; }
+.wv2-root .gz-ring { width: 112px; height: 112px; flex: 0 0 auto; }
+.wv2-root .gz-ring-track { fill: none; stroke: var(--line-2); stroke-width: 8; }
+.wv2-root .gz-ring-fill { fill: none; stroke: var(--sage); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset .45s cubic-bezier(.2,.7,.2,1); }
+.wv2-root .gz-ring-num { font-family: var(--serif); font-size: 22px; font-weight: 600; fill: var(--ink); }
+.wv2-root .gz-ring-lbl { font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; fill: var(--ink-3); }
+.wv2-root .gz-ring-list { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.wv2-root .gz-ring-chip { font-size: 12px; color: var(--ink-2); }
+.wv2-root .gz-ring-chip.hit { color: var(--ink); }
+.wv2-root .gz-ring-chip.miss { color: var(--ink-4); }
+
+/* ── report · contradiction list (non-chart form) ──────────────────────── */
+.wv2-root .gz-report-row { padding: 11px 2px; border-bottom: 1px solid var(--line); }
+.wv2-root .gz-report-row:last-child { border-bottom: 0; }
+.wv2-root .gz-report-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.wv2-root .gz-report-clash { font-size: 11px; color: var(--clay); font-weight: 500; }
+.wv2-root .gz-report-ev { font-size: 12px; color: var(--ink-2); margin-top: 4px; padding-left: 22px; }
+
+/* ── line_with_ideal overlay (arc) ─────────────────────────────────────── */
+.wv2-root .gz-ideal-line { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-dasharray: 5 5; opacity: .55; }
+
+/* ── map · bars ────────────────────────────────────────────────────────── */
+.wv2-root .gz-bars { display: flex; align-items: flex-end; gap: 4px; height: 180px; padding: 4px 2px 0; }
+.wv2-root .gz-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.wv2-root .gz-bar { width: 100%; max-width: 26px; border-radius: 3px 3px 0 0; box-shadow: var(--bevel-up); transition: height .3s ease; }
+.wv2-root .gz-bar-x { font-size: 9px; color: var(--ink-4); margin-top: 4px; }
+.wv2-root .gz-bars-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+.wv2-root .gz-bars-key { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--ink-2); }
+.wv2-root .gz-bars-key i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+/* ── map · heat strip ──────────────────────────────────────────────────── */
+.wv2-root .gz-heat { display: flex; gap: 3px; }
+.wv2-root .gz-heat-cell { flex: 1; height: 46px; border-radius: 4px; display: grid; place-items: end center; box-shadow: var(--bevel-up); }
+.wv2-root .gz-heat-cell span { font-size: 9px; color: var(--ink); opacity: .55; padding-bottom: 3px; }
+.wv2-root .gz-heat-scale { display: flex; justify-content: space-between; margin-top: 7px; font-size: 11px; color: var(--ink-3); }
+
+/* ── arc · gauge dial ──────────────────────────────────────────────────── */
+.wv2-root .gz-gauge-card { display: flex; align-items: center; gap: 20px; padding: 10px 6px; }
+.wv2-root .gz-gauge { width: 200px; height: 120px; flex: 0 0 auto; }
+.wv2-root .gz-gauge-track { fill: none; stroke: var(--line-2); stroke-width: 10; stroke-linecap: round; }
+.wv2-root .gz-gauge-fill { fill: none; stroke: var(--terra); stroke-width: 10; stroke-linecap: round; }
+.wv2-root .gz-gauge-needle { stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
+.wv2-root .gz-gauge-hub { fill: var(--ink); }
+.wv2-root .gz-gauge-val { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--ink); }
+.wv2-root .gz-gauge-sub { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+
+/* ── tracker · transition list ─────────────────────────────────────────── */
+.wv2-root .gz-trans-list { display: flex; flex-direction: column; gap: 7px; }
+.wv2-root .gz-trans-line { font-size: 13px; color: var(--ink-2); }
+.wv2-root .gz-trans-line b { color: var(--ink); font-weight: 600; }
+.wv2-root .gz-trans-sc { display: inline-block; min-width: 78px; font-size: 11px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
+
+/* ── setup → payoff · board + hanging list ─────────────────────────────── */
+.wv2-root .gz-board { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wv2-root .gz-board-h { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px; }
+.wv2-root .gz-board-cell { font-size: 12.5px; color: var(--ink); padding: 7px 9px; border-radius: var(--r-sm); background: var(--surface-2); margin-bottom: 6px; border: 1px solid var(--line); }
+.wv2-root .gz-board-cell.paid { color: var(--teal); }
+.wv2-root .gz-board-cell.open { color: var(--clay); }
+.wv2-root .gz-board-sc { font-size: 10.5px; color: var(--ink-3); }
+.wv2-root .gz-board-open { font-size: 11.5px; }
+.wv2-root .gz-hang { display: flex; flex-direction: column; gap: 8px; }
+.wv2-root .gz-hang-row { font-size: 13px; color: var(--ink); }
+.wv2-root .gz-hang-row b { color: var(--clay); }
+.wv2-root .gz-hang-sc { display: block; font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Surface C — the custom-create modal + shared form controls
+ * ════════════════════════════════════════════════════════════════════════ */
+.wv2-root .gz-custom {
+  width: min(780px, 96vw); max-height: 90vh; display: flex; flex-direction: column;
+  background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r-xl);
+  box-shadow: var(--sh-4); overflow: hidden;
+}
+.wv2-root .gz-custom-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 16px 14px; border-bottom: 1px solid var(--line); }
+.wv2-root .gz-custom-title { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1.25; margin-top: 3px; }
+.wv2-root .gz-custom-body { flex: 1; overflow-y: auto; padding: 16px; }
+.wv2-root .gz-custom-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 16px; border-top: 1px solid var(--line); background: var(--paper-2); }
+.wv2-root .gz-custom-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+@media (max-width: 720px) { .wv2-root .gz-custom-grid { grid-template-columns: 1fr; } }
+.wv2-root .gz-custom-preview { position: sticky; top: 0; }
+
+/* form fields (shared) */
+.wv2-root .gz-field { margin-bottom: 15px; }
+.wv2-root .gz-field > label { display: block; font-size: 11px; font-weight: 600; color: var(--ink-2); margin-bottom: 6px; }
+.wv2-root .gz-input, .wv2-root .gz-textarea {
+  width: 100%; font: inherit; font-size: 13px; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 8px 10px; outline: none; transition: border-color .12s ease;
+}
+.wv2-root .gz-input:focus, .wv2-root .gz-textarea:focus { border-color: var(--terra); }
+.wv2-root .gz-textarea { resize: vertical; min-height: 54px; line-height: 1.45; }
+
+/* scale rows */
+.wv2-root .gz-scale { display: flex; flex-direction: column; gap: 6px; }
+.wv2-root .gz-scale-row { display: flex; align-items: center; gap: 7px; }
+.wv2-root .gz-scale-row .vinput { width: 120px; flex: 0 0 auto; }
+.wv2-root .gz-scale-row .dinput { flex: 1; }
+.wv2-root .gz-scale-row .rm { border: 0; background: transparent; color: var(--ink-4); cursor: pointer; padding: 2px; }
+.wv2-root .gz-scale-row .rm:hover { color: var(--clay); }
+
+/* step-0 form picker */
+.wv2-root .gz-forms { display: flex; flex-direction: column; gap: 8px; }
+.wv2-root .gz-form-opt {
+  display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; width: 100%;
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-md); padding: 11px 13px; transition: border-color .12s ease, background .12s ease;
+}
+.wv2-root .gz-form-opt:hover { border-color: var(--line-3); }
+.wv2-root .gz-form-opt.is-sel { border-color: var(--terra); background: color-mix(in srgb, var(--terra) 5%, var(--surface)); }
+.wv2-root .gz-form-glyph { flex: 0 0 auto; }
+.wv2-root .gz-form-txt { display: flex; flex-direction: column; min-width: 0; }
+.wv2-root .gz-form-txt .t { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+.wv2-root .gz-form-txt .d { font-size: 11.5px; color: var(--ink-3); margin-top: 1px; }
+.wv2-root .gz-form-opt .j { margin-left: auto; font-size: 10px; color: var(--ink-4); white-space: nowrap; }
+
+/* math-rule radio */
+.wv2-root .gz-rules { display: flex; flex-direction: column; gap: 5px; }
+.wv2-root .gz-rule { display: flex; align-items: center; gap: 9px; cursor: pointer; border: 1px solid var(--line-2); border-radius: var(--r-sm); padding: 7px 10px; background: var(--surface); }
+.wv2-root .gz-rule.is-sel { border-color: var(--terra); background: color-mix(in srgb, var(--terra) 5%, var(--surface)); }
+.wv2-root .gz-rule .r { width: 13px; height: 13px; border-radius: 999px; border: 2px solid var(--line-3); flex: 0 0 auto; }
+.wv2-root .gz-rule.is-sel .r { border-color: var(--terra); background: radial-gradient(circle, var(--terra) 0 3px, transparent 4px); }
+.wv2-root .gz-rule .lbl { font-size: 12px; font-weight: 600; color: var(--ink); }
+.wv2-root .gz-rule .demo { font-size: 11px; color: var(--ink-3); }
+.wv2-root .gz-rule .soon { margin-left: auto; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-4); }
+
+/* Surface B — section-source (read-only; the scale lives in a World section) */
+.wv2-root .gz-section-vals {
+  font-size: 13px; color: var(--ink); font-weight: 500; line-height: 1.7;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-sm);
+  padding: 10px 12px; margin: 8px 0;
+}
+.wv2-root .gz-section-manage { font-size: 11.5px; color: var(--ink-3); }
+.wv2-root .gz-link { color: var(--terra-deep); cursor: pointer; font-weight: 600; }
+
+/* ── config modal: verdict badge + the visual / findings steppers (3 & 4) ── */
+.wv2-root .gz-verdict-badge {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+  font-size: 11.5px; line-height: 1.4; color: var(--ink-2);
+  background: var(--surface-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 3px 10px;
+}
+.wv2-root .gz-verdict-badge .ico { flex: 0 0 auto; }
+
+.wv2-root .gz-cfg-step { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.wv2-root .gz-vstep { display: inline-flex; align-items: center; gap: 8px; margin: 6px 0 4px; }
+.wv2-root .gz-vstep-arr {
+  width: 26px; height: 26px; border-radius: var(--r-sm); border: 1px solid var(--line-2);
+  background: var(--surface); color: var(--ink-2); cursor: pointer; font-size: 16px; line-height: 1;
+  display: grid; place-items: center; transition: border-color .12s ease, color .12s ease;
+}
+.wv2-root .gz-vstep-arr:hover:not(:disabled) { border-color: var(--terra); color: var(--terra-deep); }
+.wv2-root .gz-vstep-arr:disabled { opacity: .4; cursor: not-allowed; }
+.wv2-root .gz-vstep-lbl { min-width: 120px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ink); }
+.wv2-root .gz-vstep-count { font-size: 10.5px; color: var(--ink-4); font-variant-numeric: tabular-nums; }
+
+.wv2-root .gz-cfg-preview {
+  margin-top: 8px; border: 1.5px dashed var(--line-2); border-radius: var(--r-lg);
+  padding: 10px 12px; background: color-mix(in srgb, var(--surface) 55%, transparent);
+}
+.wv2-root .gz-cfg-preview .cv-chart-card { border: 0; box-shadow: none; background: transparent; padding: 0; }
+.wv2-root .gz-cfg-preview .cv-chart-head { display: none; }
+
+.wv2-root .gz-rvp {
+  margin-top: 8px; display: flex; flex-direction: column; gap: 5px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r-md); padding: 10px 12px;
+}
+.wv2-root .gz-rvp-row { font-size: 12px; color: var(--ink-2); }

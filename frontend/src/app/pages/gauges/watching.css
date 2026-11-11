@@ -1,0 +1,974 @@
+/* ==============================================================
+ * Watching — lens directory / dashboard. Scoped under .wv2-root.
+ * Ported from handoff 12-watching.html.
+ * ============================================================== */
+
+/* Column-1 child of the shared .wv2-page grid (which provides the page padding
+   and a column-2 track for the right rail). Caps at 1120 and centers within its
+   column, matching the grand outline / plot threads pages. */
+.wv2-root .wtch {
+  grid-column: 1;
+  width: 100%;
+  min-width: 0;
+  max-width: 1120px;
+  margin-inline: auto;
+}
+
+/* ---- page header ---- */
+.wv2-root .wtch-hdr {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+
+.wv2-root .wtch-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sage);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sage) 18%, transparent);
+  animation: live-pulse 20s infinite;
+  margin-left: 10px;
+  flex: 0 0 7px;
+}
+
+@keyframes live-pulse {
+
+  0%,
+  5% {
+    opacity: 1;
+  }
+
+  5.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.wv2-root .wtch-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+.wv2-root .wtch-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+}
+
+.wv2-root .wtch-sub {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  font-family: var(--ui);
+}
+
+.wv2-root .wtch-sub b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.wv2-root .wtch-sub .wtch-sl {
+  color: var(--ink-4);
+  margin: 0 7px;
+}
+
+/* ---- welcome-back banner ---- */
+.wv2-root .wtch-wb {
+  display: block;
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--ai-bg-2) 100%);
+  border: 1px solid var(--line-3);
+  border-radius: var(--r-lg);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--sh-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.wv2-root .wtch-wb::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--terra), var(--gold) 50%, var(--terra));
+}
+
+/* welcome-back always visible when rendered */
+
+.wv2-root .wtch-wb-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.wv2-root .wtch-wb-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  display: grid;
+  place-items: center;
+  color: var(--terra-deep);
+  flex: 0 0 38px;
+  box-shadow: var(--sh-1);
+}
+
+.wv2-root .wtch-wb-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wv2-root .wtch-wb-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .wtch-wb-lbl {
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.wv2-root .wtch-wb-h {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+  letter-spacing: -.005em;
+}
+
+.wv2-root .wtch-wb-h em {
+  color: var(--terra-deep);
+  font-style: italic;
+}
+
+.wv2-root .wtch-wb-h b {
+  font-weight: 700;
+}
+
+.wv2-root .wtch-wb-deltas {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-top: 9px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+.wv2-root .wtch-wb-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 0;
+  border-right: 1px solid var(--line-2);
+  margin-right: 9px;
+}
+
+.wv2-root .wtch-wb-delta:last-child {
+  border: 0;
+  margin: 0;
+}
+
+.wv2-root .wtch-wb-delta b {
+  color: var(--ink);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.wv2-root .wtch-wb-delta svg {
+  width: 11px;
+  height: 11px;
+  color: var(--ink-3);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.wv2-root .wtch-wb-delta.is-new b {
+  color: var(--terra-deep);
+}
+
+.wv2-root .wtch-wb-delta.is-catch b {
+  color: var(--clay);
+}
+
+.wv2-root .wtch-wb-actions {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+/* ---- catches strip ---- */
+.wv2-root .wtch-catches {
+  background: var(--clay-soft);
+  border: 1px solid color-mix(in srgb, var(--clay) 40%, var(--line));
+  border-radius: var(--r-md);
+  padding: 11px 14px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* catches strip — directory style (single mode) */
+.wv2-root .wtch .wtch-catches {
+  background: transparent;
+  border: 1px dashed color-mix(in srgb, var(--clay) 40%, var(--line));
+}
+
+.wv2-root .wtch-catch-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--clay) 40%, var(--line));
+  color: var(--clay);
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+}
+
+.wv2-root .wtch-catch-icon svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wv2-root .wtch-catch-tag {
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--clay);
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.wv2-root .wtch-catch-msg {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink);
+  letter-spacing: -.003em;
+}
+
+.wv2-root .wtch-catch-msg b {
+  font-weight: 700;
+}
+
+.wv2-root .wtch-catch-ref {
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-left: 5px;
+}
+
+.wv2-root .wtch-catch-go {
+  flex: 0 0 auto;
+  font-size: 11.5px;
+  color: var(--clay);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ui);
+  background: none;
+  border: 0;
+}
+
+.wv2-root .wtch-catch-go:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.wv2-root .wtch-catch-go svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+/* ---- section heading ---- */
+.wv2-root .wtch-sec {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 22px 0 10px;
+}
+
+.wv2-root .wtch-sec:first-of-type {
+  margin-top: 8px;
+}
+
+.wv2-root .wtch-sec-t {
+  font-family: var(--serif);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wv2-root .wtch-sec-t .wtch-spark {
+  color: var(--gold);
+  font-size: 12px;
+}
+
+.wv2-root .wtch-sec-cap {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+}
+
+.wv2-root .wtch-sec-cap b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* ---- cards grid ---- */
+.wv2-root .wtch-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ---- the card ---- */
+.wv2-root .wtch-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 14px 16px 12px;
+  box-shadow: var(--sh-1);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  cursor: pointer;
+  transition: border-color .14s, transform .14s, box-shadow .14s;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  font-family: var(--ui);
+}
+
+.wv2-root .wtch-card:hover {
+  border-color: var(--line-3);
+  transform: translateY(-1px);
+  box-shadow: var(--sh-2);
+}
+
+/* remove-scope (stop watching) — a quiet corner × that surfaces on hover and
+   warms to the danger tint on its own hover. Same op as the configure dialog's
+   "Remove scope". */
+.wv2-root .wtch-card-rm {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .14s, color .14s, background .14s;
+  z-index: 2;
+}
+
+.wv2-root .wtch-card-rm svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.wv2-root .wtch-card:hover .wtch-card-rm {
+  opacity: 1;
+}
+
+.wv2-root .wtch-card-rm:hover {
+  color: var(--clay);
+  background: color-mix(in srgb, var(--clay) 12%, var(--surface));
+}
+
+.wv2-root .wtch-card-rm:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--clay);
+  outline-offset: 1px;
+}
+
+/* descriptive — softer */
+.wv2-root .wtch-card.is-descrip {
+  background: repeating-linear-gradient(45deg,
+      var(--surface) 0 10px, var(--surface-2) 10px 20px);
+}
+
+
+/* head row */
+.wv2-root .wtch-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+}
+
+.wv2-root .wtch-glyph {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+  flex: 0 0 32px;
+  box-shadow: var(--sh-1);
+}
+
+.wv2-root .wtch-glyph svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* kind tints */
+.wv2-root .wtch-card.k-arc .wtch-glyph {
+  background: var(--teal-soft);
+  border-color: color-mix(in srgb, var(--teal) 35%, var(--line));
+  color: var(--teal);
+}
+
+.wv2-root .wtch-card.k-track .wtch-glyph {
+  background: var(--terra-soft);
+  border-color: color-mix(in srgb, var(--terra) 35%, var(--line));
+  color: var(--terra-deep);
+}
+
+.wv2-root .wtch-card.k-promise .wtch-glyph {
+  background: color-mix(in srgb, var(--mauve) 15%, var(--surface));
+  border-color: color-mix(in srgb, var(--mauve) 35%, var(--line));
+  color: var(--mauve);
+}
+
+.wv2-root .wtch-card.k-cover .wtch-glyph {
+  background: color-mix(in srgb, var(--sage) 15%, var(--surface));
+  border-color: color-mix(in srgb, var(--sage) 35%, var(--line));
+  color: var(--sage);
+}
+
+.wv2-root .wtch-card.is-descrip .wtch-glyph {
+  background: var(--surface);
+  border-color: var(--line-2);
+  color: var(--ink-3);
+}
+
+.wv2-root .wtch-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .wtch-card-nm {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  line-height: 1.25;
+}
+
+.wv2-root .wtch-card-ask {
+  font-family: var(--serif);
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--ink-2);
+  letter-spacing: -.003em;
+  margin-top: 2px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- chart thumbnail row ---- */
+.wv2-root .wtch-chart {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+}
+
+.wv2-root .wtch-card.is-descrip .wtch-chart {
+  background: var(--surface);
+  border-style: dashed;
+}
+
+.wv2-root .wtch-chart-vis {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+}
+
+.wv2-root .wtch-chart-vis svg {
+  width: 100%;
+  height: 36px;
+  display: block;
+  overflow: visible;
+}
+
+.wv2-root .wtch-chart-metric {
+  flex: 0 0 auto;
+  text-align: right;
+  font-family: var(--ui);
+  line-height: 1.1;
+}
+
+.wv2-root .wtch-chart-big {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.wv2-root .wtch-chart-big small {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.wv2-root .wtch-chart-label {
+  font-size: 9px;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin-top: 3px;
+}
+
+/* per-type chart colors — trajectory (consistency) */
+.wv2-root .wtch-card.k-arc .wtch-ch-line {
+  stroke: var(--teal);
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.wv2-root .wtch-card.k-arc .wtch-ch-area {
+  opacity: .35;
+}
+
+.wv2-root .wtch-card.k-arc .wtch-ch-dot {
+  fill: var(--teal);
+}
+
+.wv2-root .wtch-card.k-arc .wtch-ch-dot.is-wob {
+  fill: var(--clay);
+}
+
+/* trajectory (descriptive) — softer, muted palette */
+.wv2-root .wtch-card.is-descrip .wtch-ch-line {
+  stroke: var(--ink-3);
+  fill: none;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.wv2-root .wtch-card.is-descrip .wtch-ch-area {
+  opacity: .18;
+}
+
+.wv2-root .wtch-card.is-descrip .wtch-ch-dot {
+  fill: var(--ink-3);
+}
+
+.wv2-root .wtch-card.is-descrip .wtch-ch-dot.is-wob {
+  fill: var(--clay);
+}
+
+.wv2-root .wtch-card.k-cover .wtch-cov-hit {
+  fill: var(--sage);
+  rx: 1.5;
+}
+
+.wv2-root .wtch-card.k-cover .wtch-cov-miss {
+  fill: none;
+  stroke: color-mix(in srgb, var(--clay) 60%, var(--ink-3));
+  stroke-width: 1.2;
+  stroke-dasharray: 1.5 1.5;
+  rx: 1.5;
+}
+
+.wv2-root .wtch-card.k-track .wtch-led {
+  rx: 1;
+}
+
+.wv2-root .wtch-card.k-track .wtch-led-l {
+  fill: color-mix(in srgb, var(--terra) 80%, var(--gold));
+}
+
+.wv2-root .wtch-card.k-track .wtch-led-m {
+  fill: var(--mauve);
+}
+
+.wv2-root .wtch-card.k-track .wtch-led-x {
+  fill: var(--ink-4);
+}
+
+.wv2-root .wtch-card.k-track .wtch-led-e {
+  fill: var(--surface);
+  stroke: var(--line);
+  stroke-width: .8;
+}
+
+.wv2-root .wtch-card.k-promise .wtch-dep-pt {
+  fill: var(--surface);
+}
+
+.wv2-root .wtch-card.k-promise .wtch-dep-closed {
+  fill: var(--mauve);
+  stroke: none;
+}
+
+.wv2-root .wtch-card.k-promise .wtch-dep-open {
+  fill: var(--surface);
+  stroke: var(--terra);
+  stroke-width: 1.8;
+}
+
+.wv2-root .wtch-card.k-promise .wtch-dep-arc {
+  fill: none;
+  stroke: var(--mauve);
+  stroke-width: 1.2;
+  opacity: .8;
+}
+
+.wv2-root .wtch-card.k-promise .wtch-dep-arc-open {
+  fill: none;
+  stroke: var(--terra);
+  stroke-width: 1.2;
+  opacity: .8;
+  stroke-dasharray: 2 3;
+}
+
+/* ---- foot row ---- */
+.wv2-root .wtch-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .wtch-foot-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  flex: 1;
+}
+
+.wv2-root .wtch-scan {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.wv2-root .wtch-scan::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sage);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sage) 18%, transparent);
+}
+
+/* verdict-colored scan indicator */
+.wv2-root .wtch-scan-holds {
+  color: var(--sage);
+}
+
+.wv2-root .wtch-scan-holds::before {
+  background: var(--sage);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sage) 18%, transparent);
+}
+
+.wv2-root .wtch-scan-warn {
+  color: var(--clay);
+}
+
+.wv2-root .wtch-scan-warn::before {
+  background: var(--clay);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--clay) 18%, transparent);
+}
+
+.wv2-root .wtch-scan-open {
+  color: var(--terra);
+}
+
+.wv2-root .wtch-scan-open::before {
+  background: var(--terra);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 18%, transparent);
+}
+
+.wv2-root .wtch-scan-noting {
+  color: var(--ink-3);
+}
+
+.wv2-root .wtch-scan-noting::before {
+  background: var(--ink-3);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ink-3) 18%, transparent);
+}
+
+.wv2-root .wtch-holders {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+  font-weight: 600;
+  font-size: 9.5px;
+  letter-spacing: .04em;
+}
+
+.wv2-root .wtch-foot-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.wv2-root .wtch-scan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s, opacity .15s;
+}
+
+.wv2-root .wtch-scan-btn svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wv2-root .wtch-scan-btn:hover {
+  color: var(--terra);
+  border-color: var(--terra);
+}
+
+.wv2-root .wtch-scan-btn:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+/* a never-scanned gauge nudges the eye to its one next action */
+.wv2-root .wtch-scan-btn.is-fresh {
+  color: var(--terra);
+  border-color: color-mix(in srgb, var(--terra) 45%, var(--line));
+  background: color-mix(in srgb, var(--terra) 8%, var(--surface-2));
+}
+
+.wv2-root .wtch-scan-btn svg.is-spin {
+  animation: wtch-scan-spin .8s linear infinite;
+  transform-origin: 12px 12px;
+}
+
+@keyframes wtch-scan-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.wv2-root .wtch-arr {
+  color: var(--ink-3);
+  transition: transform .15s, color .15s;
+}
+
+.wv2-root .wtch-card:hover .wtch-arr {
+  color: var(--terra);
+  transform: translateX(3px);
+}
+
+/* "since" pip — visible only in welcome mode */
+.wv2-root .wtch-since {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 2px 6px;
+  border-radius: var(--r-md);
+  background: var(--gold-soft);
+  color: color-mix(in srgb, var(--gold) 80%, #000);
+  border: 1px solid color-mix(in srgb, var(--gold) 50%, var(--line));
+  line-height: 1.1;
+}
+
+/* ---- browse-more footer ---- */
+.wv2-root .wtch-browse {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: inherit;
+  transition: background .12s, border-color .12s;
+  cursor: pointer;
+}
+
+.wv2-root .wtch-browse:hover {
+  background: var(--surface);
+  border-color: var(--line-3);
+}
+
+.wv2-root .wtch-browse-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--ink-3);
+  flex: 0 0 30px;
+}
+
+.wv2-root .wtch-browse-icon svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wv2-root .wtch-browse-t {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.003em;
+}
+
+.wv2-root .wtch-browse-s {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 2px;
+  font-family: var(--ui);
+}
+
+.wv2-root .wtch-browse-arr {
+  color: var(--ink-3);
+  margin-left: auto;
+  font-size: 13px;
+}
+
+/* sparkle — reuse from lenses */
+.wv2-root .wtch-spark {
+  color: var(--gold);
+  font-size: 10px;
+  margin-right: 3px;
+  vertical-align: 1px;
+}
+
+/* ---- responsive ---- */
+@media (max-width: 1200px) {
+  .wv2-root .wtch-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wv2-root .wtch-live-dot {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,1551 @@
+/* ==============================================================
+ * Lenses — page styles. Scoped under .wv2-root so they stay inside
+ * the app shell. Colour tokens come from the theme; static
+ * tokens (radius, shadow, type) from app.css.
+ * Cards/glyphs/search ported from the refined handoff 10-lenses.html;
+ * the configure-modal block (further down) is kept from the chart build.
+ * ============================================================== */
+
+/* This page's main column is .lens-page (not .wv2-page-main), so it carries the
+   shared grid's reading-column behaviour directly: column 1, capped + centered
+   between the rails. Centering itself comes from the .wv2-page grid. */
+.wv2-root .lens-page {
+  grid-column: 1;
+  width: 100%;
+  min-width: 0;
+  max-width: var(--read-max, 1200px);
+  margin-inline: auto;
+}
+
+/* ---- page head + search ---- */
+.wv2-root .lens-head {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.wv2-root .lens-page-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  line-height: 1.2;
+  color: var(--ink);
+  margin: 0 0 12px;
+}
+
+.wv2-root .lens-empty {
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+.wv2-root .lens-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 7px 12px;
+  width: 280px;
+  box-shadow: var(--sh-1);
+}
+
+.wv2-root .lens-search svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+  color: var(--ink-3);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wv2-root .lens-search input {
+  border: 0;
+  background: transparent;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  color: var(--ink);
+  outline: none;
+}
+
+.wv2-root .lens-search input::placeholder {
+  color: var(--ink-3);
+}
+
+.wv2-root .lens-kbd {
+  font-size: 9.5px;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+/* ---- the spark (gold twinkle on the AI-origin marker) ---- */
+.wv2-root .lens-spark {
+  color: var(--gold);
+  font-size: 14px;
+  line-height: 1;
+  display: inline-block;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold) 55%, transparent));
+  animation: lens-twinkle 2.8s ease-in-out infinite;
+}
+
+@keyframes lens-twinkle {
+
+  0%,
+  100% {
+    opacity: .55;
+    transform: scale(.86) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.18) rotate(8deg);
+  }
+}
+
+/* ---- section ---- */
+.wv2-root .lens-sec {
+  margin-bottom: 32px;
+}
+
+.wv2-root .lens-sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.wv2-root .lens-sec-t {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+}
+
+.wv2-root .lens-sec-c {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.wv2-root .lens-cap {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  margin: 0 0 14px;
+  line-height: 1.55;
+}
+
+.wv2-root .lens-cap i {
+  color: var(--terra-deep);
+  font-style: italic;
+}
+
+.wv2-root .lens-nomatch {
+  font-size: 12.5px;
+  color: var(--ink-3);
+  font-style: italic;
+  margin: 0 0 8px;
+  padding: 2px 4px;
+}
+
+/* ---- the grid ---- */
+.wv2-root .lens-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+
+/* ---- a lens card ---- */
+.wv2-root .lens-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-1);
+  transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+  text-align: left;
+  font-family: var(--ui);
+  position: relative;
+}
+
+.wv2-root .lens-card.is-clickable {
+  cursor: pointer;
+}
+
+.wv2-root .lens-card.is-clickable:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-3);
+  /* + the theme's metallic top sheen (cf. the sidebar/rail hover) */
+  box-shadow: var(--sh-2), inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+.wv2-root .lens-card:focus-visible {
+  outline: 2px solid var(--terra);
+  outline-offset: 2px;
+}
+
+/* tier A — made for your story */
+.wv2-root .lens-card-special {
+  background: linear-gradient(180deg, var(--ai-bg) 0%, var(--ai-bg-2) 100%);
+  border-color: var(--line-3);
+  box-shadow: var(--sh-2);
+  overflow: hidden;
+}
+
+.wv2-root .lens-card-special::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), color-mix(in srgb, var(--gold) 60%, #fff), var(--gold));
+}
+
+.wv2-root .lens-card-special::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 251, 238, .55) 50%, transparent 62%);
+  transform: translateX(-130%);
+  animation: lens-sheen 7s ease-in-out infinite;
+}
+
+.wv2-root .lens-card-special:nth-of-type(2)::after {
+  animation-delay: 1.2s;
+}
+
+@keyframes lens-sheen {
+
+  0%,
+  14% {
+    transform: translateX(-130%);
+  }
+
+  42%,
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+/* "made for you" lenses carry the Night Eyes AI medallion (the ✦ Pro spark is
+   handled globally by .lens-glyph::after) */
+.wv2-root .lens-card-special .lens-glyph {
+  color: var(--terra-deep);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .16), transparent 42%),
+    linear-gradient(135deg, var(--ai-bg) 0%, var(--terra-soft) 100%);
+}
+
+/* tier B — fits your story */
+.wv2-root .lens-card-ai {
+  background: linear-gradient(180deg, var(--ai-bg), var(--ai-bg-2));
+  border-color: var(--line-2);
+}
+
+/* tier C — flat catalogue */
+.wv2-root .lens-flat {
+  appearance: none;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+/* flat catalogue rows are the closest analog to the rail rows — give them the
+   theme's hover: surface elevation gradient + line border + top sheen */
+.wv2-root .lens-flat:hover {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border-color: var(--line);
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+/* active (watching/bound) — borrows the primary sidebar's terra treatment:
+   a terra border + soft terra fill + inset sheen, with NO left accent bar. The
+   per-kind colour still reads via the glyph tint + the type dot, so the frame
+   no longer needs to carry it. background-color is the longhand, so it sits
+   BEHIND (and never clobbers) the special / ai cards' own gradient. */
+.wv2-root .lens-card.is-watching {
+  border-color: color-mix(in srgb, var(--terra) 45%, var(--line));
+  background-color: color-mix(in srgb, var(--terra) 7%, var(--surface));
+  box-shadow: var(--sh-1), inset 0 1px 0 rgba(255, 255, 255, .4);
+}
+
+.wv2-root .lens-flat.is-watching {
+  border-color: color-mix(in srgb, var(--terra) 40%, var(--line));
+  background-color: color-mix(in srgb, var(--terra) 7%, var(--surface));
+}
+
+/* head: layout the search + create-custom action side by side */
+.wv2-root .lens-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+}
+
+.wv2-root .lens-create-btn {
+  white-space: nowrap;
+}
+
+.wv2-root .lens-page-bound {
+  margin-left: 10px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--sage);
+  vertical-align: middle;
+}
+
+/* flat row: pull the Add/Remove cluster to the right */
+.wv2-root .lens-flat-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.wv2-root .lens-flat-add {
+  margin-left: auto;
+}
+
+.wv2-root .lens-rm-btn {
+  color: var(--ink-3);
+}
+
+.wv2-root .lens-rm-btn:hover {
+  color: var(--ink);
+}
+
+/* ---- the glyph tile ---- */
+/* ── the lens medallion ──────────────────────────────────────────────────
+ * A metallic, magic icon disc in the Night Eyes language: a brushed-metal
+ * gradient + bevel sheen, a kind-tinted rune-ring and inner glow, a gold ✦
+ * spark that twinkles on hover / when bound, and a glyph that GLOWS and is
+ * NOT boxed in (overflow visible, generously sized, spilling its light).
+ * All token-driven, so the metal reads correctly in every theme. */
+.wv2-root .lens-glyph {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: var(--r-lg);
+  /* modern squircle medallion */
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  /* the glyph & its glow are never trapped */
+  isolation: isolate;
+  margin-top: 2px;
+  color: var(--ink-2);
+  /* default tint; kind rules override */
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .12), transparent 40%),
+    linear-gradient(160deg, color-mix(in srgb, var(--surface) 84%, #fff) 0%, var(--surface-2) 52%, var(--surface-3) 100%);
+  box-shadow: var(--bevel-up), var(--sh-2);
+  transition: transform .18s cubic-bezier(.2, .7, .2, 1), box-shadow .2s ease;
+}
+
+/* tinted rune-ring + inner glow, behind the glyph */
+.wv2-root .lens-glyph::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 34%, var(--line-2));
+  background: radial-gradient(72% 60% at 50% 36%, color-mix(in srgb, currentColor 15%, transparent), transparent 72%);
+  transition: box-shadow .2s ease, background .2s ease;
+}
+
+/* the magic spark — overhangs the disc, lights on hover / when bound */
+.wv2-root .lens-glyph::after {
+  content: '✦';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  z-index: 2;
+  pointer-events: none;
+  font-family: var(--serif);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--gold);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--gold) 60%, transparent));
+  /* Pro-subscriber indicator: present on EVERY lens whenever the diamond
+     setting is on (gated off via html[data-wv-diamond="off"]) — not tied to
+     hover or bound state. */
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  animation: lens-twinkle 3.4s ease-in-out infinite;
+}
+
+.wv2-root .lens-glyph svg {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, currentColor 36%, transparent));
+}
+
+/* lit state — hovering anywhere on the card, hovering the disc, or a bound lens */
+.wv2-root .lens-card:hover .lens-glyph,
+.wv2-root .lens-glyph:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--bevel-up), var(--sh-3);
+}
+
+.wv2-root .lens-card:hover .lens-glyph::before,
+.wv2-root .lens-glyph:hover::before,
+.wv2-root .lens-card.is-watching .lens-glyph::before {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 60%, var(--line-2));
+  background: radial-gradient(72% 60% at 50% 36%, color-mix(in srgb, currentColor 26%, transparent), transparent 72%);
+}
+
+/* flat (catalogue rows) — smaller disc, same metal */
+.wv2-root .lens-glyph.is-flat {
+  width: 34px;
+  height: 34px;
+  flex-basis: 34px;
+  border-radius: var(--r-md);
+}
+
+.wv2-root .lens-glyph.is-flat svg {
+  width: 22px;
+  height: 22px;
+}
+
+.wv2-root .lens-glyph.is-flat::after {
+  font-size: 9px;
+  top: -4px;
+  right: -4px;
+}
+
+/* kind tint — now just the colour; the disc itself is unified brushed metal */
+.wv2-root .lens-g-feeling {
+  color: var(--teal);
+}
+
+.wv2-root .lens-g-tracking {
+  color: var(--terra-deep);
+}
+
+.wv2-root .lens-g-loose-end {
+  color: var(--mauve);
+}
+
+.wv2-root .lens-g-fair-share {
+  color: var(--sage);
+}
+
+@keyframes lens-twinkle {
+
+  0%,
+  100% {
+    opacity: .85;
+    transform: scale(.94) rotate(-6deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.12) rotate(8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wv2-root .lens-glyph {
+    transition: none;
+  }
+
+  .wv2-root .lens-glyph::after {
+    animation: none !important;
+  }
+}
+
+/* app-level "diamond accent" toggle (theme setting) — hide the ✦ spark when off */
+html[data-wv-diamond="off"] .lens-glyph::after {
+  display: none;
+}
+
+/* ── TEMP design-check: medallion box on/off, driven by the floating button on
+ *    the lenses page. Remove this block + the button in LensesPage.tsx once the
+ *    look is locked. ── */
+.wv2-root .lens-box-toggle {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--ink-2);
+  border: 1px solid var(--line-2);
+  box-shadow: var(--bevel-up), var(--sh-2);
+  transition: color .15s ease, border-color .15s ease;
+}
+
+.wv2-root .lens-box-toggle:hover {
+  color: var(--ink);
+  border-color: var(--line-3);
+}
+
+/* no-box mode — strip the metallic disc so the glyph ITSELF becomes the icon:
+ * bigger, embossed into raised 3D metal (a cool top-left sheen + dark
+ * bottom-right depth + the kind-tinted glow it already carried), with the gold
+ * ✦ riding the icon's own top-right corner — a gem set into the mark, not a
+ * badge floating off an empty box corner. No bounding box anywhere. */
+.wv2-root .lens-nobox .lens-glyph,
+.wv2-root .lens-nobox .lens-card-special .lens-glyph {
+  background: none;
+  box-shadow: none;
+}
+
+.wv2-root .lens-nobox .lens-glyph::before {
+  display: none;
+}
+
+.wv2-root .lens-nobox .lens-card:hover .lens-glyph,
+.wv2-root .lens-nobox .lens-glyph:hover {
+  box-shadow: none;
+}
+
+.wv2-root .lens-nobox .lens-glyph svg {
+  width: 48px;
+  height: 48px;
+  stroke-width: 1.5;
+  filter:
+    drop-shadow(0 0 4px color-mix(in srgb, currentColor 24%, transparent)) drop-shadow(-0.5px -0.5px 0 color-mix(in srgb, #fff 66%, transparent)) drop-shadow(0.5px 0.8px 1px rgba(8, 12, 20, .26));
+}
+
+.wv2-root .lens-nobox .lens-card:hover .lens-glyph svg,
+.wv2-root .lens-nobox .lens-glyph:hover svg {
+  filter:
+    drop-shadow(0 0 6px color-mix(in srgb, currentColor 38%, transparent)) drop-shadow(-0.5px -0.5px 0 color-mix(in srgb, #fff 74%, transparent)) drop-shadow(0.6px 1px 1.1px rgba(8, 12, 20, .3));
+}
+
+.wv2-root .lens-nobox .lens-glyph.is-flat svg {
+  width: 36px;
+  height: 36px;
+}
+
+/* the ✦ rides well onto the icon's top-right — bigger, more overlapping */
+.wv2-root .lens-nobox .lens-glyph::after {
+  top: 1px;
+  right: 1px;
+  font-size: 18px;
+}
+
+.wv2-root .lens-nobox .lens-glyph.is-flat::after {
+  top: 0;
+  right: 0;
+  font-size: 14px;
+}
+
+/* ---- card body ---- */
+.wv2-root .lens-card-body {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.wv2-root .lens-card-nm {
+  font-family: var(--serif);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+  letter-spacing: -.005em;
+}
+
+.wv2-root .lens-flat-nm {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+  letter-spacing: -.005em;
+}
+
+.wv2-root .lens-card-ask {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.wv2-root .lens-card-why {
+  font-size: 10.5px;
+  color: var(--teal);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+}
+
+.wv2-root .lens-card-why::before {
+  content: '↳';
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.wv2-root .lens-term {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* ---- right column: type + state ---- */
+.wv2-root .lens-card-right {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 84px;
+  text-align: right;
+  position: relative;
+  z-index: 1;
+}
+
+.wv2-root .lens-ctype {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wv2-root .lens-ctype-d {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.wv2-root .lens-state-tracking {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--sage);
+  background: color-mix(in srgb, var(--sage) 16%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--sage) 30%, var(--line));
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.wv2-root .lens-state-tracking::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+  animation: lens-soft-pulse 2.4s ease-in-out infinite;
+}
+
+.wv2-root .lens-state-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-soft);
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line));
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.wv2-root .lens-state-pro::before {
+  content: '✦';
+  font-size: 10px;
+}
+
+.wv2-root .lens-flat-pro {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+@keyframes lens-soft-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--sage) 50%, transparent);
+  }
+
+  70% {
+    box-shadow: 0 0 0 5px transparent;
+  }
+}
+
+/* ---- catalogue (grouped by kind) ---- */
+.wv2-root .lens-cat {
+  margin-bottom: 18px;
+}
+
+.wv2-root .lens-cat-h {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .lens-cat-d {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 9px;
+}
+
+.wv2-root .lens-cat-w {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+}
+
+.wv2-root .lens-cat-term {
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.wv2-root .lens-cat-desc {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .lens-cat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+/* ---- reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+
+  .wv2-root .lens-spark,
+  .wv2-root .lens-card-special::after,
+  .wv2-root .lens-state-tracking::before {
+    animation: none !important;
+  }
+}
+
+/* ---- narrow viewports ---- */
+@media (max-width: 760px) {
+
+  .wv2-root .lens-grid,
+  .wv2-root .lens-cat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==============================================================
+ * Configure-lens modal — kept from the chart build (the user chose to
+ * keep it as the card-click action). Two steps: ① y-items editor
+ * ② draggable draw-chart.
+ * ============================================================== */
+.wv2-root .lens-cfg-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(20, 14, 8, .46);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: lens-cfgfade .2s ease;
+}
+
+@keyframes lens-cfgfade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.wv2-root .lens-cfg {
+  width: min(880px, 100%);
+  max-height: 92vh;
+  overflow: auto;
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-4);
+  animation: lens-cfgpop .24s cubic-bezier(.2, .8, .2, 1);
+}
+
+@keyframes lens-cfgpop {
+  from {
+    transform: translateY(12px) scale(.98);
+    opacity: 0;
+  }
+
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.wv2-root .lens-cfg-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+
+.wv2-root .lens-cfg-head-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .lens-cfg-kicker {
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wv2-root .lens-cfg-title {
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 600;
+  margin-top: 5px;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.wv2-root .lens-cfg-desc {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-top: 3px;
+}
+
+.wv2-root .lens-cfg-typewrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  padding-right: 34px;
+  white-space: nowrap;
+}
+
+.wv2-root .lens-cfg-x {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  background: var(--surface-2);
+  border: 0;
+  border-radius: var(--r-md);
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  color: var(--ink-2);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.wv2-root .lens-cfg-x:hover {
+  background: var(--line-2);
+}
+
+.wv2-root .lens-cfg-scope-step {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.wv2-root .lens-cfg-scope-step.is-confirmed {
+  background: var(--surface);
+}
+
+.wv2-root .lens-cfg-scope-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .lens-cfg-scope-val {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.wv2-root .lens-cfg-scope-check {
+  color: var(--teal);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.wv2-root .lens-cfg-scope-select,
+.wv2-root .lens-cfg-scope-input {
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink);
+  outline: none;
+  min-width: 180px;
+}
+
+.wv2-root .lens-cfg-scope-select:focus,
+.wv2-root .lens-cfg-scope-input:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 18%, transparent);
+}
+
+.wv2-root .lens-cfg-scope-select:disabled,
+.wv2-root .lens-cfg-scope-input:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.wv2-root .lens-cfg-hint {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+
+/* ---- binding stepper (scope navigation) ---- */
+.wv2-root .lens-cfg-bind-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .lens-cfg-bind-arrow {
+  min-width: 26px;
+  padding: 2px 5px;
+  font-size: 13px;
+}
+
+.wv2-root .lens-cfg-scope-rm {
+  color: var(--ink-3);
+}
+
+.wv2-root .lens-cfg-scope-rm:hover {
+  color: #c0392b;
+  background: rgba(192, 57, 43, 0.07);
+}
+
+.wv2-root .lens-cfg-bind-scopes {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .lens-cfg-bind-pill {
+  font-size: 11.5px;
+  line-height: 1;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  color: var(--ink-2);
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-root .lens-cfg-bind-pill:hover {
+  border-color: var(--terra);
+  color: var(--ink);
+}
+
+.wv2-root .lens-cfg-bind-pill.is-active {
+  background: color-mix(in srgb, var(--terra) 12%, var(--surface));
+  border-color: var(--terra);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---- chart stepper nav ---- */
+.wv2-root .lens-cfg-chart-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 24px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--terra) 6%, var(--surface));
+}
+
+.wv2-root .lens-cfg-chart-arrow {
+  min-width: 28px;
+  padding: 2px 6px;
+  font-size: 14px;
+}
+
+.wv2-root .lens-cfg-chart-pos {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wv2-root .lens-cfg-chart-label {
+  font-size: 12.5px;
+  color: var(--ink);
+  font-weight: 700;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wv2-root .lens-cfg-chart-type {
+  font-size: 10px;
+  color: var(--terra);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  background: color-mix(in srgb, var(--terra) 12%, transparent);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* ---- bound scope tags on cards ---- */
+.wv2-root .lens-bound-scopes {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 5px;
+}
+
+.wv2-root .lens-bound-tag {
+  font-size: 10px;
+  line-height: 1;
+  background: color-mix(in srgb, var(--teal) 12%, var(--surface));
+  color: var(--ink-2);
+  border-radius: 4px;
+  padding: 3px 7px;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-root .lens-cfg-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-root .lens-cfg-cols {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+}
+
+.wv2-root .lens-cfg-col {
+  padding: 20px 24px;
+}
+
+.wv2-root .lens-cfg-col+.lens-cfg-col {
+  border-left: 1px solid var(--line);
+}
+
+.wv2-root .lens-cfg-h {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.wv2-root .lens-cfg-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--terra);
+  color: #fff;
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  flex: 0 0 20px;
+}
+
+.wv2-root .lens-cfg-sub {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin: 0 0 14px;
+  line-height: 1.45;
+}
+
+.wv2-root .lens-yitems {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.wv2-root .lens-yrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border-radius: 9px;
+  padding: 6px 8px 6px 9px;
+}
+
+.wv2-root .lens-yrow.is-fresh {
+  animation: lens-freshpop 1s ease;
+}
+
+@keyframes lens-freshpop {
+  0% {
+    background: var(--gold-soft);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 32%, transparent);
+  }
+
+  100% {
+    background: var(--surface-2);
+    box-shadow: none;
+  }
+}
+
+.wv2-root .lens-grip {
+  color: var(--ink-3);
+  cursor: grab;
+  font-size: 11px;
+  letter-spacing: -1px;
+  user-select: none;
+}
+
+.wv2-root .lens-yrow input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  min-width: 0;
+}
+
+.wv2-root .lens-yrow-ai {
+  font-size: 11px;
+  color: var(--gold);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--gold) 50%, transparent));
+}
+
+.wv2-root .lens-yrow-rm {
+  background: transparent;
+  border: 0;
+  color: var(--ink-3);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+  border-radius: 6px;
+}
+
+.wv2-root .lens-yrow-rm:hover {
+  background: color-mix(in srgb, var(--clay) 16%, transparent);
+  color: var(--clay);
+}
+
+.wv2-root .lens-yadd {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.wv2-root .lens-yadd input {
+  flex: 1;
+  border: 1px dashed var(--line-2);
+  background: transparent;
+  border-radius: var(--r-md);
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink);
+  outline: none;
+  min-width: 0;
+}
+
+.wv2-root .lens-yadd input:focus {
+  border-color: var(--teal);
+  border-style: solid;
+}
+
+.wv2-root .lens-extract {
+  width: 100%;
+  justify-content: center;
+  background: var(--ai-bg);
+  color: var(--teal);
+  border-color: var(--line-2);
+}
+
+.wv2-root .lens-extract:hover:not(:disabled) {
+  background: var(--ai-bg-2);
+}
+
+.wv2-root .lens-extract:disabled {
+  opacity: .7;
+  cursor: default;
+}
+
+.wv2-root .lens-extract.is-loading .lens-spark {
+  animation: lens-spin 1s linear infinite;
+}
+
+@keyframes lens-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- extract diff preview ---- */
+.wv2-root .lens-extract-diff {
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  padding: 14px 14px 12px;
+  margin-bottom: 12px;
+}
+
+.wv2-root .lens-extract-diff-head {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wv2-root .lens-diff-group {
+  margin-bottom: 8px;
+}
+
+.wv2-root .lens-diff-group:last-of-type {
+  margin-bottom: 10px;
+}
+
+.wv2-root .lens-diff-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  padding: 0 2px;
+}
+
+.wv2-root .lens-diff-kept {
+  color: var(--ink-3);
+}
+
+.wv2-root .lens-diff-added {
+  color: var(--teal);
+}
+
+.wv2-root .lens-diff-removed {
+  color: var(--clay);
+}
+
+.wv2-root .lens-diff-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .12s;
+}
+
+.wv2-root .lens-diff-row:hover {
+  background: var(--surface);
+}
+
+.wv2-root .lens-diff-row input[type="checkbox"] {
+  accent-color: var(--teal);
+  flex: 0 0 auto;
+}
+
+.wv2-root .lens-diff-text {
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+.wv2-root .lens-diff-text--added {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.wv2-root .lens-diff-text--removed {
+  color: var(--ink-3);
+  text-decoration: line-through;
+}
+
+.wv2-root .lens-diff-row:has(input:not(:checked)) .lens-diff-text {
+  opacity: .5;
+}
+
+.wv2-root .lens-diff-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+}
+
+.wv2-root .lens-drawwrap {
+  background: var(--ai-bg);
+  border-radius: var(--r-lg);
+  padding: 8px 10px 4px;
+  box-shadow: var(--sh-2);
+}
+
+.wv2-root .lens-drawsvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+}
+
+.wv2-root .lens-drawsvg .lens-axis {
+  stroke: var(--line-2);
+  stroke-width: 1.2;
+}
+
+.wv2-root .lens-drawsvg .lens-guide {
+  stroke: var(--line-2);
+  stroke-width: 1;
+  opacity: .55;
+  stroke-dasharray: 1 4;
+}
+
+.wv2-root .lens-drawsvg .lens-ylab {
+  font-size: 9.5px;
+  fill: var(--ink-2);
+  font-family: var(--ui);
+}
+
+.wv2-root .lens-drawsvg .lens-xlab {
+  font-size: 9px;
+  fill: var(--ink-3);
+  font-family: var(--ui);
+}
+
+.wv2-root .lens-drawsvg .lens-stem {
+  stroke: currentColor;
+  stroke-width: 1.5;
+  opacity: .22;
+}
+
+.wv2-root .lens-drawsvg .lens-rule-area {
+  fill: currentColor;
+  fill-opacity: .12;
+  stroke: none;
+}
+
+.wv2-root .lens-drawsvg .lens-rule-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wv2-root .lens-drawsvg .lens-rule-pt {
+  fill: var(--surface);
+  stroke: currentColor;
+  stroke-width: 2.6;
+  cursor: grab;
+}
+
+.wv2-root .lens-drawsvg .lens-rule-pt:active {
+  cursor: grabbing;
+}
+
+.wv2-root .lens-drawsvg .lens-actual {
+  fill: none;
+  stroke: var(--ink-3);
+  stroke-width: 1.8;
+  stroke-dasharray: 4 4;
+  opacity: .85;
+}
+
+.wv2-root .lens-draw-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .lens-toggle {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.wv2-root .lens-toggle input {
+  accent-color: var(--terra);
+}
+
+.wv2-root .lens-c-feeling {
+  color: var(--teal);
+}
+
+.wv2-root .lens-c-tracking {
+  color: var(--terra);
+}
+
+.wv2-root .lens-c-loose-end {
+  color: var(--mauve);
+}
+
+.wv2-root .lens-c-fair-share {
+  color: var(--sage);
+}
+
+.wv2-root .lens-cfg-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 24px 20px;
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.wv2-root .lens-cfg-foot-note {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .lens-cfg-foot-note b {
+  color: var(--gold);
+}
+
+.wv2-root .lens-cfg-foot-btns {
+  display: flex;
+  gap: 9px;
+}
+
+@media (max-width: 680px) {
+  .wv2-root .lens-cfg-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .wv2-root .lens-cfg-col+.lens-cfg-col {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* Step 14c — suggest-lenses page surface + hint. */
+.wv2-root .lens-suggest-hint {
+  margin: 0 0 12px;
+  font-size: 12px;
+  opacity: 0.65;
+  font-style: italic;
+}
+
+.wv2-root .lens-surface {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.wv2-root .lens-surface-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+  background: var(--panel, rgba(255, 255, 255, 0.02));
+}
+
+.wv2-root .lens-surface-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}

@@ -1,0 +1,400 @@
+/* ==============================================================
+ * config-bind.css — TEMPORARY scaffold for the two-step gauge flow:
+ *   gz2-cfg   = ConfigPresetModal (step 1 · config → preset)
+ *   gz2-bind  = BindingsModal     (step 2 · preset → N bindings)
+ * Deliberately plain + legible — getting the CONCEPT right, not the polish.
+ * Theme tokens only.
+ * ============================================================== */
+
+.wv2-root .gz2-scrim {
+  position: fixed; inset: 0; z-index: 60;
+  background: color-mix(in srgb, var(--ink-1) 38%, transparent);
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 48px 16px; overflow-y: auto;
+}
+.wv2-root .gz2-modal {
+  width: 100%; max-width: min(720px, 94vw); margin: auto;
+  background: var(--surface); border: 1px solid var(--line-2);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-lg, 0 24px 64px rgba(0,0,0,.22));
+  display: flex; flex-direction: column; overflow: hidden;
+  font-family: var(--ui);
+}
+.wv2-root .gz2-bind { max-width: 600px; }
+
+/* ── header ─────────────────────────────────────────────────────────────── */
+.wv2-root .gz2-head {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 18px 20px 14px; border-bottom: 1px solid var(--line-2);
+  background: var(--surface-2);
+}
+.wv2-root .gz2-head-main { flex: 1; min-width: 0; }
+.wv2-root .gz2-kicker {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--ink-3); margin-bottom: 6px;
+}
+.wv2-root .gz2-step-dot {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 999px;
+  background: var(--accent, var(--terra)); color: var(--on-accent, #fff);
+  font-size: 10px; font-weight: 800;
+}
+.wv2-root .gz2-title-input {
+  font-family: var(--serif); font-size: 21px; font-weight: 600; color: var(--ink-1);
+  border: 0; background: transparent; width: 100%; padding: 2px 0;
+  border-bottom: 1.5px solid transparent;
+}
+.wv2-root .gz2-title-input:focus { outline: none; border-bottom-color: var(--line-3, var(--line-2)); }
+.wv2-root .gz2-head-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.wv2-root .gz2-type-chip {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font-size: 11px; font-weight: 600; color: var(--ink-2);
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 999px; padding: 2px 9px;
+}
+.wv2-root .gz2-type-d { width: 8px; height: 8px; border-radius: 999px; }
+.wv2-root .gz2-term {
+  font-size: 10px; color: var(--ink-3); font-style: italic;
+}
+.wv2-root .gz2-x {
+  border: 0; background: transparent; cursor: pointer; color: var(--ink-3);
+  font-size: 22px; line-height: 1; padding: 0 2px; align-self: flex-start;
+}
+.wv2-root .gz2-x:hover { color: var(--ink-1); }
+
+/* ── body + sections ────────────────────────────────────────────────────── */
+.wv2-root .gz2-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 18px; }
+.wv2-root .gz2-sec { display: flex; flex-direction: column; gap: 8px; }
+.wv2-root .gz2-sec-h {
+  font-size: 12px; font-weight: 700; color: var(--ink-1);
+  letter-spacing: .01em; padding-bottom: 4px; border-bottom: 1px solid var(--line-2);
+}
+.wv2-root .gz2-muted { color: var(--ink-3); font-weight: 400; }
+.wv2-root .gz2-hint { font-size: 12px; color: var(--ink-3); line-height: 1.5; margin: 0; }
+
+/* ── AI prompt blocks (the "show me the prompt" bits) ───────────────────── */
+.wv2-root .gz2-aiprompt {
+  border-radius: var(--r-md, 10px); padding: 9px 11px;
+  background: color-mix(in srgb, var(--teal) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--teal) 18%, transparent);
+}
+.wv2-root .gz2-aiprompt-locked {
+  background: var(--surface-2); border: 1px dashed var(--line-2);
+}
+.wv2-root .gz2-aiprompt p { margin: 4px 0 0; font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+.wv2-root .gz2-ai { font-size: 10.5px; font-weight: 700; color: var(--teal); letter-spacing: .02em; }
+.wv2-root .gz2-lock { font-size: 10.5px; font-weight: 700; color: var(--ink-3); letter-spacing: .02em; }
+
+.wv2-root .gz2-typecard { display: flex; flex-direction: column; gap: 8px; }
+.wv2-root .gz2-typecard-nm { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+
+/* ── scope type (step 1) ────────────────────────────────────────────────── */
+.wv2-root .gz2-scopetype { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
+.wv2-root .gz2-scopetype-val { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+
+/* ── y-items ─────────────────────────────────────────────────────────────── */
+.wv2-root .gz2-yitems { display: flex; flex-direction: column; gap: 6px; }
+.wv2-root .gz2-yrow { display: flex; align-items: center; gap: 6px; }
+.wv2-root .gz2-yval, .wv2-root .gz2-ydesc {
+  font-family: var(--ui); font-size: 12.5px; color: var(--ink-1);
+  border: 1px solid var(--line-2); border-radius: var(--r-xs); padding: 5px 8px; background: var(--surface);
+}
+.wv2-root .gz2-yval { width: 34%; font-weight: 600; }
+.wv2-root .gz2-ydesc { flex: 1; color: var(--ink-2); }
+.wv2-root .gz2-yval:focus, .wv2-root .gz2-ydesc:focus { outline: none; border-color: var(--accent, var(--terra)); }
+.wv2-root .gz2-yrm { border: 0; background: transparent; color: var(--ink-3); cursor: pointer; font-size: 16px; padding: 0 4px; }
+.wv2-root .gz2-yrm:hover { color: var(--clay, var(--ink-1)); }
+.wv2-root .gz2-yadd { display: flex; gap: 6px; margin-top: 2px; }
+.wv2-root .gz2-yadd input {
+  flex: 1; font-family: var(--ui); font-size: 12.5px; color: var(--ink-1);
+  border: 1px solid var(--line-2); border-radius: var(--r-xs); padding: 5px 8px; background: var(--surface);
+}
+.wv2-root .gz2-yadd input:focus { outline: none; border-color: var(--accent, var(--terra)); }
+
+/* ── rules (switchable list) ─────────────────────────────────────────────── */
+.wv2-root .gz2-rulelist { display: flex; flex-direction: column; gap: 6px; }
+.wv2-root .gz2-rule {
+  display: flex; align-items: flex-start; gap: 9px; text-align: left;
+  border: 1px solid var(--line-2); border-radius: var(--r-md, 10px); padding: 9px 11px;
+  background: var(--surface); cursor: pointer; transition: border-color .12s, background .12s;
+}
+.wv2-root .gz2-rule:hover { border-color: var(--line-3, var(--ink-3)); }
+.wv2-root .gz2-rule.is-sel {
+  border-color: var(--accent, var(--terra));
+  background: color-mix(in srgb, var(--accent, var(--terra)) 7%, transparent);
+}
+.wv2-root .gz2-rule-radio {
+  flex: none; width: 14px; height: 14px; border-radius: 999px; margin-top: 1px;
+  border: 2px solid var(--line-3, var(--ink-3)); background: var(--surface);
+}
+.wv2-root .gz2-rule.is-sel .gz2-rule-radio {
+  border-color: var(--accent, var(--terra));
+  box-shadow: inset 0 0 0 3px var(--accent, var(--terra));
+}
+.wv2-root .gz2-rule-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wv2-root .gz2-rule-nm { font-size: 12.5px; font-weight: 600; color: var(--ink-1); display: flex; align-items: center; gap: 6px; }
+.wv2-root .gz2-rule-hint { font-size: 11.5px; color: var(--ink-3); line-height: 1.45; }
+.wv2-root .gz2-fam {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--ink-3); background: var(--surface-2); border: 1px solid var(--line-2);
+  border-radius: 999px; padding: 0 6px;
+}
+.wv2-root .gz2-soon {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--gold); background: var(--gold-soft); border-radius: 999px; padding: 0 6px;
+}
+
+/* ── ideal-vs-flagged preview (updates as the rule changes) ──────────────── */
+.wv2-root .gz2-rulewrap { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) { .wv2-root .gz2-rulewrap { grid-template-columns: 1.2fr 1fr; align-items: start; } }
+.wv2-root .gz2-states { display: flex; gap: 10px; }
+.wv2-root .gz2-state {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;
+  border-radius: var(--r-md, 10px); padding: 9px 10px; border: 1px solid var(--line-2); background: var(--surface);
+}
+.wv2-root .gz2-state-ideal { border-color: color-mix(in srgb, var(--sage, var(--teal)) 40%, var(--line-2)); background: color-mix(in srgb, var(--sage, var(--teal)) 7%, transparent); }
+.wv2-root .gz2-state-flag { border-color: color-mix(in srgb, var(--clay, var(--terra)) 40%, var(--line-2)); background: color-mix(in srgb, var(--clay, var(--terra)) 7%, transparent); }
+.wv2-root .gz2-state-h { font-size: 10px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; }
+.wv2-root .gz2-state-ideal .gz2-state-h { color: var(--sage-deep, var(--teal)); }
+.wv2-root .gz2-state-flag .gz2-state-h { color: var(--clay, var(--terra-deep)); }
+.wv2-root .gz2-state-cap { font-size: 11px; color: var(--ink-2); line-height: 1.4; }
+.wv2-root .gz2-state-glyph { font-size: 20px; line-height: 1; }
+
+.wv2-root .gz2-spark { width: 100%; height: 30px; display: block; }
+.wv2-root .gz2-spark polyline { stroke-width: 2; vector-effect: non-scaling-stroke; }
+.wv2-root .gz2-spark-ideal polyline { stroke: var(--sage-deep, var(--teal)); }
+.wv2-root .gz2-spark-ideal circle { fill: var(--sage-deep, var(--teal)); }
+.wv2-root .gz2-spark-flag polyline { stroke: var(--clay, var(--terra-deep)); }
+.wv2-root .gz2-spark-flag circle { fill: var(--clay, var(--terra-deep)); }
+
+.wv2-root .gz2-cells { display: flex; flex-direction: column; gap: 3px; }
+.wv2-root .gz2-cells-row { display: flex; gap: 3px; }
+.wv2-root .gz2-cell { width: 12px; height: 9px; border-radius: 2px; background: var(--surface-2); border: 1px solid var(--line-2); }
+.wv2-root .gz2-cells-ideal .gz2-cell.on { background: var(--sage-deep, var(--teal)); border-color: transparent; }
+.wv2-root .gz2-cells-flag .gz2-cell.on { background: var(--clay, var(--terra-deep)); border-color: transparent; }
+
+.wv2-root .gz2-ticks { display: flex; gap: 5px; }
+.wv2-root .gz2-tick {
+  width: 18px; height: 18px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; border: 1px solid var(--line-2); background: var(--surface);
+}
+.wv2-root .gz2-tick.ok { color: var(--sage-deep, var(--teal)); }
+.wv2-root .gz2-tick.miss { color: var(--clay, var(--terra-deep)); border-style: dashed; }
+.wv2-root .gz2-ticks-ideal .gz2-tick.num { color: var(--sage-deep, var(--teal)); }
+.wv2-root .gz2-ticks-flag .gz2-tick.num { color: var(--clay, var(--terra-deep)); }
+
+/* ── verdict views / chips ───────────────────────────────────────────────── */
+.wv2-root .gz2-chiprow { display: flex; flex-wrap: wrap; gap: 6px; }
+.wv2-root .gz2-chip {
+  font-size: 11.5px; font-weight: 600; color: var(--ink-2);
+  border: 1px solid var(--line-2); border-radius: 999px; padding: 4px 11px;
+  background: var(--surface); cursor: pointer; transition: border-color .12s, background .12s, color .12s;
+}
+.wv2-root .gz2-chip:hover { border-color: var(--line-3, var(--ink-3)); }
+.wv2-root .gz2-chip.is-sel {
+  color: var(--accent-deep, var(--terra-deep)); border-color: var(--accent, var(--terra));
+  background: color-mix(in srgb, var(--accent, var(--terra)) 9%, transparent);
+}
+
+/* ── description-set fields ──────────────────────────────────────────────── */
+.wv2-root .gz2-field { display: flex; flex-direction: column; gap: 5px; }
+.wv2-root .gz2-flabel { font-size: 11.5px; font-weight: 600; color: var(--ink-2); }
+.wv2-root .gz2-ta {
+  font-family: var(--ui); font-size: 12.5px; color: var(--ink-1); line-height: 1.5;
+  border: 1px solid var(--line-2); border-radius: var(--r-xs); padding: 7px 9px; background: var(--surface); resize: vertical;
+}
+.wv2-root .gz2-ta:focus { outline: none; border-color: var(--accent, var(--terra)); }
+.wv2-root .gz2-locked-line { font-size: 11px; color: var(--ink-3); font-style: italic; }
+.wv2-root .gz2-readonly {
+  font-size: 12px; color: var(--ink-3); margin: 0; padding: 7px 9px;
+  background: var(--surface-2); border: 1px dashed var(--line-2); border-radius: var(--r-xs);
+}
+
+/* ── footer ──────────────────────────────────────────────────────────────── */
+.wv2-root .gz2-foot {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 20px; border-top: 1px solid var(--line-2); background: var(--surface-2);
+}
+.wv2-root .gz2-foot-note { flex: 1; font-size: 11.5px; color: var(--ink-3); }
+.wv2-root .gz2-foot-btns { display: flex; gap: 8px; }
+
+/* ══ merged try-on + config dialog ═══════════════════════════════════════════
+ * A richer try-on, not a form: a live chart whose y-items ARE its editable axis,
+ * morphing with the rule (shape + red catch) and the visual. Heavy knobs fold
+ * into Advanced. */
+.wv2-root .gz2-cfg-wide { max-width: min(880px, 94vw); }
+.wv2-root .gz2-cfg-desc { font-size: 12.5px; color: var(--ink-2); line-height: 1.5; margin-top: 4px; }
+.wv2-root .gz2-cfg-body { gap: 14px; }
+
+/* shared-preset heads-up — quiet, informational (not an alarm) */
+.wv2-root .gz2-shared-note {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 9px 12px; border-radius: var(--r-md, 10px);
+  background: var(--surface-2); border: 1px solid var(--line-2);
+  font-size: 12px; color: var(--ink-2); line-height: 1.45;
+}
+.wv2-root .gz2-shared-note b { color: var(--ink-1); font-weight: 700; }
+.wv2-root .gz2-shared-ico { color: var(--ink-3); font-size: 13px; line-height: 1.3; flex: 0 0 auto; }
+
+/* what it catches — bold + eye-catching */
+.wv2-root .gz2-catches {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 10px 13px; border-radius: var(--r-md, 10px);
+  background: color-mix(in srgb, var(--clay, var(--terra)) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--clay, var(--terra)) 26%, transparent);
+}
+.wv2-root .gz2-catches-lbl {
+  font-size: 9.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--clay, var(--terra-deep)); white-space: nowrap;
+}
+.wv2-root .gz2-catches-txt { font-size: 14px; font-weight: 600; color: var(--ink-1); line-height: 1.35; }
+
+/* the live centerpiece — editable axis + chart side by side */
+.wv2-root .gz2-preview {
+  display: flex; gap: 14px; align-items: stretch;
+  padding: 12px; border: 1px solid var(--line-2); border-radius: var(--r-lg, 12px); background: var(--surface-2);
+  min-height: 200px;
+}
+.wv2-root .gz2-axis {
+  flex: 0 0 212px; display: flex; flex-direction: column; justify-content: center; gap: 3px;
+  padding: 4% 0 8%;
+}
+/* each rung: [reorder] [value]      [×]   with a subtle hint tucked underneath */
+.wv2-root .gz2-rung {
+  display: grid; grid-template-columns: 15px 1fr 14px; grid-template-rows: auto auto;
+  column-gap: 5px; align-items: center;
+}
+.wv2-root .gz2-rung-move { grid-row: 1 / 3; grid-column: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+.wv2-root .gz2-rung-arr {
+  border: 0; background: transparent; color: var(--ink-3); cursor: pointer;
+  padding: 0; height: 11px; display: flex; align-items: center; justify-content: center; border-radius: 3px;
+}
+.wv2-root .gz2-rung-arr:hover:not(:disabled) { color: var(--accent, var(--terra)); background: var(--surface); }
+.wv2-root .gz2-rung-arr:disabled { opacity: .18; cursor: default; }
+.wv2-root .gz2-rung-val {
+  grid-row: 1; grid-column: 2; width: 100%;
+  font-family: var(--ui); font-size: 13.5px; font-weight: 650; color: var(--ink-1);
+  border: 1px solid transparent; border-radius: var(--r-xs); padding: 2px 6px; background: transparent;
+}
+.wv2-root .gz2-rung-val:hover { background: var(--surface); }
+.wv2-root .gz2-rung-val:focus { outline: none; background: var(--surface); border-color: var(--accent, var(--terra)); }
+/* the description recedes to a faint one-line hint under the value */
+.wv2-root .gz2-rung-desc {
+  grid-row: 2; grid-column: 2; width: 100%;
+  font-family: var(--ui); font-size: 10px; color: var(--ink-3); line-height: 1.25;
+  border: 0; background: transparent; padding: 0 7px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.wv2-root .gz2-rung-desc::placeholder { color: var(--ink-3); opacity: .45; }
+.wv2-root .gz2-rung-desc:focus { outline: none; color: var(--ink-2); white-space: normal; }
+.wv2-root .gz2-rung-rm {
+  grid-row: 1; grid-column: 3; border: 0; background: transparent; color: var(--ink-3);
+  cursor: pointer; font-size: 13px; line-height: 1; padding: 0; opacity: 0; transition: opacity .12s ease;
+}
+.wv2-root .gz2-rung:hover .gz2-rung-rm { opacity: .8; }
+.wv2-root .gz2-rung-rm:hover { color: var(--clay, var(--ink-1)); opacity: 1; }
+
+/* ghost rungs — an empty scale renders as dashed placeholders (fill these in) */
+.wv2-root .gz2-rung-ghost .gz2-rung-val {
+  height: 24px; border: 1px dashed var(--line-2); border-radius: var(--r-xs);
+  background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+}
+/* add-a-step — the last rung, in the same format */
+.wv2-root .gz2-rung-add .gz2-rung-val { border: 1px dashed var(--line-2); }
+.wv2-root .gz2-rung-add .gz2-rung-val:focus { border-style: solid; }
+.wv2-root .gz2-rung-add .gz2-rung-val::placeholder { color: var(--accent-deep, var(--terra-deep)); opacity: .75; font-weight: 600; }
+.wv2-root .gz2-rung-plus { display: flex; align-items: center; justify-content: center; color: var(--accent, var(--terra)); font-weight: 700; font-size: 14px; }
+.wv2-root .gz2-axis-note { font-size: 11px; color: var(--ink-3); font-style: italic; padding: 8px 6px; }
+/* faint example rungs (a section tracker's lanes, before World fills them) */
+.wv2-root .gz2-rung-val-eg { color: var(--ink-3); font-weight: 600; font-style: italic; opacity: .8; padding: 2px 6px; }
+.wv2-root .gz2-rung-eg .gz2-rung-val-eg { border: 0; background: transparent; }
+
+/* ── tracker lanes preview (the bespoke "journey" config chart) ───────────── */
+.wv2-root .gz-lanes { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.wv2-root .gz-lanes-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.wv2-root .gz-lane-rail { stroke: var(--line-2); stroke-width: 1; stroke-dasharray: 2 4; }
+.wv2-root .gz-lane-path { stroke: color-mix(in srgb, var(--terra) 55%, transparent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.wv2-root .gz-lane-seg { stroke: var(--terra); stroke-width: 2; stroke-linecap: round; }
+.wv2-root .gz-lane-seg.is-break { stroke: var(--clay, var(--terra-deep)); stroke-width: 2.2; stroke-dasharray: 3 3; }
+.wv2-root .gz-lane-node { fill: var(--terra); }
+.wv2-root .gz-lane-node.is-break { fill: var(--clay, var(--terra-deep)); stroke: var(--surface); stroke-width: 1.5; }
+.wv2-root .gz-lane-band { stroke: color-mix(in srgb, var(--clay, var(--terra)) 40%, transparent); stroke-width: 11; stroke-linecap: round; }
+.wv2-root .gz-lane-flag { fill: var(--clay, var(--terra-deep)); font-size: 10px; }
+.wv2-root .gz-lane-tick { fill: var(--ink-3); font-size: 9px; font-family: var(--ui); }
+.wv2-root .gz-lanes-cap { font-size: 11px; color: var(--ink-3); padding-left: 2px; }
+.wv2-root .gz-lanes-cap-break { color: var(--clay, var(--terra-deep)); font-weight: 600; }
+
+/* ── tracker cells preview (the colored step-grid, same journey as the lanes) ── */
+.wv2-root .gz-cells { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.wv2-root .gz-cells-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.wv2-root .gz-cell-empty { fill: var(--surface-2); stroke: var(--line-2); stroke-width: .75; }
+.wv2-root .gz-cell { stroke: var(--surface); stroke-width: 1; }
+.wv2-root .gz-cell.is-break { fill: var(--clay, var(--terra-deep)); stroke: var(--surface); stroke-width: 1.5; }
+.wv2-root .gz-cell-flag { fill: var(--clay, var(--terra-deep)); font-size: 10px; }
+.wv2-root .gz-cell-tick { fill: var(--ink-3); font-size: 9px; font-family: var(--ui); }
+
+.wv2-root .gz2-preview-chart { flex: 1; min-width: 0; display: flex; align-items: center; }
+.wv2-root .gz2-preview-chart .cv-chart-card { border: 0; background: transparent; box-shadow: none; padding: 0; width: 100%; }
+.wv2-root .gz2-preview-chart .cv-chart-head { padding: 0 0 4px; }
+
+/* add-a-step + the returning Extract action */
+.wv2-root .gz2-axis-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.wv2-root .gz2-axis-actions .gz2-yadd { flex: 1; min-width: 180px; margin: 0; }
+.wv2-root .wv2-btn-ai.is-on { background: color-mix(in srgb, var(--teal) 16%, transparent); }
+.wv2-root .gz2-extract-panel {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 10px 12px; border: 1px dashed color-mix(in srgb, var(--teal) 32%, var(--line-2));
+  border-radius: var(--r-md, 10px); background: color-mix(in srgb, var(--teal) 5%, transparent);
+}
+
+/* control groups (rule, visual) */
+.wv2-root .gz2-control { display: flex; flex-direction: column; gap: 7px; }
+.wv2-root .gz2-control-h { font-size: 12px; font-weight: 700; color: var(--ink-1); }
+/* "What it walks" — the x-axis picker: a small fixed label + a chip row per dimension */
+.wv2-root .gz2-axis-row { display: flex; align-items: baseline; gap: 10px; }
+.wv2-root .gz2-axis-lbl { flex: 0 0 56px; font-size: 11.5px; font-weight: 600; color: var(--ink-2); padding-top: 4px; }
+.wv2-root .gz2-axis-row .gz2-chiprow { flex: 1; }
+.wv2-root .gz2-chip-ai { border-color: color-mix(in srgb, var(--teal) 40%, var(--line-2)); color: var(--teal); }
+.wv2-root .gz2-chip-ai.is-sel { background: color-mix(in srgb, var(--teal) 12%, transparent); border-color: var(--teal); color: var(--teal); }
+
+/* advanced fold */
+.wv2-root .gz2-adv-toggle {
+  align-self: flex-start; border: 0; background: transparent; cursor: pointer;
+  font-family: var(--ui); font-size: 12px; font-weight: 600; color: var(--ink-2); padding: 2px 0;
+}
+.wv2-root .gz2-adv-toggle:hover { color: var(--ink-1); }
+.wv2-root .gz2-adv {
+  display: flex; flex-direction: column; gap: 13px;
+  padding: 13px; border: 1px solid var(--line-2); border-radius: var(--r-md, 10px); background: var(--surface-2);
+}
+
+/* ── bindings modal specifics ────────────────────────────────────────────── */
+.wv2-root .gz2-bind-summary { display: flex; align-items: flex-start; gap: 11px; }
+.wv2-root .gz2-bind-nm { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--ink-1); margin: 2px 0; }
+.wv2-root .gz2-bind-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 11.5px; }
+
+.wv2-root .gz2-bindlist { display: flex; flex-direction: column; gap: 6px; }
+.wv2-root .gz2-bindrow {
+  display: flex; align-items: center; gap: 10px;
+  border: 1px solid var(--line-2); border-radius: var(--r-md, 10px); padding: 9px 12px; background: var(--surface);
+}
+.wv2-root .gz2-bindrow-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.wv2-root .gz2-bindrow-scope { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+.wv2-root .gz2-bindrow-sub { font-size: 11px; color: var(--ink-3); }
+
+.wv2-root .gz2-addbind {
+  background: var(--surface-2); border: 1px solid var(--line-2);
+  border-radius: var(--r-md, 10px); padding: 12px 13px;
+}
+.wv2-root .gz2-scope-row { display: flex; align-items: center; gap: 9px; }
+.wv2-root .gz2-scope-lbl {
+  font-size: 11px; font-weight: 600; color: var(--ink-3); min-width: 84px; text-transform: lowercase;
+}
+.wv2-root .gz2-scope-select, .wv2-root .gz2-scope-input {
+  flex: 1; font-family: var(--ui); font-size: 12.5px; color: var(--ink-1);
+  border: 1px solid var(--line-2); border-radius: var(--r-xs); padding: 6px 9px; background: var(--surface);
+}
+.wv2-root .gz2-scope-select:focus, .wv2-root .gz2-scope-input:focus { outline: none; border-color: var(--accent, var(--terra)); }
+.wv2-root .gz2-pair-toggle {
+  display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--ink-2); cursor: pointer; padding: 2px 0;
+}
+.wv2-root .gz2-addbind .wv2-btn { align-self: flex-start; margin-top: 4px; }
