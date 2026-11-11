@@ -1,0 +1,427 @@
+/* ==============================================================
+ * Story so far — page styles. All scoped under .wv2-root so they
+ * stay inside the app shell. Color tokens come from the theme;
+ * static tokens (radius, shadow, bevels, type) from app.css.
+ * ============================================================== */
+
+/* ---- page shell — layout primitives now in app.css ---- */
+.wv2-root .ssf-page .wv2-page-main { gap: 24px; }
+
+/* ---- page header ---- */
+.wv2-root .wv2-page-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+}
+.wv2-root .wv2-page-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+}
+.wv2-root .wv2-page-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ---- boxes (people / items / rules / future y_items) ----
+ * Layout-driven: the grid decides where boxes land. Each box has a min size and
+ * fills its cell (full width + full height of its row). */
+.wv2-root .wv2-boxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: stretch;
+}
+.wv2-root .wv2-box { min-height: 120px; }
+/* layout widths from the box config: half boxes share a row (and grow to fill if
+   alone); full boxes stretch across. People + Items = half; Rules = full. */
+.wv2-root .wv2-box-half { flex: 1 1 300px; min-width: 0; }
+.wv2-root .wv2-box-full { flex: 1 1 100%; min-width: 0; }
+
+/* primary (featured) box — the focus is carried by the bigger circular avatars;
+   a gentle extra lift, nothing loud. */
+.wv2-root .wv2-box.is-primary { box-shadow: var(--bevel-up), var(--sh-2); }
+.wv2-root .wv2-box.is-secondary { box-shadow: var(--bevel-up), var(--sh-1); }
+.wv2-root .wv2-panel {
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  box-shadow: var(--bevel-up), var(--sh-1);
+}
+.wv2-root .wv2-panel-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--ink-3);
+  margin: 0 0 12px;
+}
+.wv2-root .wv2-ct {
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .wv2-empty { font-size: 12.5px; color: var(--ink-3); margin: 2px 0 0; }
+
+.wv2-root .wv2-entity-list { display: flex; flex-direction: column; gap: 8px; }
+.wv2-root .wv2-entity {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 8px 4px;
+  border-radius: var(--r-md);
+}
+.wv2-root .wv2-av {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%; /* people are circles */
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: var(--bevel-up), var(--sh-1);
+}
+.wv2-root .wv2-glyph {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-md);
+  background: var(--surface-3);
+  border: 1px solid var(--line-2);
+  display: grid;
+  place-items: center;
+  color: var(--ink-2);
+}
+.wv2-root .wv2-entity-info { flex: 1; min-width: 0; }
+.wv2-root .wv2-nm {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -.005em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.wv2-root .wv2-role { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; line-height: 1.4; }
+.wv2-root .wv2-entity.faded .wv2-nm { color: var(--ink-2); }
+.wv2-root .wv2-entity.faded .wv2-role { font-style: italic; }
+
+/* ---- people (featured — the focus; clean entities across the full width) ---- */
+.wv2-root .wv2-people {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 2px 18px;
+}
+.wv2-root .wv2-person {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 7px 6px;
+  border-radius: var(--r-md);
+}
+.wv2-root .wv2-person:hover { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+/* bigger circular avatar = the focus signal; People stays clean */
+.wv2-root .wv2-person .wv2-av {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  font-size: 15px;
+}
+
+/* ---- rules (clean entity rows; typed by scope, character attached by avatar) ---- */
+.wv2-root .wv2-rules { display: flex; flex-direction: column; gap: 2px; }
+.wv2-root .wv2-rule {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 7px 6px;
+  border-radius: var(--r-md);
+}
+.wv2-root .wv2-rule .wv2-av,
+.wv2-root .wv2-rule .wv2-rule-ghost { flex: 0 0 30px; width: 30px; height: 30px; }
+/* ghost icon: a faint, borderless scroll — the quiet "this is a rule" mark */
+.wv2-root .wv2-rule-ghost {
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+}
+.wv2-root .wv2-rule-text {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--ink);
+  letter-spacing: -.003em;
+}
+
+/* ---- scenes strip (drag to reorder) ---- */
+.wv2-root .wv2-scenes-strip {
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 18px 20px 22px;
+  box-shadow: var(--bevel-up), var(--sh-1);
+}
+.wv2-root .wv2-strip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.wv2-root .wv2-strip-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+/* view toggle (Scenes / Chapters / Recent) */
+.wv2-root .wv2-view-toggle {
+  display: inline-flex;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 2px;
+}
+.wv2-root .wv2-view-toggle button {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 4px 9px;
+  border-radius: var(--r-xs);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--ink-3);
+  transition: background .12s ease, color .12s ease, box-shadow .12s ease;
+}
+.wv2-root .wv2-view-toggle button:hover { color: var(--ink-2); }
+.wv2-root .wv2-view-toggle button.on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--bevel-up), var(--sh-1);
+}
+
+/* view body transition */
+.wv2-root .wv2-view { animation: wv2-viewin .18s ease-out; }
+@keyframes wv2-viewin { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* --- scenes view: chapter bracket overlay --- */
+.wv2-root .wv2-chap-rail { display: flex; align-items: stretch; padding: 0 6px; margin-bottom: 6px; min-height: 18px; }
+.wv2-root .wv2-chap-bracket { flex: 0 0 auto; display: flex; flex-direction: column; align-items: stretch; padding: 0 4px; }
+.wv2-root .wv2-bracket-lbl {
+  font-size: 10px; letter-spacing: .08em; color: var(--ink-3);
+  text-align: center; margin-bottom: 3px; line-height: 1.2; white-space: nowrap;
+}
+.wv2-root .wv2-bracket-lbl b { color: var(--terra-deep); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+.wv2-root .wv2-bracket-lbl em { color: var(--ink-2); font-style: italic; font-weight: 500; letter-spacing: 0; }
+.wv2-root .wv2-bracket-arc { height: 6px; border: 1px solid var(--line-3); border-bottom: 0; border-radius: 6px 6px 0 0; }
+.wv2-root .wv2-chap-bracket.next .wv2-bracket-arc { border-style: dashed; border-color: var(--line-2); }
+.wv2-root .wv2-chap-bracket.next .wv2-bracket-lbl { color: var(--ink-3); font-style: italic; }
+.wv2-root .wv2-chap-bracket.next .wv2-bracket-lbl b { color: var(--ink-3); font-style: normal; }
+
+/* the dotted chapter-break marker in the timeline */
+.wv2-root .wv2-conn.chapbreak {
+  flex: 0 0 26px;
+  align-self: flex-start;
+  margin-top: 18px;
+  height: 0;
+  border-top: 2px dotted var(--line-3);
+  position: relative;
+}
+.wv2-root .wv2-conn.chapbreak::after {
+  content: '';
+  position: absolute; left: 50%; top: -3px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--line-3);
+  transform: translateX(-50%);
+}
+
+/* --- chapters view: chapter cards --- */
+.wv2-root .wv2-chap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.wv2-root .wv2-chap-card {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 12px 13px 13px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: border-color .12s ease, box-shadow .12s ease;
+  cursor: pointer;
+}
+.wv2-root .wv2-chap-card:hover { border-color: var(--line-3); box-shadow: var(--sh-1); }
+.wv2-root .wv2-chap-card.current { background: var(--surface); border-color: var(--line-3); box-shadow: var(--bevel-up), var(--sh-1); }
+.wv2-root .wv2-chap-card.empty {
+  background: transparent;
+  border: 1.5px dashed var(--line-3);
+  align-items: center; justify-content: center;
+  color: var(--ink-3); font-size: 12px; font-weight: 600;
+  min-height: 104px; gap: 4px;
+}
+.wv2-root .wv2-chap-card.empty .wv2-plus { font-size: 18px; line-height: 1; color: var(--ink-3); font-weight: 400; }
+.wv2-root .wv2-ch-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.wv2-root .wv2-ch-num { display: inline-flex; align-items: center; gap: 6px; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--terra-deep); font-weight: 700; white-space: nowrap; }
+.wv2-root .wv2-stat-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--terra); flex: 0 0 6px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 22%, transparent); }
+.wv2-root .wv2-ch-meta { font-size: 10.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wv2-root .wv2-ch-title { font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--ink); letter-spacing: -.005em; line-height: 1.25; }
+.wv2-root .wv2-mini-scenes { display: flex; flex-direction: column; gap: 4px; }
+.wv2-root .wv2-mini { display: flex; align-items: center; gap: 8px; padding: 5px 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; min-width: 0; }
+.wv2-root .wv2-mini-n { flex: 0 0 14px; font-size: 9.5px; letter-spacing: .06em; color: var(--ink-3); font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.wv2-root .wv2-mini-t { flex: 1; min-width: 0; font-size: 11.5px; color: var(--ink); font-family: var(--serif); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wv2-root .wv2-mini.empty { background: transparent; border: 1.5px dashed var(--line-3); justify-content: center; color: var(--ink-3); font-size: 11px; font-style: italic; cursor: pointer; }
+.wv2-root .wv2-ch-progress { height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.wv2-root .wv2-ch-progress span { display: block; height: 100%; background: var(--terra); border-radius: 2px; }
+
+/* --- recent view: last chapters list --- */
+.wv2-root .wv2-recent-chaps { display: flex; flex-direction: column; gap: 8px; }
+.wv2-root .wv2-recent-chap {
+  display: grid; grid-template-columns: auto 1fr auto;
+  align-items: center; gap: 14px;
+  padding: 10px 12px 10px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+.wv2-root .wv2-recent-chap.current { background: var(--surface); border-color: var(--line-3); box-shadow: var(--bevel-up), var(--sh-1); }
+.wv2-root .wv2-ch-badge { display: flex; flex-direction: column; align-items: center; width: 42px; padding: 5px 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-sm); flex: 0 0 42px; }
+.wv2-root .wv2-recent-chap.current .wv2-ch-badge { background: var(--terra-soft); border-color: var(--terra); }
+.wv2-root .wv2-badge-lbl { font-size: 8.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--terra-deep); font-weight: 700; line-height: 1; }
+.wv2-root .wv2-badge-num { font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.1; margin-top: 2px; }
+.wv2-root .wv2-recent-body { min-width: 0; }
+.wv2-root .wv2-recent-top { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.wv2-root .wv2-recent-top h5 { margin: 0; font-family: var(--serif); font-size: 13.5px; font-weight: 600; color: var(--ink); letter-spacing: -.005em; line-height: 1.2; }
+.wv2-root .wv2-recent-meta { font-size: 10.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.wv2-root .wv2-scene-dots { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.wv2-root .wv2-sdot { display: flex; align-items: center; gap: 6px; padding: 3px 7px 3px 4px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-xs); font: inherit; color: var(--ink-2); line-height: 1; cursor: pointer; }
+.wv2-root .wv2-sdot-n { font-size: 9px; font-weight: 700; color: var(--ink-3); letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.wv2-root .wv2-sdot-t { color: var(--ink-2); font-family: var(--serif); font-size: 11px; letter-spacing: -.003em; }
+.wv2-root .wv2-sdot.empty { border-style: dashed; border-color: var(--line-3); color: var(--ink-3); font-style: italic; }
+.wv2-root .wv2-recent-when { font-size: 10.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; text-align: right; line-height: 1.3; flex: 0 0 auto; }
+.wv2-root .wv2-recent-when b { display: block; color: var(--ink-2); font-weight: 600; font-size: 11px; font-family: var(--serif); font-style: italic; letter-spacing: -.003em; }
+.wv2-root .wv2-strip-h {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--ink-3);
+}
+.wv2-root .wv2-strip-h .wv2-ct { margin-left: 6px; }
+.wv2-root .wv2-timeline {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 0 6px;
+}
+/* continuous baseline behind the pills */
+.wv2-root .wv2-timeline::before {
+  content: '';
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 18px;
+  height: 2px;
+  background: var(--line-2);
+  border-radius: 2px;
+}
+.wv2-root .wv2-scene {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: grab;
+  touch-action: none;
+}
+.wv2-root .wv2-scene.empty { cursor: pointer; }
+.wv2-root .wv2-scene.dragging { cursor: grabbing; z-index: 2; }
+.wv2-root .wv2-pill {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-3);
+  border: 1px solid var(--line-2);
+  color: var(--ink-2);
+  transition: border-color .12s ease;
+}
+.wv2-root .wv2-scene.done .wv2-pill {
+  background: linear-gradient(180deg, var(--paper), var(--paper-2));
+  border-color: var(--line-3);
+  color: var(--ink);
+  box-shadow: var(--bevel-up), var(--sh-1);
+}
+.wv2-root .wv2-scene.empty .wv2-pill {
+  background: transparent;
+  border: 1.5px dashed var(--line-3);
+  color: var(--ink-3);
+  box-shadow: none;
+}
+.wv2-root .wv2-scene:hover .wv2-pill { border-color: var(--terra); }
+.wv2-root .wv2-ttl {
+  font-family: var(--serif);
+  font-size: 11px;
+  color: var(--ink-2);
+  line-height: 1.3;
+  text-align: center;
+  max-width: 80px;
+}
+.wv2-root .wv2-scene.empty .wv2-ttl { color: var(--ink-3); font-style: italic; }
+.wv2-root .wv2-scenes-empty { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+
+/* ---- suggestions (expanded-notification view — AI surface) ----
+ * Sleek, flat callout: solid tint, hairline border, soft shadow, a thin accent. */
+.wv2-root .wv2-noticed {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  background: var(--ai-bg);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  padding: 15px 17px;
+  box-shadow: var(--sh-1);
+}
+.wv2-root .wv2-noticed-quote {
+  flex: 0 0 3px;
+  align-self: stretch;
+  background: var(--terra);
+  border-radius: 999px;
+  opacity: .85;
+}
+.wv2-root .wv2-noticed-body { flex: 1; min-width: 0; }
+.wv2-root .wv2-noticed-heading {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+  letter-spacing: -.005em;
+}
+.wv2-root .wv2-noticed-text {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 4px 0 14px;
+}
+.wv2-root .wv2-noticed-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* (right rail stub removed — PageRail handles this now) */

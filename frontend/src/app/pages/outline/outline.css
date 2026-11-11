@@ -1,0 +1,1465 @@
+/* ============================================================
+ * Grand outline page — act/chapter/scene/beat tree.
+ * Scoped under .wv2-root. Ported from 07-outline.html.
+ * ============================================================ */
+
+/* ---- page shell — layout primitives now in app.css ---- */
+/* Centering comes from the shared .wv2-page grid (app.css): the tree
+   (.wv2-page-main, capped at 720 below) sits centered between the page edge and
+   the stats rail, with the wide-screen slack as balanced gutters either side. */
+/* (dead .ol-page layout overrides removed; now uses standard PageShell geometry) */
+
+/* ---- page header ---- */
+.ol-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 14px;
+}
+.ol-head .ol-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+.ol-head .ol-head-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 0 16px;
+}
+
+/* zoom toggle → shared <Segmented> / .wv2-seg (app.css) */
+
+/* ============================================ */
+/* outline tree                                 */
+/* ============================================ */
+.ol-tree { font-size: 13px; }
+
+/* act */
+.ol-act { margin-bottom: 18px; }
+.ol-act-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 0 8px;
+  border-bottom: 1px solid var(--line-2);
+  margin-bottom: 8px;
+}
+.ol-act-title {
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+.ol-act-title b { color: var(--ink-2); font-weight: 700; }
+.ol-act-meta {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  font-family: var(--ui);
+}
+.ol-act-meta b { color: var(--sage); font-weight: 600; }
+.ol-act-meta b.wip { color: var(--terra-deep); }
+
+/* chapter */
+.ol-chap {
+  margin: 0 0 14px 0;
+  scroll-margin-top: 24px;
+  border-radius: 6px;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+/* focused chapter (driven by the `?chap=` URL param) */
+.ol-chap.is-active {
+  background: color-mix(in srgb, var(--terra) 5%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 24%, transparent);
+}
+.ol-chap-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0 8px 2px;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+.ol-ch-num {
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+.ol-ch-ttl {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: -0.008em;
+  line-height: 1.25;
+}
+.ol-ch-ttl.placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+  font-weight: 500;
+}
+.ol-ch-meta {
+  margin-left: auto;
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+/* scenes-in-chapter */
+.ol-scenes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1.5px solid var(--line);
+  margin-left: 6px;
+  padding-left: 16px;
+}
+.ol-scene {
+  padding: 4px 0 8px;
+  position: relative;
+}
+.ol-scene + .ol-scene { margin-top: 2px; }
+
+/* bullet on the rail */
+.ol-scene::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 8px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink-2);
+  box-shadow: 0 0 0 3px var(--surface-2);
+}
+.ol-scene.empty::before {
+  background: transparent;
+  border: 1.5px dashed var(--terra);
+  width: 11px;
+  height: 11px;
+  top: 7px;
+  left: -23px;
+}
+
+/* scene head */
+.ol-sc-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.ol-sc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.ol-sc-tag .sw {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex: 0 0 5px;
+  display: inline-block;
+}
+.ol-sc-tag .nm {
+  color: var(--ink-3);
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+  font-size: 10.5px;
+  font-family: var(--serif);
+  margin-left: 2px;
+}
+.ol-scene.empty .ol-sc-tag .nm { color: var(--terra-deep); }
+.ol-sc-meta {
+  margin-left: auto;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* beats — prose paragraphs */
+.ol-beats {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ol-beat {
+  padding: 1px 0;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.55;
+  letter-spacing: -0.003em;
+}
+.ol-beat b { font-weight: 600; }
+.ol-beat em { font-style: italic; color: var(--ink-2); }
+.ol-beat.placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* ---- right rail sections ---- */
+.ol-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 6px;
+  font-family: var(--ui);
+}
+.ol-col-head > span { white-space: nowrap; }
+.ol-col-head .ct {
+  color: var(--ink-3);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 10px;
+}
+.ol-col-head .glyph {
+  color: var(--gold);
+  font-size: 11px;
+  margin-right: 5px;
+  letter-spacing: 0;
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, 0.4));
+}
+
+/* hint */
+.ol-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 8px 10px 9px;
+  background: rgba(80, 55, 15, 0.025);
+  border: 1px dashed var(--line-2);
+  border-radius: 6px;
+  font-family: var(--ui);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  margin: 0 0 10px;
+}
+.ol-hint .hint-ic {
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid var(--teal);
+  display: grid;
+  place-items: center;
+  color: var(--teal);
+  font-family: var(--serif);
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 600;
+  line-height: 1;
+  margin-top: 1px;
+}
+.ol-hint .hint-text {
+  flex: 1;
+  min-width: 0;
+  color: var(--ink-2);
+}
+.ol-hint .hint-text b { color: var(--ink); font-weight: 600; }
+.ol-hint .hint-x {
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-4);
+  font-size: 14px;
+  line-height: 0.6;
+  padding: 0;
+  margin-top: -1px;
+  border-radius: 3px;
+  font-family: var(--ui);
+}
+.ol-hint .hint-x:hover {
+  color: var(--ink-2);
+  background: rgba(60, 40, 15, 0.06);
+}
+
+/* contradiction tiles */
+.ol-contra {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  font-family: var(--ui);
+}
+.ol-contra-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.ol-contra-tag {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.ol-contra-tag .sw {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex: 0 0 5px;
+}
+.ol-contra-pair { margin: 0; padding: 0; }
+.ol-contra-line {
+  font-family: var(--serif);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--ink-2);
+  margin: 0;
+  padding-left: 12px;
+  letter-spacing: -0.003em;
+  position: relative;
+}
+.ol-contra-line + .ol-contra-line { margin-top: 1px; }
+.ol-contra-line b { color: var(--ink); font-weight: 600; }
+.ol-contra-line .op {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--serif);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--clay);
+  line-height: 1.4;
+}
+.ol-contra-actions {
+  display: flex;
+  gap: 0;
+  align-items: center;
+  font-family: var(--ui);
+  padding-top: 6px;
+  margin-top: 7px;
+  border-top: 1px solid var(--line);
+}
+.ol-contra-actions button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-3);
+  padding: 1px 0;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+.ol-contra-actions .resolve {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.ol-contra-actions .resolve:hover { color: var(--clay); }
+.ol-contra-actions .sep {
+  color: var(--line-3);
+  padding: 0 5px;
+  font-size: 10px;
+}
+.ol-contra-actions .ignore { margin-left: auto; }
+.ol-contra-actions .ignore:hover { color: var(--ink-2); }
+
+/* coverage stats */
+.ol-stats { font-family: var(--ui); padding: 2px 0; }
+.ol-stats-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  column-gap: 14px;
+  row-gap: 5px;
+  margin-bottom: 12px;
+}
+.ol-stats-bar .lbl {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  line-height: 1.2;
+  padding-bottom: 3px;
+}
+.ol-stats-bar .v {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: end;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #6e8478 0%, #2e4239 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.ol-stats-bar .v small {
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 1px;
+  letter-spacing: 0;
+  background: linear-gradient(180deg, #95a89d 0%, #5a7065 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ol-stats-bar .track {
+  grid-column: 1;
+  grid-row: 2;
+  height: 6px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(40, 30, 15, 0.10) 0%, rgba(0, 0, 0, 0) 60%),
+    linear-gradient(90deg, var(--line-2) 0%, var(--line) 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(60, 40, 15, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+.ol-stats-bar .fill {
+  height: 100%;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.10) 100%),
+    linear-gradient(90deg, #6f8b7c 0%, #4d6a5b 100%);
+  box-shadow:
+    0 0 0 0.5px rgba(45, 70, 55, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transition: width 0.4s ease;
+}
+.ol-stats-bar .sub {
+  grid-column: 1;
+  grid-row: 3;
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+  letter-spacing: 0.01em;
+}
+.ol-stats-bar .sub b { color: var(--ink-2); font-weight: 600; }
+
+.ol-ledger {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0;
+  padding: 0;
+}
+.ol-ledger .cell {
+  padding: 10px 10px 9px;
+  border-right: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+  min-width: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+}
+.ol-ledger .cell:first-child { padding-left: 0; }
+.ol-ledger .cell:last-child { border-right: 0; padding-right: 0; }
+.ol-ledger dt {
+  font-size: 9.5px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ol-ledger dd {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #443928 0%, #1a1610 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.ol-ledger .cell.warn dd {
+  background: linear-gradient(180deg, #b56330 0%, #6c2e00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.ol-ledger .cell.good dd {
+  background: linear-gradient(180deg, #5a7568 0%, #2e4239 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* ---- meta labels: hidden until row hover ---- */
+.ol-meta-hover {
+  opacity: 0;
+  transition: opacity .15s;
+}
+.ol-act-head:hover .ol-meta-hover,
+.ol-chap-head:hover .ol-meta-hover,
+.ol-sc-head:hover .ol-meta-hover {
+  opacity: 1;
+}
+
+/* ---- inline edit ---- */
+.ol-editable {
+  cursor: default;
+}
+.ol-inline-input {
+  border: 0;
+  border-bottom: 1.5px solid var(--terra);
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  outline: 0;
+  padding: 0 0 1px;
+  min-width: 60px;
+  width: 100%;
+  max-width: 380px;
+}
+.ol-inline-input.ol-act-edit {
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.ol-inline-input.ol-ch-ttl {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+}
+.ol-inline-input.nm {
+  font-family: var(--serif);
+  font-size: 10.5px;
+  font-style: italic;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ---- always-on title fields (chapter / scene) ----
+   These read as plain heading text at rest and light up on focus/hover. They
+   flex to fill the whole row so a click anywhere lands on a focusable target —
+   no dead air. The row's own click handler also focuses the input, covering any
+   padding/label. */
+.ol-field-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  outline: 0;
+  margin: 0;
+  padding: 2px 5px;
+  border-radius: var(--r-xs);
+  cursor: text;
+  transition: background 0.12s, box-shadow 0.12s;
+}
+.ol-field-input::placeholder {
+  color: var(--ink-4);
+  font-style: italic;
+  opacity: 1;
+}
+.ol-field-input:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+.ol-field-input:focus {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--terra) 38%, transparent);
+}
+/* chapter title — serif heading scale (matches the old .ol-ch-ttl) */
+.ol-field-input.ol-field-chap {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+  color: var(--ink);
+}
+/* scene title — quieter serif italic (matches the old .ol-sc-tag .nm) */
+.ol-field-input.ol-field-scene {
+  font-family: var(--serif);
+  font-size: 11px;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+/* heads read as editable; the whole row focuses the field */
+.ol-chap-head,
+.ol-sc-head { cursor: text; }
+
+/* the new-scene draft for a focused, scene-less chapter */
+.ol-scene-draft .ol-sc-head { margin-bottom: 0; }
+
+/* ---- hover: parent washes its whole subtree faintly, itself more ----
+   Hovering a chapter/scene tints its entire block lightly (so the children
+   read as "within" the hover), while the hovered head row itself takes a
+   stronger wash. Active (URL-selected) chapters keep their terra highlight. */
+.ol-chap:not(.is-active):hover {
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+}
+.ol-chap-head:hover {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-radius: 6px;
+}
+.ol-scene:hover {
+  background: color-mix(in srgb, var(--ink) 2.5%, transparent);
+  border-radius: 6px;
+}
+.ol-sc-head:hover {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  border-radius: 6px;
+}
+
+/* ---- item actions (hover-revealed) ---- */
+.ol-item-actions {
+  display: inline-flex;
+  gap: 1px;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.12s;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.ol-act-head:hover .ol-item-actions,
+.ol-chap-head:hover .ol-item-actions,
+.ol-sc-head:hover .ol-item-actions,
+.ol-beat-row:hover > .ol-item-actions {
+  opacity: 1;
+}
+.ol-act-btn {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-4);
+  padding: 1px 3px;
+  border-radius: 3px;
+  line-height: 1;
+  transition: color 0.1s, background 0.1s;
+}
+.ol-act-btn:hover:not(:disabled) {
+  color: var(--ink-2);
+  background: rgba(60, 40, 15, 0.06);
+}
+.ol-act-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.ol-act-btn-del:hover:not(:disabled) {
+  color: var(--clay);
+  background: rgba(180, 80, 30, 0.08);
+}
+
+/* beat row wrapper for hover actions */
+.ol-beat-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.ol-beat-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- add child button ---- */
+.ol-add-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-4);
+  padding: 3px 4px;
+  margin: 4px 0 2px;
+  transition: color 0.12s;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.ol-add-child:hover {
+  color: var(--ink-2);
+}
+.ol-add-ic {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* ---- empty state ---- */
+.ol-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.ol-empty-hint {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.ol-empty-hint code {
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+/* ============================================================
+ * Outline-start — the empty-state init surface (handoff: outline-start.html).
+ * A scaffold is an invitation, never a requirement: the blank start is the
+ * confident hero, the preset shapes sit below as a low-pressure offer, and a
+ * cross-door hands off to the threads page.
+ * ============================================================ */
+/* The hero head (.wv2-init-head/-eyebrow/-title/-sub) and the centred column
+   (.wv2-init) are the SHARED init standard from app.css; .ol-start only
+   widens the column so the hero card + 3-up scaffold grid fit. The picker is
+   rendered on a .wv2-init-stage (grand outline) or inside the manuscript
+   scroll (write page, `light`), so it adds no page padding of its own. */
+.ol-start { max-width: 760px; }
+.wv2-root .ol-start.wv2-init { max-width: 760px; }
+.ol-start .wv2-init-sub b { color: var(--ink); font-weight: 600; }
+
+/* a quiet line that disarms the "am I doing this right" worry */
+.ol-start-reassure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin: 16px 0 22px;
+  font-family: var(--ui);
+}
+.ol-start-reassure svg {
+  width: 13px; height: 13px; flex: 0 0 13px;
+  fill: none; stroke: var(--sage); stroke-width: 1.7;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.ol-start-reassure b { color: var(--ink-2); font-weight: 600; }
+
+/* shared eyebrow */
+.ol-start .ol-kicker {
+  font-size: 9.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 9px;
+}
+
+/* ---- the blank-start hero: the confident, *recommended* path ----
+   Highlighted with the design's active treatment (terra tint + accent
+   border + soft ring) so it visibly outranks the neutral preset cards
+   below — the blank start is the path we nudge toward. */
+.ol-hero {
+  display: grid;
+  grid-template-columns: 1fr 232px;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  background: linear-gradient(165deg, var(--surface) 55%, var(--terra-soft));
+  border: 1px solid var(--terra);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-2), 0 0 0 3px var(--terra-soft);
+  overflow: hidden;
+  transition: border-color .14s, box-shadow .14s, transform .1s;
+  font-family: var(--ui);
+  margin-bottom: 30px;
+  padding: 0;
+}
+.ol-hero:hover:not(:disabled) {
+  border-color: var(--terra-deep);
+  box-shadow: var(--sh-3), 0 0 0 3px color-mix(in srgb, var(--terra) 28%, transparent);
+  transform: translateY(-1px);
+}
+.ol-hero:active:not(:disabled) { transform: translateY(0); }
+.ol-hero:disabled { opacity: 0.6; cursor: default; }
+.ol-hero .ho-left { padding: 22px 24px 20px; display: flex; flex-direction: column; }
+.ol-hero .ol-kicker { color: var(--sage); }
+.ol-hero .ho-name {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.ol-hero .ho-desc {
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.6;
+  margin: 8px 0 0;
+  max-width: 430px;
+}
+.ol-hero .ho-desc b { color: var(--ink); font-weight: 600; }
+.ol-hero .ho-cta {
+  margin-top: auto;
+  padding-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--terra-deep);
+}
+.ol-hero .ho-cta svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; transition: transform .14s; }
+.ol-hero:hover:not(:disabled) .ho-cta svg { transform: translateX(3px); }
+
+/* the blank blueprint — airy on purpose, the emptiness is the pitch */
+.ol-hero .ho-diagram {
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-3));
+  border-left: 1px solid color-mix(in srgb, var(--terra) 20%, var(--line));
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+.ol-hero .dlabel {
+  position: absolute;
+  top: 12px; left: 22px;
+  font-size: 8.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  font-weight: 700;
+}
+.ol-hero .bp-act {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--serif);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ol-hero .bp-act .dot {
+  width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px;
+  background: var(--terra);
+  box-shadow: 0 0 0 3px var(--surface-2);
+}
+.ol-hero .bp-chap {
+  margin: 8px 0 0 4px;
+  padding-left: 16px;
+  border-left: 1.5px solid var(--line-3);
+}
+.ol-hero .bp-chap .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-3);
+  padding: 2px 0;
+}
+.ol-hero .bp-chap .ring {
+  width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px;
+  border: 1.5px dashed var(--ink-4);
+}
+.ol-hero .bp-chap .add { font-size: 11px; color: var(--ink-4); font-style: italic; }
+
+/* the three-act spine preview — the .ol-mini ladder, tuned for the hero's
+   tinted diagram panel (ring colour follows the panel bg, markers stay quiet) */
+.ol-hero .ho-acts { margin: 2px 0 0; }
+.ol-hero .ho-acts li { color: var(--ink); padding: 4px 0; }
+.ol-hero .ho-acts li::before { box-shadow: 0 0 0 2.5px var(--surface-2); opacity: .55; }
+.ol-hero .ho-acts li .n { color: var(--ink-3); }
+
+/* ---- the "or try a shape" divider ---- */
+.ol-or-line { display: flex; align-items: center; gap: 14px; margin: 0 0 18px; }
+.ol-or-line .t {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  white-space: nowrap;
+  letter-spacing: .01em;
+}
+.ol-or-line .t b { color: var(--ink-2); font-weight: 600; }
+.ol-or-line::before, .ol-or-line::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: repeating-linear-gradient(90deg, var(--line-2) 0 4px, transparent 4px 8px);
+}
+.ol-or-line::before { flex: 0 0 4px; }
+
+/* ---- the scaffold grid ---- */
+.ol-opt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.ol-start-loading {
+  grid-column: 1 / -1;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+  padding: 16px 0;
+}
+.ol-opt {
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--ui);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-1);
+  padding: 16px 17px 14px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color .14s, box-shadow .14s, transform .1s;
+}
+button.ol-opt:hover:not(:disabled) { border-color: var(--line-3); box-shadow: var(--sh-2); transform: translateY(-1px); }
+.ol-opt:disabled { opacity: 0.55; cursor: default; }
+.ol-opt-name {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -.008em;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.ol-opt-desc {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin: 6px 0 12px;
+  min-height: 34px;
+}
+
+/* the mini act ladder inside a scaffold card */
+.ol-mini {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0 0 0 13px;
+  margin-left: 3px;
+  border-left: 1.5px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.ol-mini li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: var(--ink);
+  padding: 3.5px 0;
+  position: relative;
+}
+.ol-mini li::before {
+  content: '';
+  position: absolute;
+  left: -17px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--c, var(--terra));
+  opacity: .5;
+  box-shadow: 0 0 0 2.5px var(--surface);
+}
+.ol-mini li .n {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+  min-width: 18px;
+}
+.ol-mini li.more { color: var(--ink-3); font-style: italic; font-size: 11px; }
+.ol-mini li.more::before { background: transparent; border: 1.5px dashed var(--ink-4); opacity: 1; }
+
+/* custom card — invites typing */
+.ol-opt-custom { cursor: default; }
+.ol-crows { margin: 0 0 4px; display: flex; flex-direction: column; gap: 6px; }
+.ol-crow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface-2);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.ol-crow .n { font-size: 9px; font-weight: 700; color: var(--ink-3); letter-spacing: .08em; flex: 0 0 auto; }
+.ol-crow-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink);
+  outline: 0;
+  padding: 0;
+}
+.ol-crow-input::placeholder { color: var(--ink-4); font-style: italic; }
+.ol-crow-del {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-4);
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 2px;
+  border-radius: 4px;
+}
+.ol-crow-del:hover { color: var(--clay); }
+.ol-crow.ol-crow-add {
+  border-style: dashed;
+  background: transparent;
+  color: var(--ink-3);
+  justify-content: center;
+  font-size: 11px;
+  font-family: var(--ui);
+  cursor: pointer;
+}
+.ol-crow.ol-crow-add:hover:not(:disabled) { color: var(--ink-2); border-color: var(--line-3); }
+
+/* blank card — the truly empty path. Same .ol-opt frame, but dashed + quieter
+   so it reads as set apart from the shaped options beside it; no accent. */
+.ol-opt-blank {
+  background: var(--surface-2);
+  border-style: dashed;
+  border-color: var(--line-2);
+  box-shadow: none;
+}
+.ol-opt-blank .ol-opt-name,
+.ol-opt-blank .ol-opt-desc { color: var(--ink-2); }
+.ol-opt-blank .ol-mini { border-left-color: var(--line-2); }
+.ol-opt-blank .ol-mini li::before { background: var(--ink-4); opacity: .5; }
+.ol-opt-blank .ol-opt-foot .go { color: var(--ink-3); }
+button.ol-opt-blank:hover:not(:disabled) {
+  background: var(--surface);
+  border-color: var(--line-3);
+  box-shadow: var(--sh-1);
+}
+button.ol-opt-blank:hover:not(:disabled) .ol-opt-foot .go { color: var(--ink-2); }
+
+.ol-opt-foot {
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+.ol-opt-foot .go { color: var(--terra-deep); display: inline-flex; align-items: center; gap: 4px; }
+button.ol-opt:hover:not(:disabled) .ol-opt-foot .go { color: var(--terra); }
+.ol-opt-build { background: transparent; border: 0; font: inherit; cursor: pointer; }
+.ol-opt-build:disabled { opacity: 0.4; cursor: default; }
+
+/* closing reassurance under the grid */
+.ol-fine {
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.55;
+  margin: 2px 0 28px;
+  max-width: 560px;
+}
+.ol-fine b { color: var(--ink-2); font-weight: 600; }
+
+/* ---- the other door: start with threads instead ---- */
+.ol-start-door {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(165deg, var(--ai-bg) 0%, var(--ai-bg-2) 120%);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+}
+.ol-start-door .od-ic {
+  width: 38px; height: 38px; border-radius: 9px; flex: 0 0 38px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  display: grid;
+  place-items: center;
+  color: var(--mauve);
+  box-shadow: var(--sh-1);
+}
+.ol-start-door .od-ic svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ol-start-door .od-body { flex: 1; min-width: 0; }
+.ol-start-door .od-h {
+  font-family: var(--serif);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  line-height: 1.25;
+}
+.ol-start-door .od-body p {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin: 3px 0 0;
+  max-width: 480px;
+}
+.ol-start-door .od-body p b { color: var(--ink); font-weight: 600; }
+.ol-start-door .od-go {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--mauve);
+  border: 1px solid #4f3a47;
+  border-radius: var(--r-sm);
+  padding: 9px 15px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .16) inset, 0 1px 2px rgba(60, 40, 55, .18);
+  transition: filter .12s, transform .08s;
+}
+.ol-start-door .od-go:hover { filter: brightness(.94); }
+.ol-start-door .od-go:active { transform: translateY(.5px); }
+.ol-start-door .od-go svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* keep it sane when the work area gets narrow */
+@media (max-width: 1180px) {
+  .ol-opt-grid { grid-template-columns: 1fr; }
+  .ol-opt-desc { min-height: 0; }
+  .ol-hero { grid-template-columns: 1fr; }
+  .ol-hero .ho-diagram { border-left: 0; border-top: 1px solid var(--line); }
+  .ol-start-door { flex-wrap: wrap; }
+  .ol-start-door .od-body { flex: 1 1 100%; }
+  .ol-start-door .od-go { margin-left: 50px; }
+}
+
+/* ---- light variant: the chapters/write second init ----
+ * Same init standard as the grand-outline start — hero + frames grid. Trims
+ * reassurance and preset descriptions; adds a quiet third tier (braindumps /
+ * plot threads) instead of the full threads door. */
+
+.wv2-root .ol-start-exits {
+  margin-top: 6px;
+  padding: 14px 16px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  text-align: center;
+}
+.wv2-root .ol-start-exits .ol-exits-lead {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  margin: 0 0 10px;
+  letter-spacing: .01em;
+}
+.wv2-root .ol-exits-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+}
+.wv2-root .ol-exit {
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mauve);
+  background: transparent;
+  border: 0;
+  padding: 4px 2px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--mauve) 35%, transparent);
+  text-underline-offset: 3px;
+  transition: color .12s;
+}
+.wv2-root .ol-exit:hover { color: var(--ink); }
+.wv2-root .ol-exits-or {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-4);
+  font-style: italic;
+}
+
+/* ============================================================
+ * Threads panel (left) + drag-a-beat-onto-a-scene. The panel reuses the
+ * shared thread rows (.wv2-thr*, .wv2-cast-group, .wv2-role-head); only the
+ * panel chrome + expanded draggable beats + scene drop state are new here.
+ * ============================================================ */
+/* flat column — no card chrome; its own scroll region, independent of the tree */
+.wv2-root .ol-threads {
+  flex: 0 0 230px;
+  align-self: flex-start;
+  position: sticky;
+  top: 26px;
+  max-height: calc(100vh - 92px);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.wv2-root .ol-threads-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 2px 10px 10px;
+}
+.wv2-root .ol-threads-glyph {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--terra-deep);
+}
+.wv2-root .ol-threads-titles { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.wv2-root .ol-threads-eyebrow {
+  font-family: var(--ui);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1;
+}
+.wv2-root .ol-threads-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.wv2-root .ol-threads-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-3) transparent;
+}
+.wv2-root .ol-threads-body::-webkit-scrollbar { width: 8px; }
+.wv2-root .ol-threads-body::-webkit-scrollbar-thumb { background: var(--line-3); border-radius: 4px; }
+.wv2-root .ol-threads-body > .wv2-cast-group { padding: 0 var(--rail-pad, 10px); }
+.wv2-root .ol-threads-body .wv2-sublist-loading,
+.wv2-root .ol-threads-body .wv2-sublist-empty { padding: 8px 14px; }
+
+/* the collapsible thread row (a button reusing .wv2-thr) + chevron */
+.wv2-root .ol-thread-row {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wv2-root .ol-thread-chev {
+  flex: 0 0 auto;
+  margin-left: 4px;
+  color: var(--ink-4);
+  font-size: 14px;
+  line-height: 1;
+  transition: transform .15s ease;
+}
+.wv2-root .ol-thread-row.is-open .ol-thread-chev { transform: rotate(90deg); }
+
+/* expanded draggable beats */
+.wv2-root .ol-thread-beats {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 2px 12px 6px 46px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.wv2-root .ol-drag-beat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  cursor: grab;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  transition: background .12s, border-color .12s, color .12s;
+}
+.wv2-root .ol-drag-beat:hover { background: var(--paper); border-color: var(--line-3); color: var(--ink); }
+.wv2-root .ol-drag-beat:active { cursor: grabbing; }
+.wv2-root .ol-drag-beat.dragging { opacity: .45; }
+.wv2-root .ol-drag-mk { flex: 0 0 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--thr-c); }
+.wv2-root .ol-drag-beat.placeholder .ol-drag-mk { background: transparent; border: 1.5px dashed var(--thr-c); }
+.wv2-root .ol-drag-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wv2-root .ol-drag-beat.placeholder .ol-drag-text { font-style: italic; color: var(--ink-3); }
+.wv2-root .ol-thread-empty { padding: 4px 9px; font-size: 10.5px; font-style: italic; color: var(--ink-3); }
+
+/* scene drop target — faint "valid scene" cue (precise position comes from the
+   between-beat slots below) */
+.wv2-root .ol-scene.ol-drop-over {
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--terra) 6%, transparent);
+}
+
+/* between-beat drop slots — thin by default, expand to an insertion line on hover */
+.wv2-root .ol-beat-slot {
+  list-style: none;
+  height: 3px;
+  margin: 0;
+  position: relative;
+  transition: height .1s ease;
+}
+.wv2-root .ol-beat-slot.is-over { height: 18px; }
+.wv2-root .ol-beat-slot.is-over::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  border-radius: 2px;
+  background: var(--terra);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--terra) 16%, transparent);
+}
+.wv2-root .ol-beat-slot.is-over::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--terra);
+}
+
+@media (max-width: 1080px) {
+  .wv2-root .ol-threads { display: none; }
+}
+
+/* ============================================================
+ * Merge proposal preview — shown on the outline page when a
+ * `run_merge_rough_into_grand` proposal is pending. Mirrors the
+ * threads-page right-rail surface: ProposalBar + read-only outline
+ * showing newly-placed beats highlighted in place.
+ * ============================================================ */
+.wv2-root .ol-merge-preview { margin-bottom: 16px; }
+
+.wv2-root .ol-merge-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.wv2-root .ol-merge-pager-label {
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.wv2-root .ol-merge-pager-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  cursor: pointer;
+  color: var(--ink-2);
+}
+.wv2-root .ol-merge-pager-btn:disabled { opacity: .35; cursor: not-allowed; }
+
+.wv2-root .ol-merge-bar { margin-bottom: 14px; }
+
+/* Read-only tree: keep the ol-tree look but neutralise hover/edit affordances. */
+.wv2-root .ol-tree--preview .ol-editable,
+.wv2-root .ol-tree--preview .ol-item-actions { display: none; }
+.wv2-root .ol-tree--preview .ol-chap { cursor: default; }
+
+/* Newly-placed beats — terra-deep "new" pill + soft amber row tint so the
+   diff reads at a glance against the calm outline tree. */
+.wv2-root .ol-tree--preview .bl-beat.ol-beat-proposed {
+  background: color-mix(in srgb, var(--terra) 9%, var(--surface));
+  border-radius: var(--r-md);
+  padding-right: 8px;
+}
+.wv2-root .ol-beat-new {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--terra-deep, var(--terra));
+  border-radius: 999px;
+  padding: 2px 6px 1px;
+  margin-right: 6px;
+  flex: 0 0 auto;
+}
