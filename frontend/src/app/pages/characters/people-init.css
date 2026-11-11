@@ -1,0 +1,205 @@
+/* ==============================================================
+ * People — INIT. First touch of the People page.
+ * Ported from writerverse/people-init.html (hero + describe +
+ * borrow-a-shape). Suggestion styles live in characters.css
+ * (.chr-suggest*) since they render on the populated page too.
+ * Scoped under .wv2-root for theme tokens.
+ * ============================================================== */
+
+/* Hero (.wv2-init-head/-eyebrow/-title/-sub), the content column (.wv2-init)
+   and the labelled seam (.wv2-init-seam) are the SHARED init standard, defined
+   once in app.css. Only the People-specific body lives below. */
+
+/* ---- describe → generate ---- */
+.wv2-root .pi-describe {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .55) inset,
+    0 1px 2px rgba(60, 40, 15, .04),
+    0 14px 38px -24px rgba(40, 28, 8, .24);
+  padding: 18px 18px 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-root .pi-dtext {
+  width: 100%;
+  font-family: var(--serif);
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  min-height: 46px;
+  background: transparent;
+  border: 0;
+  outline: none;
+  resize: none;
+}
+.wv2-root .pi-dtext::placeholder { color: var(--ink-3); font-style: italic; }
+
+.wv2-root .pi-dfoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.wv2-root .pi-seeds {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.wv2-root .pi-seeds-lbl { opacity: .75; }
+.wv2-root .pi-seed {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  transition: border-color .14s, color .14s;
+}
+.wv2-root .pi-seed:hover { border-color: var(--terra); color: var(--terra-deep); }
+
+.wv2-root .pi-generate {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, var(--sage), color-mix(in srgb, var(--sage) 72%, #14241b));
+  border: 1px solid color-mix(in srgb, var(--sage) 72%, #14241b);
+  padding: 8px 15px;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18) inset, 0 5px 14px -6px rgba(40, 70, 48, .5);
+  transition: transform .1s, filter .14s, opacity .14s;
+}
+.wv2-root .pi-generate svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.wv2-root .pi-generate:hover:not(:disabled) { filter: brightness(1.05); }
+.wv2-root .pi-generate:active:not(:disabled) { transform: translateY(1px); }
+.wv2-root .pi-generate:disabled { opacity: .45; cursor: not-allowed; }
+
+.wv2-root .pi-gennote {
+  margin-top: 11px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--sage);
+  font-weight: 600;
+}
+
+/* ---- borrow a shape (nested, revealed on focus) ---- */
+.wv2-root .pi-shapes-wrap {
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px dashed var(--line-2);
+}
+.wv2-root .pi-shapes-lead {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 9px;
+}
+.wv2-root .pi-shapes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.wv2-root .pi-shape {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  padding: 9px 11px;
+  cursor: pointer;
+  box-shadow: var(--sh-1);
+  transition: border-color .14s, box-shadow .14s, transform .1s, background .14s;
+}
+.wv2-root .pi-shape:hover {
+  border-color: var(--terra);
+  box-shadow: 0 4px 13px -8px color-mix(in srgb, var(--terra) 40%, transparent);
+  transform: translateY(-1px);
+}
+.wv2-root .pi-shape.is-on {
+  border-color: var(--terra);
+  background: var(--terra-soft);
+}
+.wv2-root .pi-shape-i {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: var(--paper-2);
+  border: 1px solid var(--line-2);
+  color: var(--terra-deep);
+}
+.wv2-root .pi-shape-i svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wv2-root .pi-shape-l {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.28;
+  color: var(--ink);
+  letter-spacing: -.004em;
+}
+.wv2-root .pi-shape-k {
+  display: block;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+.wv2-root .pi-shape-tick {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  color: var(--terra-deep);
+  transition: opacity .12s;
+}
+.wv2-root .pi-shape-tick svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.wv2-root .pi-shape.is-on .pi-shape-tick { opacity: 1; }
+
+@media (max-width: 560px) {
+  .wv2-root .pi-shapes { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,4014 @@
+/* Character page redesign (WIP) — the .cst- namespace.
+ * Scoped under .wv2-root, reusing the app design tokens (terra, gold, sage,
+ * clay, the ink/line/surface scales, the serif/ui fonts and the r- radii). The
+ * edit FORM reuses the existing chr-person- field classes from characters.css;
+ * these .cst- classes are only the new read-view (hero, arc pillars,
+ * relationships) plus the band scaffold.
+ * See docs/superpowers/specs/2026-06-04-character-page-redesign-design.md. */
+
+/* ---- page bands ---- */
+.wv2-root .cst-band {
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.wv2-root .cst-band:first-of-type {
+  border-top: none;
+}
+
+.wv2-root .cst-band-lbl {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+/* mode switcher — sits at the band heading; reuses .cst-band-lbl typography so
+   the active tab reads as the section title (terra + underline accent). */
+.wv2-root .cst-modes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.wv2-root .cst-mode-btn {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-3);
+  background: none;
+  border: none;
+  padding: 0 0 3px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .12s, border-color .12s;
+}
+
+.wv2-root .cst-mode-btn:hover:not(:disabled):not(.is-on) {
+  color: var(--ink-2);
+}
+
+.wv2-root .cst-mode-btn.is-on {
+  color: var(--terra);
+  border-bottom-color: var(--terra);
+}
+
+.wv2-root .cst-mode-btn:disabled {
+  color: var(--line-2);
+  cursor: default;
+}
+
+.wv2-root .cst-band-stub {
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  padding: 22px;
+  text-align: center;
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 12.5px;
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
+}
+
+.wv2-root .cst-band-stub b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* ---- hero ---- */
+.wv2-root .cst-hero {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+/* portrait — tinted glossy slot; holds an AI-generated transparent PNG once made */
+.wv2-root .cst-portrait-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-portrait {
+  width: 132px;
+  height: 164px;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  text-align: center;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 80% at 32% 18%, rgba(255, 255, 255, .55), transparent 60%),
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--cst-tint, var(--terra)) 22%, var(--surface-2)),
+      color-mix(in srgb, var(--cst-tint, var(--terra)) 8%, var(--surface-2)));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), var(--sh-1, 0 1px 3px rgba(0, 0, 0, .06));
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+/* With an image, the frame hugs the PNG's own aspect ratio (fixed width, auto
+ * height) so the whole character shows — no fixed-rectangle letterbox, no crop. */
+.wv2-root .cst-portrait--has-img {
+  height: auto;
+  align-items: stretch;
+}
+
+.wv2-root .cst-portrait-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.wv2-root .cst-portrait-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  padding: 8px;
+  opacity: 0;
+  transition: opacity .14s;
+}
+
+.wv2-root .cst-portrait:hover .cst-portrait-hint {
+  opacity: 1;
+}
+
+.wv2-root .cst-portrait-mono {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 46px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--cst-tint, var(--terra)) 55%, var(--ink-3));
+  opacity: .5;
+}
+
+/* ---- generating: lock the slot + glossy "imagining" overlay ---- */
+.wv2-root .cst-portrait.is-generating {
+  cursor: progress;
+}
+
+.wv2-root .cst-portrait.is-generating .cst-portrait-img,
+.wv2-root .cst-portrait.is-generating .cst-portrait-mono {
+  filter: saturate(.55) blur(1px);
+  opacity: .7;
+}
+
+.wv2-root .cst-portrait-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--cst-tint, var(--terra)) 16%, rgba(255, 255, 255, .62)),
+      color-mix(in srgb, var(--cst-tint, var(--terra)) 8%, rgba(255, 255, 255, .5)));
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+}
+
+.wv2-root .cst-portrait-sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg,
+      transparent 30%,
+      rgba(255, 255, 255, .7) 50%,
+      transparent 70%);
+  background-size: 250% 100%;
+  animation: cst-port-sweep 1.25s ease-in-out infinite;
+}
+
+.wv2-root .cst-portrait-spinner {
+  position: relative;
+  font-family: var(--serif);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--gold);
+  animation: cst-port-spin 1.6s linear infinite;
+}
+
+.wv2-root .cst-portrait-loading-label {
+  position: relative;
+  font-family: var(--ui);
+  font-size: 11px;
+  letter-spacing: .02em;
+  color: var(--terra-deep, var(--terra));
+  animation: cst-port-fade 1.4s ease-in-out infinite;
+}
+
+@keyframes cst-port-sweep {
+  from {
+    background-position: 150% 0;
+  }
+
+  to {
+    background-position: -150% 0;
+  }
+}
+
+@keyframes cst-port-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cst-port-fade {
+
+  0%,
+  100% {
+    opacity: .55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* portrait generate panel — anchored under the slot */
+.wv2-root .cst-portrait-gen {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  z-index: 30;
+  width: 380px;
+  max-width: min(380px, 90vw);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  background: var(--surface-1, #fff);
+  border: 1px solid color-mix(in srgb, var(--terra) 14%, var(--line));
+  border-radius: var(--r-lg, 14px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .6) inset,
+    0 14px 44px rgba(40, 28, 20, .16),
+    0 3px 10px rgba(40, 28, 20, .08);
+  transform-origin: top left;
+  animation: cst-port-pop .15s cubic-bezier(.2, .8, .3, 1);
+}
+
+/* little caret pointing up at the portrait slot */
+.wv2-root .cst-portrait-gen::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 26px;
+  width: 11px;
+  height: 11px;
+  background: var(--surface-1, #fff);
+  border-left: 1px solid color-mix(in srgb, var(--terra) 14%, var(--line));
+  border-top: 1px solid color-mix(in srgb, var(--terra) 14%, var(--line));
+  transform: rotate(45deg);
+}
+
+@keyframes cst-port-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-5px) scale(.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.wv2-root .cst-portrait-gen-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wv2-root .cst-portrait-gen-title {
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.wv2-root .cst-portrait-gen-title .cst-ask-mk {
+  color: var(--gold);
+  margin-right: 2px;
+}
+
+.wv2-root .cst-portrait-gen-sub {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-portrait-gen-input {
+  width: 100%;
+  min-height: 150px;
+  resize: vertical;
+  padding: 10px 11px;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-1);
+  background: var(--surface-2, #faf9f7);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 6px);
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.wv2-root .cst-portrait-gen-input:focus {
+  outline: none;
+  border-color: var(--terra);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--terra) 12%, transparent);
+}
+
+.wv2-root .cst-portrait-gen-err {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--danger, #b4471f);
+}
+
+/* gate shown when there's no appearance yet — appearance is required first */
+.wv2-root .cst-portrait-gate p {
+  font-family: var(--ui);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
+.wv2-root .cst-portrait-gate strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.wv2-root .cst-portrait-gen-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.wv2-root .cst-portrait-gen-kbd {
+  margin-right: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-portrait-gen-kbd kbd {
+  font-family: var(--ui);
+  font-size: 10px;
+  line-height: 1;
+  padding: 2px 4px;
+  color: var(--ink-2);
+  background: var(--surface-2, #faf9f7);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.wv2-root .cst-id {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .cst-id-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .cst-name {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.05;
+  cursor: text;
+}
+
+.wv2-root .cst-name.is-empty {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.wv2-root .cst-name-input {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--terra);
+  border-radius: var(--r-sm);
+  padding: 2px 8px;
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 12%, transparent);
+}
+
+.wv2-root .cst-chip {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 11px;
+}
+
+.wv2-root .cst-chip-tier {
+  color: var(--terra);
+  border-color: color-mix(in srgb, var(--terra) 45%, var(--line));
+  cursor: pointer;
+}
+
+.wv2-root .cst-desc {
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin-top: 10px;
+  max-width: 60ch;
+  cursor: text;
+}
+
+.wv2-root .cst-desc.is-empty {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* ---- appearance — fill-in-the-blank prose (Mad-Libs) ----
+   A quiet "Appearance" label, the free-description escape hatch, then the
+   natural-language template whose blanks reuse the arc-prose look (cst-sent-val
+   for filled, cst-sent-gap for empty; the active blank is the cst-fe-inline
+   input with its terra accent ring). */
+.wv2-root .cst-appear {
+  margin-top: 16px;
+  max-width: 60ch;
+}
+
+.wv2-root .cst-appear>.cst-rel-lbl {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.wv2-root .cst-appear .cst-desc {
+  margin-top: 2px;
+}
+
+.wv2-root .cst-appear-tpl {
+  margin-top: 6px;
+}
+
+.wv2-root .cst-appear-tpl .cst-sent {
+  margin: 2px 0;
+}
+
+.wv2-root .cst-appear-write {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+  display: block;
+  margin-top: 2px;
+}
+
+.wv2-root .cst-appear-write:hover {
+  color: var(--terra);
+}
+
+.wv2-root .cst-appear-kbd {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: .02em;
+  color: var(--ink-3);
+  opacity: .85;
+}
+
+/* ---- arc as smart sentences (read view) ----
+   Scaffolding words stay muted; the author's content (the value) pops. The whole
+   block is click-to-edit. A gap reads as an honest inline "— what?" prompt. */
+.wv2-root .cst-arc-prose {
+  margin-top: 18px;
+}
+
+.wv2-root .cst-sent {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-3);
+  /* muted scaffolding */
+  margin: 0;
+  max-width: 60ch;
+}
+
+.wv2-root .cst-sent-subj {
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.wv2-root .cst-sent-val {
+  /* the content the author wrote — click to edit */
+  color: var(--ink);
+  cursor: text;
+  border-radius: 3px;
+}
+
+.wv2-root .cst-sent-val:hover {
+  background: var(--surface-2);
+}
+
+.wv2-root .cst-sent-gap {
+  /* an unfilled facet — click to fill */
+  color: var(--ink-3);
+  font-style: italic;
+  border-bottom: 1px dotted var(--line-2);
+  opacity: .8;
+  cursor: text;
+  border-radius: 3px;
+}
+
+.wv2-root .cst-sent-gap:hover {
+  color: var(--terra);
+  border-bottom-color: var(--terra);
+  background: var(--surface-2);
+}
+
+/* signature — a pull-quote */
+.wv2-root .cst-sig {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 10px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid color-mix(in srgb, var(--gold) 55%, var(--line));
+  max-width: 60ch;
+}
+
+.wv2-root .cst-sig-empty {
+  margin-top: 8px;
+}
+
+/* ---- inline field editors (FieldEdit) ----
+   One click on any value swaps it for an editor right where it lives. The
+   inline variant flows inside the arc sentences; the block variant is a
+   full-width auto-growing textarea (description / signature). field-sizing
+   grows them to content; the JS height fallback covers older engines. */
+.wv2-root .cst-fe-inline {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  vertical-align: baseline;
+  background: var(--surface-2);
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 1px 6px;
+  margin: 0 1px;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  field-sizing: content;
+  min-width: 7ch;
+  max-width: 100%;
+}
+
+.wv2-root .cst-fe-block {
+  display: block;
+  width: 100%;
+  max-width: 60ch;
+  margin-top: 10px;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 8px 10px;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  field-sizing: content;
+  min-height: 2.4em;
+  margin-left: 10px;
+}
+
+/* ---- inline tier picker (click the tier chip → choose) ---- */
+.wv2-root .cst-tier-pick {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .cst-tier-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 11px;
+  cursor: pointer;
+}
+
+.wv2-root .cst-tier-chip:hover {
+  border-color: var(--terra);
+  color: var(--ink);
+}
+
+.wv2-root .cst-tier-chip.is-on {
+  border-color: var(--terra);
+  color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 8%, var(--surface));
+}
+
+.wv2-root .cst-tier-sw {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+/* ---- relationships ---- */
+.wv2-root .cst-rel {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.wv2-root .cst-rel-lbl {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+
+.wv2-root .cst-rel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 10px 3px 4px;
+}
+
+.wv2-root .cst-rel-kind {
+  color: var(--ink-3);
+  font-size: 10.5px;
+}
+
+.wv2-root .cst-rel-add {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px dashed var(--line-2);
+  border-radius: 999px;
+  padding: 3px 11px;
+  cursor: pointer;
+}
+
+.wv2-root .cst-rel-add:hover {
+  color: var(--terra);
+  border-color: var(--terra);
+}
+
+.wv2-root .cst-rel-form {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.wv2-root .cst-rel-input {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+  outline: none;
+  width: 130px;
+}
+
+.wv2-root .cst-rel-input:focus {
+  border-color: var(--terra);
+}
+
+.wv2-root .cst-rel-select {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 4px 6px;
+  outline: none;
+}
+
+/* ---- aliases ("also known as") ----
+   A plain-text alias is a flat chip; a chip that LINKS another character is
+   glossy (an entity) — it carries an Avatar and a faint sheen. */
+.wv2-root .cst-alias-row {
+  margin-top: 10px;
+}
+
+.wv2-root .cst-alias-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 6px 3px 10px;
+}
+
+.wv2-root .cst-alias-chip.is-ref {
+  padding-left: 4px;
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--terra) 35%, var(--line));
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--terra) 7%, var(--surface)),
+      var(--surface));
+}
+
+.wv2-root .cst-alias-x {
+  font-family: var(--ui);
+  font-size: 13px;
+  line-height: 1;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.wv2-root .cst-alias-x:hover {
+  color: var(--clay);
+}
+
+/* ---- "+ details" / edit affordance ---- */
+.wv2-root .cst-details-btn {
+  margin-top: 14px;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--terra);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.wv2-root .cst-details-btn span {
+  color: var(--ink-3);
+  margin-left: 6px;
+}
+
+.wv2-root .cst-details-btn:hover {
+  color: var(--terra-deep);
+}
+
+/* fixture / coming-soon tag — marks any band not yet wired to real data */
+.wv2-root .cst-fixture-tag {
+  font-family: var(--ui);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: 7px;
+  vertical-align: middle;
+}
+
+.wv2-root .cst-band-note {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.wv2-root .cst-band-note b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* ---- ② threads master / detail ---- */
+.wv2-root .cst-md {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.wv2-root .cst-md-detail {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .cst-md-list {
+  flex: 0 0 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-root .cst-tlist-grp {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin: 12px 2px 7px;
+}
+
+.wv2-root .cst-tlist-grp:first-child {
+  margin-top: 0;
+}
+
+.wv2-root .cst-trow {
+  text-align: left;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--terra);
+  border-radius: var(--r-sm);
+  padding: 8px 11px;
+  margin-bottom: 8px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: background .12s, box-shadow .12s;
+}
+
+.wv2-root .cst-trow:hover {
+  background: var(--surface-2);
+}
+
+.wv2-root .cst-trow.on {
+  background: color-mix(in srgb, var(--terra) 7%, var(--surface));
+  box-shadow: 0 0 0 1px var(--terra);
+}
+
+.wv2-root .cst-trow-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.wv2-root .cst-trow-sw {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-trow-name {
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* "a lens is watching this thread" — an eye on the thread box; clay if it flagged */
+.wv2-root .cst-trow-lens {
+  margin-left: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--sage);
+}
+
+.wv2-root .cst-trow-lens svg {
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wv2-root .cst-trow-lens b {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.wv2-root .cst-trow-lens.is-flagged {
+  color: var(--clay);
+}
+
+.wv2-root .cst-trow-meta {
+  display: block;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+.wv2-root .cst-appears-stub {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-sm);
+  padding: 9px 11px;
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
+  margin-bottom: 8px;
+}
+
+.wv2-root .cst-tnew {
+  margin-top: 4px;
+  text-align: center;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--terra);
+  background: transparent;
+  border: 1px solid var(--terra);
+  border-radius: var(--r-sm);
+  padding: 8px;
+  cursor: pointer;
+}
+
+.wv2-root .cst-tnew:hover {
+  background: color-mix(in srgb, var(--terra) 7%, transparent);
+}
+
+/* new + smart-thread buttons sit side by side */
+.wv2-root .cst-tnew-row {
+  display: flex;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.wv2-root .cst-tnew-row .cst-tnew {
+  flex: 1;
+  margin-top: 0;
+}
+
+/* smart (AI-generate) variant — a light terra fill to set it apart from the
+   plain outline "new thread" button */
+.wv2-root .cst-tsmart {
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 9%, transparent);
+}
+
+.wv2-root .cst-tsmart:hover {
+  background: color-mix(in srgb, var(--terra) 16%, transparent);
+}
+
+.wv2-root .cst-tlink {
+  margin-top: 7px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.wv2-root .cst-tlink:hover {
+  color: var(--terra);
+}
+
+/* ---- ③ presence waveform ---- */
+.wv2-root .cst-insight {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--ink);
+  font-weight: 500;
+  max-width: 64ch;
+}
+
+.wv2-root .cst-insight b {
+  color: var(--terra);
+  font-weight: 600;
+}
+
+.wv2-root .cst-insight .warn {
+  color: var(--clay);
+  font-weight: 600;
+}
+
+.wv2-root .cst-substat {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 6px;
+}
+
+.wv2-root .cst-wave {
+  position: relative;
+  padding-top: 46px;
+  margin-top: 18px;
+  max-width: 760px;
+}
+
+.wv2-root .cst-wave-track {
+  display: flex;
+  align-items: flex-end;
+  height: 70px;
+  border-bottom: 1.5px solid var(--line);
+}
+
+.wv2-root .cst-pact {
+  flex: 1;
+}
+
+.wv2-root .cst-pact+.cst-pact {
+  border-left: 1px dashed var(--line-2);
+}
+
+.wv2-root .cst-pbars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 70px;
+  padding: 0 8px;
+}
+
+.wv2-root .cst-pbar {
+  flex: 1;
+  background: var(--terra);
+  border-radius: 3px 3px 0 0;
+  opacity: .9;
+  min-height: 3px;
+}
+
+.wv2-root .cst-pbar.bg {
+  opacity: .34;
+}
+
+.wv2-root .cst-pbar.absent {
+  background: color-mix(in srgb, var(--clay) 14%, var(--line));
+}
+
+.wv2-root .cst-act-lbl {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-2);
+  text-align: center;
+  padding-top: 7px;
+}
+
+.wv2-root .cst-pin {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.wv2-root .cst-pin-txt {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  white-space: nowrap;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 2px 8px;
+  color: var(--ink-2);
+}
+
+.wv2-root .cst-pin-txt.bad {
+  border-color: color-mix(in srgb, var(--clay) 55%, var(--line));
+  color: var(--clay);
+}
+
+.wv2-root .cst-pin-txt.key {
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--line));
+  color: var(--gold);
+}
+
+.wv2-root .cst-pin-stem {
+  width: 1px;
+  background: var(--ink-3);
+  opacity: .45;
+}
+
+/* ---- ④/⑤ lenses ---- */
+.wv2-root .cst-lens-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .cst-lens-card {
+  flex: 1 1 220px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 13px;
+  background: var(--surface);
+}
+
+.wv2-root .cst-lens-card.rec {
+  border-color: color-mix(in srgb, var(--gold) 45%, var(--line));
+  background: color-mix(in srgb, var(--gold) 5%, var(--surface));
+}
+
+.wv2-root .cst-lens-card.active {
+  border-color: color-mix(in srgb, var(--sage) 50%, var(--line));
+  background: color-mix(in srgb, var(--sage) 6%, var(--surface));
+}
+
+.wv2-root .cst-lens-ttl {
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wv2-root .cst-lens-mk {
+  color: var(--gold);
+}
+
+.wv2-root .cst-lens-card.active .cst-lens-mk {
+  color: var(--sage);
+}
+
+.wv2-root .cst-lens-stat {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--sage);
+  font-weight: 400;
+}
+
+.wv2-root .cst-lens-why {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2);
+  margin: 6px 0 10px;
+  line-height: 1.45;
+}
+
+.wv2-root .cst-lens-btn {
+  display: inline-block;
+  font-family: var(--ui);
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--terra);
+  color: var(--terra);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.wv2-root .cst-lens-btn.on {
+  background: var(--sage);
+  border-color: var(--sage);
+  color: #fff;
+}
+
+.wv2-root .cst-otherbank {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .cst-other-lens {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 7px 11px;
+  background: var(--surface);
+}
+
+.wv2-root .cst-other-lens.is-dashed {
+  border-style: dashed;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.wv2-root .cst-other-note {
+  color: var(--clay);
+}
+
+.wv2-root .cst-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-dot.rec {
+  border: 1.5px dashed var(--gold);
+}
+
+.wv2-root .cst-dot.bad {
+  background: var(--clay);
+}
+
+/* ④ thread target selector + per-suggestion target line */
+.wv2-root .cst-lens-thread {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.wv2-root .cst-lens-thread-lbl {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+
+.wv2-root .cst-lens-thread-name {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.wv2-root .cst-lens-thread-sel {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 4px 8px;
+  outline: none;
+  cursor: pointer;
+}
+
+.wv2-root .cst-lens-thread-sel:focus {
+  border-color: var(--terra);
+}
+
+.wv2-root .cst-lens-target {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin: 0 0 9px;
+}
+
+.wv2-root .cst-lens-target b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.wv2-root .cst-lens-target .is-warn {
+  color: var(--clay);
+}
+
+.wv2-root .cst-lens-target-more {
+  color: var(--ink-3);
+  opacity: .8;
+}
+
+/* per-card thread pick (revealed on Attach when >1 thread) */
+.wv2-root .cst-lens-pick {
+  margin-top: 8px;
+  padding: 9px;
+  border-radius: var(--r-sm);
+  border: 1px solid color-mix(in srgb, var(--terra) 35%, var(--line));
+  background: color-mix(in srgb, var(--terra) 5%, var(--surface));
+}
+
+.wv2-root .cst-lens-pick-lbl {
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.wv2-root .cst-lens-pick .cst-lens-thread-sel {
+  width: 100%;
+}
+
+.wv2-root .cst-lens-pick-acts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.wv2-root .cst-lens-pick-cancel {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  padding: 4px 6px;
+  cursor: pointer;
+}
+
+.wv2-root .cst-lens-pick-cancel:hover {
+  color: var(--ink-2);
+}
+
+/* ② per-thread lens strip on the thread box */
+.wv2-root .cst-thread-lenses {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--gold) 3%, var(--surface));
+  padding: 10px 12px;
+}
+
+.wv2-root .cst-thread-lenses-h {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.wv2-root .cst-tlens {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+.wv2-root .cst-tlens+.cst-tlens {
+  border-top: 1px dashed var(--line-2);
+}
+
+.wv2-root .cst-tlens-mk {
+  color: var(--sage);
+  font-size: 11px;
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-tlens-mk.is-rec {
+  color: var(--gold);
+}
+
+.wv2-root .cst-tlens-name {
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-tlens-note {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wv2-root .cst-tlens-attach {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--terra);
+  flex: 0 0 auto;
+  background: transparent;
+  border: 1px solid var(--terra);
+  border-radius: var(--r-sm);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.wv2-root .cst-tlens-attach:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--terra) 8%, transparent);
+}
+
+.wv2-root .cst-tlens-attach:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.wv2-root .cst-tlens-empty {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* per-thread lenses in the right rail (narrower column) */
+.wv2-root .cst-thread-lenses--rail {
+  margin-top: 12px;
+}
+
+.wv2-root .cst-thread-lenses--rail .cst-tlens {
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.wv2-root .cst-thread-lenses--rail .cst-tlens-note {
+  flex-basis: 100%;
+}
+
+.wv2-root .cst-tlens-more {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--terra);
+  background: transparent;
+  border: 1px dashed color-mix(in srgb, var(--terra) 40%, var(--line));
+  border-radius: var(--r-sm);
+  padding: 5px;
+  cursor: pointer;
+}
+
+.wv2-root .cst-tlens-more:hover {
+  background: color-mix(in srgb, var(--terra) 7%, transparent);
+}
+
+/* ③ presence — "Across the manuscript" header + waveform (Tony-page design) */
+.wv2-root .cst-pres-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+.wv2-root .cst-pres-head .cst-band-lbl {
+  margin-bottom: 0;
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-pres-rule {
+  flex: 1 1 auto;
+  height: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.wv2-root .cst-pres-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  margin-top: 16px;
+}
+
+.wv2-root .cst-seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.wv2-root .cst-seg-btn {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  background: transparent;
+  border: none;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+}
+
+.wv2-root .cst-seg-btn+.cst-seg-btn {
+  border-left: 1px solid var(--line);
+}
+
+.wv2-root .cst-seg-btn:hover:not(.is-on) {
+  background: color-mix(in srgb, var(--terra) 8%, transparent);
+}
+
+.wv2-root .cst-seg-btn.is-on {
+  background: var(--terra);
+  color: #fff;
+}
+
+.wv2-root .cst-pres-onper {
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* stat line — big accent numbers, muted unit text (Tony-page mockup) */
+.wv2-root .cst-pres-stat {
+  font-family: var(--ui);
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+
+.wv2-root .cst-pres-stat b {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--terra);
+}
+
+.wv2-root .cst-pres-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 72px;
+  border-bottom: 1.5px solid var(--line);
+  padding: 0 1px;
+}
+
+.wv2-root .cst-pres-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.wv2-root .cst-pres-bar {
+  width: 100%;
+  min-width: 2px;
+  flex: 0 0 auto;
+  background: var(--terra);
+  opacity: .82;
+  border-radius: 2px 2px 0 0;
+}
+
+/* Ticks with no recorded mentions — a faint baseline sliver, not a real reading. */
+.wv2-root .cst-pres-bar.is-empty {
+  background: var(--line);
+  opacity: .6;
+}
+
+.wv2-root .cst-pres-more {
+  align-self: flex-end;
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  padding: 0 0 2px 6px;
+  white-space: nowrap;
+}
+
+/* labelled variant (≤30 ticks) — wider rounded bars over numbered ticks, mockup style */
+.wv2-root .cst-pres-wave.has-nums {
+  gap: 6px;
+  height: 90px;
+  border-bottom: none;
+  align-items: stretch;
+}
+
+.wv2-root .cst-pres-wave.has-nums .cst-pres-col {
+  gap: 5px;
+  max-width: 38px;
+}
+
+.wv2-root .cst-pres-wave.has-nums .cst-pres-bar {
+  border-radius: 4px 4px 0 0;
+}
+
+.wv2-root .cst-pres-num {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  color: var(--ink-3);
+  line-height: 1;
+}
+
+/* presence row — bars on the left, "things to reconcile" count on the right (mockup) */
+.wv2-root .cst-pres-row {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.wv2-root .cst-pres-main {
+  flex: 1 1 320px;
+  min-width: 280px;
+}
+
+.wv2-root .cst-reconcile {
+  flex: 0 0 auto;
+  align-self: center;
+  text-align: left;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--clay) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--clay) 30%, transparent);
+}
+
+.wv2-root .cst-reconcile-n {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--clay);
+  line-height: 1;
+}
+
+.wv2-root .cst-reconcile-lbl {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--clay);
+  margin-top: 3px;
+}
+
+/* "Across the manuscript · no chapters yet" — the presence teaching card
+   (StudioPresenceTeaching, ported from the Tony-page init PresenceTeaching).
+   Shown in place of the mention bar-graph when there's no manuscript yet. */
+.wv2-root .cst-pt-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 99px;
+  background: transparent;
+  border: 1px solid var(--line-2);
+  color: var(--ink-3);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-pt-card {
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  padding: 20px 22px;
+}
+
+/* loop illustration */
+.wv2-root .cst-pt-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .cst-pt-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 124px;
+}
+
+.wv2-root .cst-pt-node-box {
+  width: 100%;
+  height: 66px;
+  border-radius: var(--r-lg);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  box-shadow: 0 3px 11px -7px color-mix(in srgb, var(--ink) 42%, transparent);
+  display: grid;
+  place-items: center;
+  padding: 8px;
+}
+
+.wv2-root .cst-pt-node-lbl {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--ink-3);
+  text-align: center;
+}
+
+.wv2-root .cst-pt-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 84%;
+}
+
+.wv2-root .cst-pt-chip {
+  display: block;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 10.5px;
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 12%, var(--paper));
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 3px 8px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-root .cst-pt-chip--gold {
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 14%, var(--paper));
+  border-color: var(--gold-soft);
+}
+
+.wv2-root .cst-pt-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--terra);
+  padding-bottom: 22px;
+}
+
+.wv2-root .cst-pt-arrow-mk {
+  font-size: 11px;
+  color: var(--gold);
+}
+
+.wv2-root .cst-pt-draftlines {
+  position: relative;
+  width: 60%;
+}
+
+.wv2-root .cst-pt-line {
+  display: block;
+  height: 3.5px;
+  border-radius: 2px;
+  margin-bottom: 4.5px;
+  background: color-mix(in srgb, var(--terra) 18%, var(--paper));
+}
+
+.wv2-root .cst-pt-draftmk {
+  position: absolute;
+  right: -13px;
+  bottom: -9px;
+  color: var(--gold);
+  font-size: 13px;
+}
+
+.wv2-root .cst-pt-drift {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 36px;
+  width: 100%;
+}
+
+.wv2-root .cst-pt-bar {
+  flex: 1;
+  min-height: 3px;
+  border-radius: 2px 2px 0 0;
+  background: color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.wv2-root .cst-pt-bar--voice {
+  background: color-mix(in srgb, var(--terra) 32%, transparent);
+  border-top: 2px solid var(--terra);
+}
+
+.wv2-root .cst-pt-bar--pov {
+  background: color-mix(in srgb, var(--clay) 30%, transparent);
+  border-top: 2px solid var(--clay);
+}
+
+/* the two halves, in words */
+.wv2-root .cst-pt-halves {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.wv2-root .cst-pt-kick {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.wv2-root .cst-pt-kick--feed {
+  color: var(--terra);
+}
+
+.wv2-root .cst-pt-kick--back {
+  color: var(--gold);
+}
+
+.wv2-root .cst-pt-copy {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.wv2-root .cst-pt-copy b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.wv2-root .cst-pt-copy b.cst-pt-em-voice {
+  color: var(--terra);
+}
+
+.wv2-root .cst-pt-copy b.cst-pt-em-pov {
+  color: var(--clay);
+}
+
+/* CTA */
+.wv2-root .cst-pt-cta {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .cst-pt-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--r-md);
+  padding: 10px 18px;
+  font-family: var(--ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  background: var(--terra);
+  color: #fff;
+  cursor: pointer;
+  transition: background .14s;
+}
+
+.wv2-root .cst-pt-go:hover {
+  background: var(--terra-deep);
+}
+
+.wv2-root .cst-pt-go-mk {
+  font-size: 12px;
+}
+
+.wv2-root .cst-pt-go-arrow {
+  font-size: 14px;
+}
+
+.wv2-root .cst-pt-note {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+@media (max-width: 560px) {
+  .wv2-root .cst-pt-halves {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ③ "What the prose & your definition disagree on" — reconcile cards (Tony-page) */
+.wv2-root .cst-contras {
+  margin-top: 22px;
+}
+
+.wv2-root .cst-contras-h {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 11px;
+}
+
+.wv2-root .cst-contras-h .cst-band-lbl {
+  margin-bottom: 0;
+}
+
+.wv2-root .cst-contras-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.wv2-root .cst-contra {
+  display: flex;
+  gap: 12px;
+  padding: 13px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-left: 2.5px solid var(--ink-2);
+  border-radius: var(--r-md);
+}
+
+.wv2-root .cst-contra-ic {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  margin-top: 1px;
+}
+
+.wv2-root .cst-contra-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .cst-contra-meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 3px;
+}
+
+.wv2-root .cst-contra-kind {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+.wv2-root .cst-contra-where {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-contra-what {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.wv2-root .cst-contra-acts {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 9px;
+}
+
+.wv2-root .cst-contra-fix {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--terra);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.wv2-root .cst-contra-fix:hover:not(.is-static) {
+  text-decoration: underline;
+}
+
+.wv2-root .cst-contra-fix.is-static {
+  color: var(--ink-2);
+  cursor: default;
+}
+
+.wv2-root .cst-contra-ask {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.wv2-root .cst-contra-ask:hover {
+  text-decoration: underline;
+}
+
+.wv2-root .cst-contras-note {
+  margin: 14px 0 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--ink-3);
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+/* ③ lens lanes — attached lenses charted under the presence waveform, packed
+   tight with the label OVERLAID on each chart (no heading row between charts). */
+.wv2-root .cst-lanes {
+  margin-top: 14px;
+}
+
+.wv2-root .cst-lanes-h {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+/* Analysis mode — every board lane grouped under a walk header. Each lane leads
+   with a glossy subject line (coin + metallic name, like the proposal rail), a
+   quiet scale/granularity caption, then the chart. The chart's OWN overlaid name
+   tag is suppressed here so the lens name never doubles up. */
+.wv2-root .cst-lane-groups {
+  margin-top: 6px;
+}
+
+.wv2-root .cst-lane-group+.cst-lane-group {
+  margin-top: 22px;
+}
+
+.wv2-root .cst-lane-group-h {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--line);
+}
+
+.wv2-root .cst-lane-row {
+  position: relative;
+  padding: 9px 10px 7px;
+  border-radius: var(--r-md);
+  transition: background .14s ease;
+}
+
+.wv2-root .cst-lane-row+.cst-lane-row {
+  margin-top: 2px;
+}
+
+.wv2-root .cst-lane-row:hover {
+  background: color-mix(in srgb, var(--terra) 4%, transparent);
+}
+
+/* the subject line is the label → hide each chart's own overlaid name tag here */
+.wv2-root .cst-lane-row .cst-lane-tag {
+  display: none;
+}
+
+.wv2-root .cst-lane-sentence {
+  font-family: var(--ui);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+/* a glossy entity: coin + kind-tinted metallic name, kept on one line */
+.wv2-root .cst-ent {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* quiet caption — the y-scale + the (honest, non-interactive) granularity pill */
+.wv2-root .cst-lane-cap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin: 3px 0 7px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-lane-cap-scale {
+  font-style: italic;
+}
+
+.wv2-root .cst-lane-cap-gran {
+  padding: 1px 8px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  letter-spacing: .03em;
+}
+
+/* ── pending AI field proposals ────────────────────────────────────────────
+   The SAME field turns green (no separate input) — a faint proposals-green wash
+   (matches the TipTap .ai-gen-block accept box), NO border. Editing it saves the
+   edit back into the proposal on blur; ✓ promotes it to the actual field, ✗ drops
+   it (small green circular check like .ai-gen-accept). See FieldEdit `proposed`. */
+.wv2-root .cst-prop {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  vertical-align: top;
+  max-width: 100%;
+}
+
+/* the green field itself — display element OR the edit input/textarea */
+.wv2-root .is-proposed {
+  background: color-mix(in srgb, var(--asp-proposals) 10%, transparent) !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: text;
+}
+
+/* collapsed proposed DISPLAY of a block field: up to 4 lines, click to expand */
+.wv2-root .cst-prop>p.is-proposed,
+.wv2-root .cst-prop>blockquote.is-proposed {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  max-width: 56ch;
+}
+
+/* the edit input/textarea expands fully on focus (field-sizing: content) */
+.wv2-root textarea.is-proposed,
+.wv2-root input.is-proposed {
+  min-width: 24ch;
+  max-width: 56ch;
+  line-height: 1.5;
+}
+
+.wv2-root .cst-prop-actions {
+  display: inline-flex;
+  gap: 4px;
+  flex: 0 0 auto;
+  padding-top: 3px;
+  margin-left: 12px;
+}
+
+.wv2-root .cst-prop-yes,
+.wv2-root .cst-prop-no {
+  cursor: pointer;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: background .1s, opacity .1s, color .1s;
+}
+
+.wv2-root .cst-prop-yes {
+  color: #fff;
+  background: color-mix(in srgb, var(--asp-proposals) 70%, transparent);
+  opacity: 0.65;
+}
+
+.wv2-root .cst-prop-yes:hover {
+  background: var(--asp-proposals);
+  opacity: 1;
+}
+
+.wv2-root .cst-prop-no {
+  color: var(--ink-3);
+  background: transparent;
+  opacity: 0.5;
+}
+
+.wv2-root .cst-prop-no:hover {
+  color: var(--clay);
+  opacity: 1;
+}
+
+/* ── proposal previews the COMMITTED field box (studio-scoped) ──────────────
+   "Proposal adopts field box": a pending green field spans the SAME width as the
+   committed field — no 56ch cap, no 4-line clamp — and ✓/✗ sit OUT of the text
+   flow, so accepting never re-wraps or shifts the text. All scoped to .cst2-root
+   so the World page's shared .cst-prop styling is untouched. Layout-only. */
+.wv2-root .cst2-root .cst-prop {
+  position: relative;
+}
+
+/* block fields (p / blockquote — arc, story): full width, full text */
+.wv2-root .cst2-root .cst-prop--block {
+  display: block;
+}
+
+.wv2-root .cst2-root .cst-prop--block>p.is-proposed,
+.wv2-root .cst2-root .cst-prop--block>blockquote.is-proposed {
+  display: block;
+  -webkit-line-clamp: none;
+  overflow: visible;
+  max-width: none;
+  /* offset the green wash padding so the text sits exactly where it will after accept */
+  margin: -4px -8px;
+}
+
+/* ✓/✗ drop to a right-aligned row beneath the block — never steal text width */
+.wv2-root .cst2-root .cst-prop--block .cst-prop-actions {
+  position: static;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin: 8px 0 0;
+  padding-top: 0;
+}
+
+/* inline fields: float ✓/✗ just past the right edge (the beats kit-prop-acts
+   pattern) so the value keeps its full span and the sentence never shifts. */
+.wv2-root .cst2-root .cst-prop:not(.cst-prop--block) .cst-prop-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translateX(100%);
+  margin-left: 0;
+  padding-top: 2px;
+  padding-left: 6px;
+}
+
+/* drop the inline wash's horizontal padding so the value sits exactly where it
+   will after accept (vertical padding on an inline box doesn't affect flow). */
+.wv2-root .cst2-root .cst-prop:not(.cst-prop--block)>.is-proposed {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * Character studio — 4-step layout (2026-06-08 redesign of the handoff).
+ * Maps the handoff palette to app tokens: terra = primary/purple,
+ * gold = AI/Night Eyes, sage = ready/green, clay = "the lie"/problems.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+/* ---- page shell: fresh self-contained scroll container ---- */
+.wv2-root .cst2-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+}
+
+.wv2-root .cst2-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wv2-root .cst2-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+}
+
+.wv2-root .cst2-col {
+  --wm-gutter: 130px;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 6px 32px 140px;
+}
+
+/* gutter sticky entries get an opaque background (same as world page) */
+.wv2-root .cst2-col .wm {
+  background: var(--surface);
+}
+
+/* the active-section panel effect: inside a wm-block the negative margins would
+   overshoot the grid cell, so we cancel them and keep the glow in-cell. */
+.wv2-root .wm-block .cst-section.is-active.is-open {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* ---- hero intro line under name ---- */
+.wv2-root .cst-hero-intro {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink-3);
+  margin: 8px 0 0;
+  max-width: 52ch;
+}
+
+/* ---- global show-ideas toggle (header) ---- */
+.wv2-root .cst-ideas-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 11px;
+}
+
+.wv2-root .cst-ideas-toggle:hover {
+  color: var(--ink-2);
+  border-color: var(--line-2);
+}
+
+.wv2-root .cst-ideas-toggle.is-on {
+  color: var(--gold);
+  border-color: color-mix(in srgb, var(--gold) 45%, var(--line));
+  background: color-mix(in srgb, var(--gold) 7%, transparent);
+}
+
+/* ---- 4-step stepper — lightweight row in the hero's id column, beside the
+ *      portrait. Muted by default; the current step lifts to full strength. ---- */
+.wv2-root .cst-stepper {
+  display: flex;
+  gap: 2px;
+  margin: 13px 0 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.wv2-root .cst-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  border-radius: var(--r-sm);
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background .12s, opacity .12s;
+  min-width: 0;
+  opacity: .68;
+}
+
+.wv2-root .cst-step:hover:not(.is-on) {
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  opacity: 1;
+}
+
+.wv2-root .cst-step.is-on {
+  background: color-mix(in srgb, var(--terra) 7%, transparent);
+  opacity: 1;
+}
+
+.wv2-root .cst-step-num {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-step.is-on .cst-step-num {
+  background: var(--terra);
+  color: #fff;
+}
+
+.wv2-root .cst-step.is-done .cst-step-num {
+  background: color-mix(in srgb, var(--sage) 85%, transparent);
+  color: #fff;
+}
+
+.wv2-root .cst-step-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.wv2-root .cst-step-lbl {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.wv2-root .cst-step.is-on .cst-step-lbl {
+  color: var(--terra-deep, var(--terra));
+  font-weight: 600;
+}
+
+.wv2-root .cst-step-status {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  color: var(--ink-3);
+  opacity: .85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- a section + its head ---- */
+.wv2-root .cst-section {
+  border-top: 1px solid var(--line);
+  transition: background-color .4s ease, box-shadow .4s ease, border-color .4s ease;
+}
+
+/* The vertical spacing lives in the (clickable) header + open-body, NOT in the
+   section padding — so between two collapsed headers the only dead zone is the
+   1px divider; the whole tall header row is a click target. */
+.wv2-root .cst-section.is-open {
+  padding-bottom: 18px;
+}
+
+/* the section the reader is currently on (scroll-spy `current`) AND expanded —
+   a smooth, soft whitish panel that lifts it out of the page. A collapsed section
+   never gets the panel, even while active. Content keeps its position: the side
+   padding is cancelled by an equal negative margin. */
+.wv2-root .cst-section.is-active.is-open {
+  background-color: color-mix(in srgb, #fff 62%, transparent);
+  border-top-color: transparent;
+  border-radius: var(--r-lg);
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-left: -20px;
+  margin-right: -20px;
+  box-shadow: 0 2px 14px -6px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.wv2-root .cst-sechead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.wv2-root .cst-sechead-glyph {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  background: color-mix(in srgb, var(--terra) 10%, transparent);
+  color: var(--terra);
+}
+
+.wv2-root .cst-sechead-glyph.is-ready {
+  background: color-mix(in srgb, var(--sage) 12%, transparent);
+  color: var(--sage);
+}
+
+.wv2-root .cst-sechead-lbl {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.wv2-root .cst-sechead-sub {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-sechead-spacer {
+  flex: 1 1 auto;
+}
+
+/* "✦ ask Night Eyes" — gold pill */
+.wv2-root .cst-ask {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--gold);
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, var(--line));
+  background: color-mix(in srgb, var(--gold) 7%, transparent);
+  border-radius: 999px;
+  padding: 4px 11px;
+}
+
+.wv2-root .cst-ask:hover {
+  background: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+.wv2-root .cst-ask-sm {
+  padding: 2px 9px;
+  font-size: 11px;
+  border: none;
+  background: transparent;
+}
+
+.wv2-root .cst-ask-sm:hover {
+  background: transparent;
+  color: var(--terra-deep, var(--terra));
+}
+
+.wv2-root .cst-ask-mk {
+  font-size: .92em;
+}
+
+/* ---- essence line ---- */
+.wv2-root .cst-essence {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.wv2-root .cst-essence .cst-sent-subj {
+  font-size: 15px;
+}
+
+/* ---- "FROM YOUR IDEAS" strip ---- */
+.wv2-root .cst-ideas {
+  margin-top: 12px;
+}
+
+.wv2-root .cst-ideas-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.wv2-root .cst-ideas-kicker {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-ideas-fill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gold);
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.wv2-root .cst-ideas-fill:hover {
+  color: var(--terra-deep, var(--terra));
+}
+
+/* collapsed/open header line — click to toggle the strip open */
+.wv2-root .cst-ideas-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.wv2-root .cst-ideas-chev {
+  font-size: 8.5px;
+  color: var(--ink-3);
+  transition: color .12s;
+}
+
+.wv2-root .cst-ideas-line-txt {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  transition: color .12s;
+}
+
+.wv2-root .cst-ideas-line:hover .cst-ideas-line-txt,
+.wv2-root .cst-ideas-line:hover .cst-ideas-chev,
+.wv2-root .cst-ideas-line:hover .cst-ideas-kicker {
+  color: var(--ink-2);
+}
+
+/* select-all / unselect-all (multi-select mode) */
+.wv2-root .cst-ideas-sel {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  padding: 0 2px;
+  cursor: pointer;
+  transition: color .12s, opacity .12s;
+}
+
+.wv2-root .cst-ideas-sel:hover:not(:disabled) {
+  color: var(--ink-2);
+}
+
+.wv2-root .cst-ideas-sel:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+/* discuss-with-Night-Eyes — enables once ideas are picked */
+.wv2-root .cst-ideas-discuss {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+  border-radius: 999px;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s, opacity .12s;
+}
+
+.wv2-root .cst-ideas-discuss:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--gold) 20%, transparent);
+}
+
+.wv2-root .cst-ideas-discuss:disabled {
+  opacity: .5;
+  cursor: default;
+  color: var(--ink-3);
+  background: transparent;
+  border-color: var(--line);
+}
+
+.wv2-root .cst-ideas-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.wv2-root .cst-idea-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 340px;
+  text-align: left;
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 4px 10px;
+  cursor: default;
+}
+
+.wv2-root .cst-idea-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-idea-txt {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* interactive chips — pick (multi-select) or insert (World) */
+.wv2-root .cst-idea-chip--pick,
+.wv2-root .cst-idea-chip--act {
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+}
+
+.wv2-root .cst-idea-chip--pick:hover,
+.wv2-root .cst-idea-chip--act:hover {
+  border-color: color-mix(in srgb, var(--terra) 40%, var(--line));
+}
+
+.wv2-root .cst-idea-chip.is-sel {
+  background: color-mix(in srgb, var(--terra) 12%, transparent);
+  border-color: var(--terra);
+}
+
+.wv2-root .cst-idea-chip.is-sel .cst-idea-txt {
+  color: var(--ink-2);
+  font-style: normal;
+}
+
+.wv2-root .cst-idea-check {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 9px;
+  line-height: 1;
+  color: #fff;
+  background: transparent;
+  transition: background .12s, border-color .12s;
+}
+
+.wv2-root .cst-idea-chip.is-sel .cst-idea-check {
+  background: var(--terra);
+  border-color: var(--terra);
+}
+
+/* ---- identity facets ---- */
+.wv2-root .cst-facets {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wv2-root .cst-facet {
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+}
+
+.wv2-root .cst-facet-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 8px;
+}
+
+.wv2-root .cst-facet-glyph {
+  color: var(--terra);
+  font-size: 13px;
+}
+
+.wv2-root .cst-facet-lbl {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.wv2-root .cst-facet-x {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.wv2-root .cst-facet-x:hover {
+  color: var(--clay);
+}
+
+.wv2-root .cst-facet-prose {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.wv2-root .cst-facet-prose .cst-sent {
+  margin: 0;
+}
+
+.wv2-root .cst-facet .cst-rel {
+  margin-top: 0;
+}
+
+/* closed facets → + chips */
+.wv2-root .cst-facet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.wv2-root .cst-facet-chips-lbl {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-facet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  border: 1px dashed var(--line-2);
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
+  border-radius: 999px;
+  padding: 5px 13px;
+}
+
+.wv2-root .cst-facet-chip:hover {
+  border-color: var(--terra);
+  color: var(--ink);
+}
+
+.wv2-root .cst-facet-chip-plus {
+  color: var(--terra);
+}
+
+/* ---- readiness line ---- */
+.wv2-root .cst-ready {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 13px;
+  font-family: var(--ui);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-ready.is-ready {
+  color: var(--sage);
+  font-weight: 500;
+}
+
+.wv2-root .cst-ready-check {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  background: var(--sage);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+}
+
+/* ---- arc ---- */
+.wv2-root .cst-arc-kicker {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+
+.wv2-root .cst-arc-block {
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+  gap: 3px;
+}
+
+.wv2-root .cst-arc-line {
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 60ch;
+  text-wrap: pretty;
+}
+
+.wv2-root .cst-arc-verb {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-right: 8px;
+}
+
+.wv2-root .cst-sent-gap.is-soft {
+  opacity: .7;
+}
+
+/* arc layout — internal arc, then external plot points, then idea strip */
+.wv2-root .cst-arc-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.wv2-root .cst-arc-col-internal {
+  min-width: 0;
+}
+
+.wv2-root .cst-arc-col-external {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-root .cst-arc-col-external .cst-arc-ext,
+.wv2-root .cst-arc-col-external .cst-fe-block {
+  max-width: none;
+}
+
+.wv2-root .cst-arc-ext {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink);
+  margin: 0;
+  cursor: text;
+  text-wrap: pretty;
+  min-height: 140px;
+}
+
+.wv2-root .cst-arc-ext.is-empty {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.wv2-root .cst-fe-block-tall {
+  min-height: 140px !important;
+  padding-left: 12px;
+}
+
+.wv2-root .cst-arc-cta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.wv2-root .cst-arc-cta-note {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+  max-width: 300px;
+  line-height: 1.4;
+}
+
+/* ---- collapsed "Open +" row (Arc) ---- */
+.wv2-root .cst-open-row {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 0;
+  padding: 16px 16px;
+  cursor: pointer;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
+  border-top: 1px solid var(--line);
+}
+
+.wv2-root .cst-open-row:hover {
+  border-color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 4%, transparent);
+}
+
+.wv2-root .cst-open-row-glyph {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--terra) 10%, transparent);
+  color: var(--terra);
+  font-size: 13px;
+}
+
+.wv2-root .cst-open-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.wv2-root .cst-open-row-lbl {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.wv2-root .cst-open-row-desc {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-open-row-plus {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--terra);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * Scaffold picker modal (Arc "Draft scaffolds" CTA) — .csm-*
+ * Mirrors the handoff picker; reuses app tokens (terra primary, gold AI).
+ * ════════════════════════════════════════════════════════════════════════════ */
+.wv2-root .csm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--ink) 34%, transparent);
+}
+
+.wv2-root .csm-modal {
+  position: relative;
+  width: min(760px, 96vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-2, 0 40px 100px -30px rgba(0, 0, 0, .5));
+}
+
+.wv2-root .csm-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.wv2-root .csm-head-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.wv2-root .csm-head-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .csm-weavehint {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+
+.wv2-root .csm-weavehint-txt {
+  flex: 1;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.wv2-root .csm-kicker {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.wv2-root .csm-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 4px 0 0;
+}
+
+.wv2-root .csm-sub {
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  margin: 6px 0 0;
+  max-width: 540px;
+}
+
+.wv2-root .csm-close {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.wv2-root .csm-close:hover {
+  color: var(--ink);
+}
+
+.wv2-root .csm-body {
+  padding: 16px 24px 22px;
+}
+
+.wv2-root .csm-empty {
+  font-family: var(--ui);
+  font-size: 13px;
+  color: var(--ink-3);
+  text-align: center;
+  padding: 24px;
+}
+
+.wv2-root .csm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.wv2-root .csm-card {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  cursor: pointer;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r-md);
+  padding: 13px 14px;
+  transition: border-color .12s, background .12s, box-shadow .12s;
+}
+
+.wv2-root .csm-card:hover {
+  border-color: var(--line-2);
+}
+
+.wv2-root .csm-card.is-on {
+  border-color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 8%, var(--surface));
+  box-shadow: 0 0 0 1px var(--terra);
+}
+
+.wv2-root .csm-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.wv2-root .csm-card-head-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .csm-card-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.wv2-root .csm-card-name {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.wv2-root .csm-pill {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 10%, transparent);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.wv2-root .csm-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+}
+
+.wv2-root .csm-card-beats {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.wv2-root .csm-card-shape {
+  opacity: .6;
+}
+
+.wv2-root .csm-card-check {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--ink-3);
+  border: 1.5px solid var(--line-2);
+  background: transparent;
+}
+
+.wv2-root .csm-card.is-on .csm-card-check {
+  background: var(--terra);
+  color: #fff;
+  border-color: var(--terra);
+}
+
+.wv2-root .csm-card-beatlist {
+  border-top: 1px solid var(--line);
+  padding-top: 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.wv2-root .csm-beat-h {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 2px;
+}
+
+.wv2-root .csm-beat-p {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  line-height: 1.35;
+}
+
+.wv2-root .csm-beat-plus {
+  flex: 0 0 auto;
+  color: var(--terra);
+  font-style: normal;
+  font-size: 11px;
+  opacity: .7;
+}
+
+.wv2-root .csm-beat-t {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.35;
+}
+
+.wv2-root .csm-beat-dot {
+  flex: 0 0 auto;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--ink-3);
+  align-self: center;
+}
+
+.wv2-root .csm-card-more {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-top: 3px;
+}
+
+/* the empty / blank-start scaffold card */
+.wv2-root .csm-card--empty {
+  border-style: dashed;
+}
+
+.wv2-root .csm-card--empty .csm-card-name {
+  color: var(--ink-2);
+}
+
+.wv2-root .csm-pill--quiet {
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  color: var(--ink-3);
+}
+
+.wv2-root .csm-more {
+  margin-top: 12px;
+}
+
+.wv2-root .csm-more-lbl {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+
+.wv2-root .csm-more-btn {
+  margin-top: 12px;
+  width: 100%;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  padding: 9px 0;
+  cursor: pointer;
+}
+
+.wv2-root .csm-more-btn:hover {
+  border-color: var(--terra);
+  color: var(--ink);
+}
+
+.wv2-root .csm-invent {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1.5px dashed color-mix(in srgb, var(--gold) 45%, var(--line));
+  background: color-mix(in srgb, var(--gold) 6%, var(--surface));
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  transition: background .14s, box-shadow .14s;
+}
+
+.wv2-root .csm-invent.is-focus {
+  background: color-mix(in srgb, var(--gold) 14%, var(--surface));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 25%, transparent);
+}
+
+.wv2-root .csm-invent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.wv2-root .csm-invent-mk {
+  color: var(--gold);
+  font-size: 1em;
+}
+
+.wv2-root .csm-invent-coin {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  font-size: 17px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, var(--line));
+}
+
+.wv2-root .csm-invent-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.wv2-root .csm-invent-ttl {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.wv2-root .csm-invent-desc {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink-3);
+  margin-top: 2px;
+  line-height: 1.45;
+}
+
+.wv2-root .csm-invent-actions {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+
+.wv2-root .csm-foot {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 13px 24px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.wv2-root .csm-foot-count {
+  font-family: var(--ui);
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .csm-foot-count b {
+  color: var(--terra);
+  font-size: 14px;
+}
+
+.wv2-root .csm-foot-spacer {
+  flex: 1 1 auto;
+}
+
+/* ③ Name them — editable title per chosen scaffold + live heading preview. */
+.wv2-root .csm-namestep {
+  margin-top: 18px;
+}
+
+.wv2-root .csm-namestep-h {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+
+.wv2-root .csm-namelist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wv2-root .csm-name-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.wv2-root .csm-name-input {
+  flex: 0 0 auto;
+  width: 220px;
+  max-width: 100%;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 6px 9px;
+}
+
+.wv2-root .csm-name-input:focus {
+  outline: none;
+  border-color: var(--terra);
+}
+
+.wv2-root .csm-name-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--ink-2);
+}
+
+.wv2-root .csm-name-glyph {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-3);
+  flex: 0 0 auto;
+}
+
+.wv2-root .csm-name-ttl {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * StudioSection — collapsible section shell (Identity · Arc · Outline · Voice)
+ * ════════════════════════════════════════════════════════════════════════════ */
+.wv2-root .cst-sec-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  padding: 13px 0;
+  border-radius: var(--r-md);
+  transition: background-color .3s ease;
+}
+
+/* expanded section → super-soft whitish tint behind its heading (content stays
+   aligned: the small side padding is cancelled by an equal negative margin). */
+.wv2-root .cst-section.is-open .cst-sec-head {
+  background-color: color-mix(in srgb, #fff 24%, transparent);
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
+.wv2-root .cst-sec-head:focus-visible {
+  outline: 2px solid var(--terra);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+.wv2-root .cst-sec-glyph {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  background: color-mix(in srgb, var(--terra) 10%, transparent);
+  color: var(--terra);
+}
+
+.wv2-root .cst-sec-glyph.is-ready {
+  background: color-mix(in srgb, var(--sage) 12%, transparent);
+  color: var(--sage);
+}
+
+.wv2-root .cst-section.is-collapsed .cst-sec-glyph {
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-sec-lbl {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.wv2-root .cst-section.is-collapsed .cst-sec-lbl {
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-sec-proposal-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--sage);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sage) 22%, transparent);
+}
+
+.wv2-root .cst-sec-sub {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-sec-desc {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-3);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wv2-root .cst-sec-spacer {
+  flex: 1 1 auto;
+}
+
+.wv2-root .cst-sec-chev {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--terra);
+}
+
+.wv2-root .cst-section.is-open .cst-sec-chev {
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.wv2-root .cst-sec-body {
+  margin-top: 4px;
+}
+
+/* untouched child components (StudioThreads) bring their own .cst-band — drop the
+   doubled top border/padding when nested inside an open section body. */
+.wv2-root .cst-sec-body>.cst-band {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* filled-dot on a closed facet chip that already holds data */
+.wv2-root .cst-facet-chip.is-filled {
+  color: var(--ink);
+  border-style: solid;
+  border-color: var(--line);
+}
+
+.wv2-root .cst-facet-chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--sage);
+  margin-left: 1px;
+}
+
+/* green "has a pending AI proposal" dot — on the chip and the open facet header */
+.wv2-root .cst-facet-prop-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-left: 4px;
+  background: var(--asp-proposals, var(--sage));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--asp-proposals, var(--sage)) 22%, transparent);
+}
+
+.wv2-root .cst-facet-chip.has-proposal {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--asp-proposals, var(--sage)) 50%, var(--line));
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * Arc teaching box (staged by thread count) + weave visual
+ * ════════════════════════════════════════════════════════════════════════════ */
+.wv2-root .cst-teach {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  padding: 16px 18px;
+}
+
+.wv2-root .cst-teach--weave {
+  background: color-mix(in srgb, var(--gold-soft) 38%, var(--surface));
+  border-color: color-mix(in srgb, var(--gold-soft) 85%, var(--line));
+}
+
+.wv2-root .cst-teach-top {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.wv2-root .cst-teach-vis {
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-teach-ttl {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.wv2-root .cst-teach-desc {
+  margin: 3px 0 0;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink-3);
+  line-height: 1.45;
+  max-width: 540px;
+}
+
+.wv2-root .cst-teach-desc b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.wv2-root .cst-teach-actions {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.wv2-root .cst-teach--weave .cst-teach-actions {
+  border-top-color: color-mix(in srgb, var(--gold-soft) 75%, var(--line));
+}
+
+.wv2-root .cst-teach-actions--weave {
+  align-items: center;
+  gap: 9px;
+}
+
+/* white "Draft more / Invent more" buttons (design uses a quiet outline) */
+.wv2-root .cst-teach-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+}
+
+.wv2-root .cst-teach-ghost:hover {
+  border-color: var(--terra);
+  color: var(--ink);
+}
+
+.wv2-root .cst-teach-col {
+  flex: 1 1 260px;
+}
+
+.wv2-root .cst-teach-kicker {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--terra);
+  margin-bottom: 8px;
+}
+
+.wv2-root .cst-teach-kicker-gold {
+  color: var(--gold);
+}
+
+.wv2-root .cst-teach-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 11px;
+}
+
+.wv2-root .cst-teach-chip {
+  font-family: var(--serif);
+  font-size: 12px;
+  color: var(--terra-deep, var(--terra));
+  background: color-mix(in srgb, var(--terra) 10%, transparent);
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.wv2-root .cst-teach-or {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  color: var(--ink-3);
+  padding-bottom: 9px;
+}
+
+.wv2-root .cst-teach-colnote {
+  margin: 0 0 11px;
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+
+.wv2-root .cst-teach-row {
+  display: flex;
+  gap: 9px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* gold (AI) buttons used in the teaching box */
+.wv2-root .cst-btn-gold,
+.wv2-root .cst-btn-gold-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--r-sm);
+  padding: 8px 15px;
+}
+
+.wv2-root .cst-btn-gold {
+  border: 1px solid var(--gold-soft);
+  background: color-mix(in srgb, var(--gold-soft) 30%, var(--surface));
+  color: var(--gold);
+}
+
+.wv2-root .cst-btn-gold:hover {
+  background: color-mix(in srgb, var(--gold-soft) 50%, var(--surface));
+}
+
+.wv2-root .cst-btn-gold-outline {
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, var(--line));
+  background: var(--surface);
+  color: var(--gold);
+}
+
+.wv2-root .cst-btn-gold-outline:hover {
+  background: color-mix(in srgb, var(--gold) 8%, var(--surface));
+}
+
+/* the stack→weave visual */
+.wv2-root .cst-weave {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wv2-root .cst-weave-stack {
+  position: relative;
+  width: 64px;
+  height: 46px;
+}
+
+.wv2-root .cst-weave-card {
+  position: absolute;
+  width: 44px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  padding: 0 6px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--terra) 30%, var(--line));
+  box-shadow: 0 2px 6px -3px rgba(0, 0, 0, .3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+.wv2-root .cst-weave-card span {
+  height: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--terra) 25%, var(--line));
+}
+
+.wv2-root .cst-weave-arrow {
+  flex: 0 0 auto;
+}
+
+.wv2-root .cst-weave-one {
+  width: 44px;
+  height: 40px;
+  border-radius: var(--r-md);
+  padding: 0 7px;
+  background: color-mix(in srgb, var(--terra) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--terra) 30%, var(--line));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+.wv2-root .cst-weave-one span {
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--terra);
+  opacity: .55;
+}
+
+/* divider between the new ThreadsList and the kept legacy StudioThreads (transition) */
+.wv2-root .cst-legacy-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 14px;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.wv2-root .cst-legacy-divider::before,
+.wv2-root .cst-legacy-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}

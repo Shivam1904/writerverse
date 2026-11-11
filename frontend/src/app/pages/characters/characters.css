@@ -1,0 +1,2118 @@
+/* ==============================================================
+ * Characters — page styles. All scoped under .wv2-root so they
+ * stay inside the app shell. Color tokens come from the
+ * theme; static tokens (radius, shadow, type) from app.css.
+ *
+ * Layout primitives (.wv2-page, .wv2-page-main, .wv2-page-rail,
+ * .wv2-rail-stub) are duplicated here from story-so-far.css so
+ * this page works standalone; if a third page lands they get
+ * promoted to app.css.
+ * ============================================================== */
+
+/* ---- page shell — layout primitives now in app.css ---- */
+
+/* Page centering + reading-column cap come from the shared .wv2-page grid
+   (app.css) — the reading column sits centered between the rails. */
+.wv2-root .chr-main { gap: 28px; }
+
+/* ============================================================
+ * Page head — eyebrow · serif title · italic sub · actions
+ * ============================================================ */
+.wv2-root .chr-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.wv2-root .chr-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  color: var(--ink);
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+.wv2-root .chr-title em {
+  font-style: italic;
+  color: var(--terra-deep);
+  font-weight: 500;
+}
+.wv2-root .chr-sub {
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  font-style: italic;
+  max-width: 48ch;
+  margin: 0;
+}
+.wv2-root .chr-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 16px; }
+
+/* buttons use shared .wv2-btn from app.css */
+
+/* ============================================================
+ * Generate inline form — opens under the head when Generate is toggled.
+ * Sends name + description to add_character; the character is created directly.
+ * ============================================================ */
+.wv2-root .chr-gen-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  margin: 0 0 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  font-family: var(--ui);
+}
+.wv2-root .chr-gen-name,
+.wv2-root .chr-gen-desc {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+.wv2-root .chr-gen-name { font-weight: 600; }
+.wv2-root .chr-gen-desc { resize: vertical; min-height: 52px; line-height: 1.45; }
+.wv2-root .chr-gen-name:focus,
+.wv2-root .chr-gen-desc:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 18%, transparent);
+}
+.wv2-root .chr-gen-name:disabled,
+.wv2-root .chr-gen-desc:disabled { opacity: .6; cursor: not-allowed; }
+.wv2-root .chr-gen-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.wv2-root .chr-gen-cancel,
+.wv2-root .chr-gen-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--r-sm);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  transition: background .12s, color .12s, border-color .12s, opacity .12s;
+}
+.wv2-root .chr-gen-cancel:hover { color: var(--ink); }
+.wv2-root .chr-gen-submit {
+  border-color: transparent;
+  background: var(--terra);
+  color: #fff;
+}
+.wv2-root .chr-gen-submit:hover { background: var(--terra-deep); }
+.wv2-root .chr-gen-submit:disabled,
+.wv2-root .chr-gen-cancel:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ============================================================
+ * Tier-filter strip — local view filter, terra/gold/sage swatches
+ * ============================================================ */
+.wv2-root .chr-tier-strip {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 0 18px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--ui);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.wv2-root .chr-tier-strip::-webkit-scrollbar { display: none; }
+.wv2-root .chr-tier-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 0;
+  background: transparent;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background .12s, color .12s, box-shadow .12s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+.wv2-root .chr-tier-chip:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+  color: var(--ink-2);
+}
+.wv2-root .chr-tier-chip.is-on {
+  background: var(--surface-2);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--line);
+}
+.wv2-root .chr-tier-sw {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .6);
+}
+.wv2-root .chr-tier-sw.is-ghost {
+  background: transparent;
+  box-shadow: 0 0 0 1.5px var(--line-3);
+}
+.wv2-root .chr-tier-ct {
+  font-size: 10px;
+  color: var(--ink-3);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-tier-chip.is-on .chr-tier-ct { color: var(--ink-2); }
+.wv2-root .chr-tier-spacer { flex: 1; }
+.wv2-root .chr-tier-sort {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-right: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-tier-sort b { color: var(--ink-2); font-weight: 600; }
+
+/* ============================================================
+ * Tier section heading — numbered + dashed rule
+ * ============================================================ */
+.wv2-root .chr-tier-section { display: flex; flex-direction: column; gap: 14px; }
+.wv2-root .chr-tier-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.wv2-root .chr-tier-num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-tier-title {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -.005em;
+}
+.wv2-root .chr-tier-title em { font-style: italic; color: var(--ink-2); font-weight: 500; }
+.wv2-root .chr-tier-count {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+.wv2-root .chr-tier-rule {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 3px, transparent 3px 6px);
+}
+
+/* ============================================================
+ * Portrait placeholders — striped paper + monospace caption
+ * Sized by .chr-port-{xl,lg,md,sm,round}; toned by -proto, -ghost.
+ * ============================================================ */
+.wv2-root .chr-port {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  border-radius: 6px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(45deg,
+      color-mix(in srgb, var(--ink) 8%, transparent) 0 2px,
+      transparent 2px 8px),
+    linear-gradient(165deg, var(--paper) 0%, var(--paper-2) 100%);
+  border: 1px solid var(--line-2);
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 9px;
+  letter-spacing: .04em;
+  flex: 0 0 auto;
+  vertical-align: top;
+}
+.wv2-root .chr-port::after {
+  content: attr(data-name);
+  padding: 4px 6px;
+  line-height: 1.1;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 7%, transparent);
+  width: 100%;
+  text-align: left;
+  text-transform: lowercase;
+}
+.wv2-root .chr-port-xl { width: 160px; height: 200px; }
+.wv2-root .chr-port-lg { width: 96px; height: 120px; }
+.wv2-root .chr-port-md { width: 64px; height: 80px; }
+.wv2-root .chr-port-sm { width: 40px; height: 50px; border-radius: var(--r-xs); }
+.wv2-root .chr-port-sm::after { font-size: 7.5px; padding: 2px 4px; }
+.wv2-root .chr-port-round { border-radius: 50%; width: 48px; height: 48px; }
+.wv2-root .chr-port-round::after { display: none; }
+
+/* warm halo on the protagonist's portrait */
+.wv2-root .chr-port-proto {
+  box-shadow:
+    0 0 0 1px var(--terra-soft) inset,
+    0 0 0 3px var(--surface-2),
+    0 0 0 4px var(--terra-soft),
+    0 8px 24px -8px color-mix(in srgb, var(--terra) 25%, transparent);
+}
+/* dashed "not real yet" treatment for extracted */
+.wv2-root .chr-port-ghost {
+  background:
+    repeating-linear-gradient(45deg,
+      color-mix(in srgb, var(--ink) 6%, transparent) 0 2px,
+      transparent 2px 8px),
+    linear-gradient(165deg, var(--paper-2) 0%, color-mix(in srgb, var(--ink) 8%, var(--paper-2)) 100%);
+  border: 1px dashed var(--line-3);
+  opacity: .85;
+}
+.wv2-root .chr-port-ghost::after {
+  background: transparent;
+  border-top: 1px dashed color-mix(in srgb, var(--ink) 18%, transparent);
+  font-style: italic;
+}
+
+/* photo variant — the AI portrait shown as the avatar. Frameless (no border,
+   no halo, no caption), square-cropped from the TOP so the head/upper body
+   shows. A diagonal sheen, masked to the figure's own silhouette, plus alpha-
+   following drop-shadows give a subtle metallic 3D lift. */
+.wv2-root .chr-port-img {
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible; /* let the drop-shadow bleed past the square */
+  /* tight top-center HEADSHOT crop of the full-figure PNG: zoom in (background
+     wider than the box) and frame the head near the top, centered. */
+  background-color: transparent;
+  background-image: var(--port-src);
+  background-repeat: no-repeat;
+  background-size: 320% auto;
+  background-position: center top;
+  /* 3D lift: deep cast shadow below + bright rim light on top, both following
+     the silhouette; a little saturation/contrast for a metallic punch. */
+  filter:
+    saturate(1.12) contrast(1.05)
+    drop-shadow(0 2.5px 3px rgba(0, 0, 0, .5))
+    drop-shadow(0 1px 1px rgba(0, 0, 0, .3))
+    drop-shadow(0 -1px 0.5px rgba(255, 255, 255, .65));
+}
+.wv2-root .chr-port-img::after { display: none; }
+/* specular SHINE — bright glossy highlight (a hotspot + a diagonal streak),
+   clipped to the figure's shape; `screen` makes it pop like polished metal. */
+.wv2-root .chr-port-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-image: var(--port-src);
+  mask-image: var(--port-src);
+  -webkit-mask-size: 320% auto;
+  mask-size: 320% auto;
+  -webkit-mask-position: center top;
+  mask-position: center top;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  background:
+    radial-gradient(58% 42% at 33% 20%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(125deg,
+      rgba(255, 255, 255, .78) 0%,
+      rgba(255, 255, 255, .12) 26%,
+      transparent 44%,
+      transparent 68%,
+      rgba(255, 255, 255, .2) 100%);
+  mix-blend-mode: screen;
+}
+/* volume SHADING — darken toward the base so the form reads round, not flat. */
+.wv2-root .chr-port-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: var(--port-src);
+  mask-image: var(--port-src);
+  -webkit-mask-size: 320% auto;
+  mask-size: 320% auto;
+  -webkit-mask-position: center top;
+  mask-position: center top;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  background: linear-gradient(180deg,
+    transparent 36%,
+    rgba(0, 0, 0, .16) 76%,
+    rgba(0, 0, 0, .36) 100%);
+  mix-blend-mode: multiply;
+}
+
+/* ============================================================
+ * Bust portrait — circular frame with head jutting above.
+ * The figure is CSS-masked to a bust shape (circle at bottom +
+ * head extension at top). A ring element overlays the circle
+ * boundary. Height ≈ 1.3× the circle diameter.
+ * ============================================================ */
+.wv2-root .chr-bust {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  vertical-align: top;
+  filter:
+    drop-shadow(0 2px 3px rgba(0, 0, 0, .30))
+    drop-shadow(0 1px 1px rgba(0, 0, 0, .15));
+}
+.wv2-root .chr-bust-xl { width: 160px; height: 208px; }
+.wv2-root .chr-bust-lg { width: 96px;  height: 125px; }
+.wv2-root .chr-bust-md { width: 64px;  height: 83px;  }
+.wv2-root .chr-bust-sm { width: 40px;  height: 52px;  }
+
+.wv2-root .chr-bust-fig {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-image: var(--port-src);
+  background-size: 320% auto;
+  background-position: center top;
+  background-repeat: no-repeat;
+  filter: saturate(1.12) contrast(1.05);
+  -webkit-mask-image:
+    radial-gradient(50% 38.46% at 50% 61.54%, #000 100%, transparent 100%),
+    linear-gradient(#000, #000);
+  mask-image:
+    radial-gradient(50% 38.46% at 50% 61.54%, #000 100%, transparent 100%),
+    linear-gradient(#000, #000);
+  -webkit-mask-size: 100% 100%, 80% 40%;
+  mask-size: 100% 100%, 80% 40%;
+  -webkit-mask-position: center center, center top;
+  mask-position: center center, center top;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
+}
+
+.wv2-root .chr-bust-ring {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+.wv2-root .chr-bust-sm .chr-bust-ring { border-width: 1.5px; }
+
+.wv2-root .chr-bust-proto .chr-bust-ring {
+  border-color: var(--terra-soft);
+  box-shadow:
+    0 0 0 2px var(--surface-2),
+    0 0 0 3px var(--terra-soft),
+    0 6px 18px -6px color-mix(in srgb, var(--terra) 22%, transparent);
+}
+
+/* ============================================================
+ * VARIANT A — protagonist hero spread
+ * ============================================================ */
+.wv2-root .chr-proto {
+  position: relative;
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 28px;
+  background:
+    radial-gradient(120% 80% at 0% 0%, color-mix(in srgb, var(--surface) 65%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  padding: 24px 26px 22px;
+  box-shadow: 0 10px 28px -22px color-mix(in srgb, var(--ink) 25%, transparent);
+}
+.wv2-root .chr-proto-left {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+.wv2-root .chr-proto-body { min-width: 0; }
+.wv2-root .chr-proto-name {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.012em;
+  line-height: 1.05;
+  margin: 0 0 4px;
+}
+.wv2-root .chr-proto-role {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.4;
+  margin-bottom: 18px;
+}
+.wv2-root .chr-proto-meta {
+  color: var(--ink-3);
+  font-style: normal;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-proto-corner {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+  font-weight: 700;
+}
+.wv2-root .chr-star {
+  color: var(--gold);
+  font-size: 11px;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold) 40%, transparent));
+}
+
+.wv2-root .chr-completeness {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--sage);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.wv2-root .chr-comp-bar {
+  position: relative;
+  width: 90px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--line-2);
+  overflow: hidden;
+}
+.wv2-root .chr-comp-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--sage) 0%, color-mix(in srgb, var(--sage) 70%, var(--ink-3)) 100%);
+}
+
+/* facets list (identity · emotional journey · plot) */
+.wv2-root .chr-facets {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.wv2-root .chr-facet { display: flex; flex-direction: column; }
+.wv2-root .chr-facet-lbl {
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.wv2-root .chr-facet-mk {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--terra-deep);
+}
+.wv2-root .chr-facet-mk.is-clay { color: var(--clay); }
+.wv2-root .chr-facet-body {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: -.002em;
+}
+.wv2-root .chr-facet-body em { font-style: italic; color: var(--ink-2); }
+.wv2-root .chr-facet-rule .chr-facet-body {
+  position: relative;
+  padding-left: 10px;
+}
+.wv2-root .chr-facet-rule .chr-facet-body::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: .3em;
+  bottom: .3em;
+  width: 2px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, var(--clay), var(--terra-deep));
+  opacity: .6;
+}
+.wv2-root .chr-facet-empty {
+  color: var(--ink-3);
+  font-style: italic;
+  cursor: pointer;
+}
+.wv2-root .chr-facet-empty::before {
+  content: '+ ';
+  color: var(--terra);
+  font-style: normal;
+  font-weight: 700;
+}
+
+/* voice waveform */
+.wv2-root .chr-voice-sample { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.wv2-root .chr-wave {
+  flex: 0 0 64px;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: 18px;
+}
+.wv2-root .chr-wave i {
+  flex: 1;
+  background: var(--terra);
+  border-radius: 1px;
+  opacity: .7;
+}
+.wv2-root .chr-wave i:nth-child(1) { height: 30%; }
+.wv2-root .chr-wave i:nth-child(2) { height: 65%; }
+.wv2-root .chr-wave i:nth-child(3) { height: 45%; }
+.wv2-root .chr-wave i:nth-child(4) { height: 85%; }
+.wv2-root .chr-wave i:nth-child(5) { height: 55%; }
+.wv2-root .chr-wave i:nth-child(6) { height: 75%; }
+.wv2-root .chr-wave i:nth-child(7) { height: 35%; }
+.wv2-root .chr-wave i:nth-child(8) { height: 60%; }
+.wv2-root .chr-voice-meta {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: .04em;
+}
+
+/* signature pull-quote */
+.wv2-root .chr-signature {
+  margin-top: 18px;
+  padding: 18px 0 0 22px;
+  border-top: 1px dashed var(--line-2);
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--ink-2);
+  letter-spacing: -.003em;
+  position: relative;
+}
+.wv2-root .chr-signature::before {
+  content: '\201C';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  font-family: var(--serif);
+  font-size: 42px;
+  line-height: 1;
+  color: var(--terra-deep);
+  opacity: .35;
+  font-style: normal;
+}
+.wv2-root .chr-sig-att {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--ui);
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+/* ============================================================
+ * Main grid — 2-up half-spread cards
+ * ============================================================ */
+.wv2-root .chr-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.wv2-root .chr-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+}
+.wv2-root .chr-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wv2-root .chr-card-head-text { flex: 1; min-width: 0; }
+.wv2-root .chr-card-name {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  margin: 0;
+  line-height: 1.15;
+}
+.wv2-root .chr-card-role {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.wv2-root .chr-mini-list { display: flex; flex-direction: column; gap: 10px; }
+.wv2-root .chr-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.wv2-root .chr-mini-lbl {
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+.wv2-root .chr-mini-body {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.wv2-root .chr-mini-body em { font-style: italic; color: var(--ink-2); }
+.wv2-root .chr-mini.is-empty .chr-mini-body {
+  color: var(--ink-3);
+  font-style: italic;
+  font-size: 11.5px;
+}
+.wv2-root .chr-mini.is-empty .chr-mini-body::before {
+  content: '+ ';
+  color: var(--terra);
+  font-style: normal;
+  font-weight: 700;
+}
+.wv2-root .chr-mini-empty {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.wv2-root .chr-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-mention-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.wv2-root .chr-mention-pill i { font-style: italic; color: var(--ink-2); }
+.wv2-root .chr-mention-pill b { color: var(--ink-2); font-weight: 600; }
+.wv2-root .chr-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--terra);
+}
+.wv2-root .chr-open {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 10px;
+  font-family: var(--ui);
+}
+.wv2-root .chr-open:hover { color: var(--terra-deep); }
+
+/* ============================================================
+ * Supporting — one-line rows
+ * ============================================================ */
+.wv2-root .chr-supp-list { display: flex; flex-direction: column; }
+.wv2-root .chr-supp-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 160px 110px auto 24px 24px;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 8px;
+  border-bottom: 1px dashed var(--line);
+  font-family: var(--ui);
+}
+.wv2-root .chr-supp-row:last-child { border-bottom: 0; }
+.wv2-root .chr-supp-row:hover { background: color-mix(in srgb, var(--ink) 3%, transparent); }
+.wv2-root .chr-supp-name {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+}
+.wv2-root .chr-supp-name em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink-2);
+  font-size: 12px;
+  margin-left: 6px;
+}
+.wv2-root .chr-supp-desc {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-style: italic;
+}
+.wv2-root .chr-supp-meta {
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.wv2-root .chr-supp-more {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-3);
+  font-size: 14px;
+  padding: 0;
+}
+.wv2-root .chr-supp-more:hover { color: var(--ink); }
+
+/* ============================================================
+ * Extracted — ghost rows, dashed container
+ * ============================================================ */
+.wv2-root .chr-extr {
+  margin-top: 12px;
+  padding: 18px 20px 16px;
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+}
+.wv2-root .chr-extr-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.wv2-root .chr-extr-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-2);
+  margin: 0;
+}
+.wv2-root .chr-extr-count {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-extr-help {
+  margin-left: auto;
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  font-style: italic;
+}
+.wv2-root .chr-extr-row {
+  display: grid;
+  grid-template-columns: 36px 1fr auto auto;
+  gap: 14px;
+  align-items: center;
+  padding: 8px 6px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.wv2-root .chr-extr-row:last-child { border-bottom: 0; }
+.wv2-root .chr-extr-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  letter-spacing: -.003em;
+}
+.wv2-root .chr-extr-why {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 2px;
+  letter-spacing: -.003em;
+}
+.wv2-root .chr-extr-src {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-extr-src b {
+  color: var(--ink-2);
+  font-weight: 500;
+  font-style: italic;
+  font-family: var(--serif);
+  font-size: 11px;
+}
+.wv2-root .chr-promote {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--terra-deep);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--r-xs);
+}
+.wv2-root .chr-promote svg {
+  width: 11px;
+  height: 11px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.wv2-root .chr-promote:hover { background: color-mix(in srgb, var(--terra) 8%, transparent); }
+
+/* ============================================================
+ * Empty state
+ * ============================================================ */
+.wv2-root .chr-empty {
+  padding: 28px 30px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.wv2-root .chr-empty p { margin: 0; }
+.wv2-root .chr-empty p + p { margin-top: 10px; }
+.wv2-root .chr-empty-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--terra-deep);
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.wv2-root .chr-empty-link:hover { color: var(--terra); }
+.wv2-root .chr-empty-hint { font-size: 12px; color: var(--ink-3); font-style: italic; }
+.wv2-root .chr-empty code {
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 12px;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ============================================================
+ * Character form modal
+ * ============================================================ */
+.wv2-root .chr-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--ink) 40%, transparent);
+  backdrop-filter: blur(3px);
+}
+.wv2-root .chr-modal {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 28px 30px 22px;
+  width: 500px;
+  max-width: 92vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px -16px color-mix(in srgb, var(--ink) 35%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.wv2-root .chr-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wv2-root .chr-modal-head h2 {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+.wv2-root .chr-modal-close {
+  background: transparent;
+  border: 0;
+  font-size: 22px;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+.wv2-root .chr-modal-close:hover { color: var(--ink); }
+.wv2-root .chr-field { display: flex; flex-direction: column; gap: 5px; }
+.wv2-root .chr-field-lbl {
+  font-family: var(--ui);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+.wv2-root .chr-field-input {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color .12s;
+}
+.wv2-root .chr-field-input:focus { border-color: var(--terra); }
+.wv2-root .chr-field-input::placeholder { color: var(--ink-3); font-style: italic; }
+.wv2-root .chr-field-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+.wv2-root .chr-field-textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+.wv2-root .chr-role-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.wv2-root .chr-role-chip {
+  font-family: var(--ui);
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: var(--r-xl);
+  border: 1px solid var(--line-2);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: all .15s;
+}
+.wv2-root .chr-role-chip:hover { border-color: var(--ink-3); color: var(--ink); }
+.wv2-root .chr-role-chip.is-on {
+  background: var(--terra);
+  border-color: var(--terra);
+  color: #fff;
+}
+/* Form group — groups related fields with a label divider */
+.wv2-root .chr-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 6px;
+}
+.wv2-root .chr-form-group-label {
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  padding-bottom: 2px;
+  border-bottom: 1px dashed var(--line-2);
+}
+
+.wv2-root .chr-modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
+.wv2-root .chr-modal-foot .chr-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Edit pencil icon button (reused across tiers) */
+.wv2-root .chr-edit-btn {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-3);
+  padding: 3px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  transition: color .12s, background .12s;
+}
+.wv2-root .chr-edit-btn:hover { color: var(--terra-deep); background: color-mix(in srgb, var(--terra) 8%, transparent); }
+.wv2-root .chr-edit-btn svg { width: 13px; height: 13px; }
+.wv2-root .chr-del-btn:hover { color: #c0392b; background: color-mix(in srgb, #c0392b 8%, transparent); }
+
+/* SupportingList wraps each row in a display:contents shell. */
+.wv2-root .chr-supp-row-wrap { display: contents; }
+
+/* ============================================================
+ * Clickable name — cursor + underline hint on hover
+ * ============================================================ */
+.wv2-root .chr-clickable { cursor: pointer; }
+.wv2-root .chr-clickable:hover { text-decoration: underline; text-decoration-style: dashed; text-underline-offset: 3px; text-decoration-color: var(--terra); }
+
+/* ============================================================
+ * Person page — full character detail view
+ * ============================================================ */
+
+/* ---- back link ---- */
+.wv2-root .chr-person-back {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-3);
+  cursor: pointer;
+  letter-spacing: .02em;
+  transition: color .12s;
+}
+.wv2-root .chr-person-back:hover { color: var(--terra-deep); }
+
+/* ---- person wrapper ---- */
+.wv2-root .chr-person {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ============================================================
+ * Header — portrait + tier selector + name/role inputs
+ * ============================================================ */
+.wv2-root .chr-person-header {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+.wv2-root .chr-person-head-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+/* Tier selector — segmented control */
+.wv2-root .chr-person-tier-strip {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 3px;
+  width: fit-content;
+}
+.wv2-root .chr-person-tier-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background .12s, color .12s, box-shadow .12s;
+  white-space: nowrap;
+}
+.wv2-root .chr-person-tier-chip:hover {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  color: var(--ink-2);
+}
+.wv2-root .chr-person-tier-chip.is-on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--sh-1);
+}
+.wv2-root .chr-person-tier-sw {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Name input — large serif */
+.wv2-root .chr-person-name-input {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.012em;
+  line-height: 1.15;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 4px 0;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s;
+}
+.wv2-root .chr-person-name-input:hover {
+  border-bottom-color: var(--line-2);
+}
+.wv2-root .chr-person-name-input:focus {
+  border-bottom-color: var(--terra);
+}
+.wv2-root .chr-person-name-input::placeholder {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+/* Role input — italic serif */
+.wv2-root .chr-person-role-input {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-2);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: 2px 0;
+  outline: none;
+  width: 100%;
+  transition: border-color .15s;
+}
+.wv2-root .chr-person-role-input:hover {
+  border-bottom-color: var(--line);
+}
+.wv2-root .chr-person-role-input:focus {
+  border-bottom-color: var(--terra);
+  color: var(--ink);
+}
+.wv2-root .chr-person-role-input::placeholder {
+  color: var(--ink-3);
+}
+
+/* ============================================================
+ * Body — two-column grid (fields left, aside right)
+ * ============================================================ */
+.wv2-root .chr-person-body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 36px;
+  padding: 28px 0;
+}
+
+/* ---- left column: fields ---- */
+.wv2-root .chr-person-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* 2-column row for short fields (age, lives in, etc.) */
+.wv2-root .chr-person-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Field wrapper */
+.wv2-root .chr-person-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Labels */
+.wv2-root .chr-person-lbl {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Marks (the symbol before the label: circle, filled circle, etc.) */
+.wv2-root .chr-person-mk {
+  font-family: var(--serif);
+  font-style: normal;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--terra-deep);
+  line-height: 1;
+}
+.wv2-root .chr-person-mk.is-clay { color: var(--clay); }
+
+/* Gap tag on misbelief when empty */
+.wv2-root .chr-person-gap-tag {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--clay);
+  background: color-mix(in srgb, var(--clay) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--clay) 25%, transparent);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: 4px;
+}
+
+/* Input fields */
+.wv2-root .chr-person-input {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 8px 11px;
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+.wv2-root .chr-person-input:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 12%, transparent);
+}
+.wv2-root .chr-person-input::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* Textareas */
+.wv2-root .chr-person-textarea {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 9px 12px;
+  outline: none;
+  resize: vertical;
+  min-height: 56px;
+  transition: border-color .12s, box-shadow .12s;
+}
+.wv2-root .chr-person-textarea:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 12%, transparent);
+}
+.wv2-root .chr-person-textarea::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+/* Misbelief gap highlight */
+.wv2-root .chr-person-textarea.is-gap {
+  border-color: color-mix(in srgb, var(--clay) 35%, var(--line));
+  background: color-mix(in srgb, var(--clay) 3%, var(--surface-2));
+}
+
+/* Signature textarea — serif italic pull-quote feel */
+.wv2-root .chr-person-signature-input {
+  font-style: italic;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px dashed var(--line-2);
+  position: relative;
+}
+.wv2-root .chr-person-signature-input:focus {
+  border-color: var(--terra);
+  border-style: solid;
+  color: var(--ink);
+}
+
+/* Read-only display values (first appears, mentions) */
+.wv2-root .chr-person-readonly {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink);
+  padding: 8px 0;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+}
+.wv2-root .chr-person-readonly em {
+  font-style: italic;
+  color: var(--ink-3);
+}
+
+/* ---- Sub-divider ---- */
+.wv2-root .chr-person-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0 2px;
+}
+.wv2-root .chr-person-divider-text {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.wv2-root .chr-person-divider-rule {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--line-2) 0 3px, transparent 3px 6px);
+}
+
+/* ---- Empty state (no lens attached) ---- */
+.wv2-root .chr-person-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 28px 24px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+  gap: 6px;
+}
+.wv2-root .chr-person-empty-icon {
+  color: var(--ink-3);
+  opacity: .45;
+  margin-bottom: 4px;
+}
+.wv2-root .chr-person-empty-text {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin: 0;
+}
+.wv2-root .chr-person-empty-hint {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  font-style: italic;
+  margin: 0;
+  max-width: 36ch;
+  line-height: 1.45;
+}
+
+/* ============================================================
+ * Right column — aside (lens preview, contradictions)
+ * ============================================================ */
+.wv2-root .chr-person-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 4px;
+}
+.wv2-root .chr-person-aside-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.wv2-root .chr-person-aside-head {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Lens empty state card */
+.wv2-root .chr-person-lens-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 20px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  background:
+    radial-gradient(80% 60% at 50% 30%, color-mix(in srgb, var(--surface) 50%, transparent), transparent),
+    var(--surface-2);
+  gap: 8px;
+}
+.wv2-root .chr-person-lens-empty-icon {
+  color: var(--ink-3);
+  opacity: .35;
+  margin-bottom: 4px;
+}
+.wv2-root .chr-person-lens-empty-text {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--terra-deep);
+  margin: 0;
+  cursor: pointer;
+}
+.wv2-root .chr-person-lens-empty-text:hover {
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 3px;
+}
+.wv2-root .chr-person-lens-empty-hint {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-style: italic;
+  margin: 0;
+  max-width: 28ch;
+  line-height: 1.45;
+}
+
+/* Contradiction — green "nothing contradicts" state */
+.wv2-root .chr-person-contra-ok {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--sage) 30%, var(--line));
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--sage) 5%, var(--surface-2));
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--sage);
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+.wv2-root .chr-person-contra-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sage);
+  flex-shrink: 0;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--sage) 40%, transparent);
+}
+
+/* ============================================================
+ * Page-level right rail — plot threads attached to this person
+ * (the .chr-rail variant of the shared PageRail)
+ * ============================================================ */
+.wv2-root .chr-rail {
+  gap: 10px;
+  padding-top: 4px;
+}
+.wv2-root .chr-rail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line);
+}
+.wv2-root .chr-rail-head .ct {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 10px;
+}
+.wv2-root .chr-rail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.wv2-root .chr-rail-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: border-color .14s ease, background .14s ease;
+}
+.wv2-root .chr-rail-thread:hover {
+  border-color: var(--line-2);
+  background: var(--surface);
+}
+.wv2-root .chr-rail-thread-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wv2-root .chr-rail-thread-sw {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.wv2-root .chr-rail-thread-name {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-1);
+  line-height: 1.3;
+  min-width: 0;
+}
+.wv2-root .chr-rail-thread-chev {
+  margin-left: auto;
+  color: var(--ink-3);
+  font-size: 15px;
+  line-height: 1;
+  transition: transform .14s ease;
+}
+.wv2-root .chr-rail-thread-chev.is-open {
+  transform: rotate(90deg);
+}
+
+/* Expanded item — toolbar + the shared ThreadCard */
+.wv2-root .chr-rail-thread-exp {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wv2-root .chr-rail-thread-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.wv2-root .chr-rail-thread-collapse,
+.wv2-root .chr-rail-thread-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: none;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+}
+.wv2-root .chr-rail-thread-collapse {
+  color: var(--ink-3);
+}
+.wv2-root .chr-rail-thread-collapse:hover {
+  color: var(--ink-2);
+}
+.wv2-root .chr-rail-thread-collapse .chr-rail-thread-chev {
+  margin-left: 0;
+}
+.wv2-root .chr-rail-thread-nav {
+  color: var(--terra-deep);
+}
+.wv2-root .chr-rail-thread-nav:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.wv2-root .chr-rail-thread-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 17px;
+}
+.wv2-root .chr-rail-thread-cov {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-rail-thread-gap {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--clay);
+  background: color-mix(in srgb, var(--clay) 12%, transparent);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.wv2-root .chr-rail-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 16px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+.wv2-root .chr-rail-empty-text {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  margin: 0;
+}
+.wv2-root .chr-rail-empty-link {
+  align-self: flex-start;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--terra-deep);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.wv2-root .chr-rail-empty-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ============================================================
+ * Footer — mention summary + save/cancel
+ * ============================================================ */
+.wv2-root .chr-person-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+}
+.wv2-root .chr-person-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.wv2-root .chr-person-footer-stat {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.wv2-root .chr-person-footer-stat b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.wv2-root .chr-person-footer-stat em {
+  font-style: italic;
+  color: var(--ink-2);
+  font-family: var(--serif);
+}
+.wv2-root .chr-person-footer-stat.is-empty {
+  font-style: italic;
+  color: var(--ink-3);
+}
+.wv2-root .chr-person-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.wv2-root .chr-person-footer-right .wv2-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+/* delete sits at the left edge of the footer-right cluster, set apart + danger-tinted */
+.wv2-root .chr-person-delete {
+  margin-right: auto;
+  color: var(--ink-3);
+}
+.wv2-root .chr-person-delete:hover:not(:disabled) {
+  color: #c0392b;
+  border-color: color-mix(in srgb, #c0392b 40%, var(--line));
+}
+
+/* ---- relationships managed list (CharacterFormModal) ---- */
+.wv2-root .chr-rel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wv2-root .chr-rel-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wv2-root .chr-rel-row .chr-rel-who { flex: 0 0 38%; }
+.wv2-root .chr-rel-row .chr-rel-rel { flex: 1 1 auto; }
+.wv2-root .chr-rel-del {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .12s, border-color .12s, background .12s;
+}
+.wv2-root .chr-rel-del:hover {
+  color: #c0392b;
+  border-color: color-mix(in srgb, #c0392b 40%, var(--line));
+  background: rgba(192, 57, 43, 0.06);
+}
+.wv2-root .chr-rel-add {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--terra-deep);
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--r-xs);
+}
+.wv2-root .chr-rel-add:hover { background: rgba(180, 90, 30, 0.06); }
+
+/* ============================================================
+ * Responsive — single column below 780px
+ * ============================================================ */
+@media (max-width: 780px) {
+  .wv2-root .chr-person-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .wv2-root .chr-person-body {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .wv2-root .chr-person-aside {
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+  }
+  .wv2-root .chr-person-footer {
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .wv2-root .chr-person-footer-right {
+    align-self: flex-end;
+  }
+  .wv2-root .chr-person-row-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+ * CharacterSuggestions — the green "make real" block, shown at
+ * the top of BOTH the init page and the populated cast page.
+ * Ported from writerverse/people-init.html · block 1. Green
+ * (sage) tint = AI-generated suggestion, per the design's
+ * convention; the green vars derive from --sage so they track
+ * whatever theme is active.
+ * ============================================================ */
+.wv2-root .chr-suggest {
+  --sug-bg: color-mix(in srgb, var(--sage) 13%, var(--surface));
+  --sug-bg-2: color-mix(in srgb, var(--sage) 7%, var(--surface));
+  --sug-line: color-mix(in srgb, var(--sage) 34%, var(--line-2));
+  --sug-line-2: color-mix(in srgb, var(--sage) 22%, var(--line-2));
+  --sug-deep: color-mix(in srgb, var(--sage) 72%, #14241b);
+
+  position: relative;
+  border-radius: 13px;
+  background:
+    radial-gradient(150% 120% at 0% 0%, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0) 50%),
+    linear-gradient(168deg, var(--sug-bg) 0%, var(--sug-bg-2) 100%);
+  border: 1px solid var(--sug-line-2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .5),
+    0 1px 2px rgba(40, 55, 40, .05),
+    0 16px 40px -24px rgba(40, 60, 42, .34);
+  padding: 15px 16px 16px;
+  margin-bottom: 16px;
+}
+
+.wv2-root .chr-suggest-head { display: flex; align-items: center; gap: 9px; margin-bottom: 11px; }
+.wv2-root .chr-suggest-spark {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--sage) 18%, var(--surface));
+  border: 1px solid var(--sug-line);
+  color: var(--sug-deep);
+  font-size: 10px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sage) 9%, transparent);
+}
+.wv2-root .chr-suggest-ttl {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--sug-deep);
+}
+.wv2-root .chr-suggest-meta { margin-left: auto; font-family: var(--ui); font-size: 10.5px; color: var(--ink-3); }
+.wv2-root .chr-suggest-meta b { color: var(--sug-deep); font-weight: 700; }
+
+.wv2-root .chr-suggest-list { display: flex; flex-direction: column; gap: 8px; }
+
+.wv2-root .chr-sug {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--surface);
+  border: 1px solid var(--sug-line);
+  border-radius: var(--r-md);
+  padding: 10px 11px 10px 12px;
+  box-shadow: 0 1px 2px rgba(40, 55, 40, .05);
+}
+.wv2-root .chr-sug-face {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  background: var(--paper-2);
+  border: 1px dashed var(--terra);
+  display: grid;
+  place-items: center;
+  color: var(--terra);
+}
+.wv2-root .chr-sug-face svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+
+.wv2-root .chr-sug-main { min-width: 0; flex: 1; }
+.wv2-root .chr-sug-name {
+  font-family: var(--serif);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.01em;
+  line-height: 1.2;
+}
+.wv2-root .chr-sug-where {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wv2-root .chr-sug-src { color: var(--terra-deep); font-weight: 600; text-transform: capitalize; }
+.wv2-root .chr-sug-dot { opacity: .4; }
+.wv2-root .chr-sug-desc { color: var(--ink-2); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+
+.wv2-root .chr-sug-arc { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 5px; }
+.wv2-root .chr-sug-arc-item { font-family: var(--ui); font-size: 10.5px; color: var(--ink-2); }
+.wv2-root .chr-sug-arc-item em {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 8.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-right: 3px;
+}
+
+/* relationship chips on a promoted-character suggestion (name · type). */
+.wv2-root .chr-sug-rels { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 5px; }
+.wv2-root .chr-sug-rel {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-2);
+  padding: 1px 7px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.wv2-root .chr-sug-rel-kind { color: var(--ink-3); text-transform: capitalize; }
+
+.wv2-root .chr-sug-acts { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; }
+.wv2-root .chr-sug-dismiss {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid var(--line-2);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color .14s, border-color .14s, background .14s;
+}
+.wv2-root .chr-sug-dismiss svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.wv2-root .chr-sug-dismiss:hover { color: var(--clay); border-color: var(--clay); background: color-mix(in srgb, var(--clay) 8%, transparent); }
+
+.wv2-root .chr-sug-accept {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, var(--sage), var(--sug-deep));
+  border: 1px solid var(--sug-deep);
+  padding: 7px 13px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18) inset, 0 4px 12px -5px rgba(40, 70, 48, .5);
+  transition: transform .1s, box-shadow .14s, filter .14s;
+}
+.wv2-root .chr-sug-accept svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.wv2-root .chr-sug-accept:hover { filter: brightness(1.05); }
+.wv2-root .chr-sug-accept:active { transform: translateY(1px); }
+
+/* ── Draft-character candidates ──
+ * Names the AI tagged in the braindump idea tree that aren't cast yet. A lighter,
+ * character-toned strip — deliberately NOT the green "Suggested" card (those are
+ * proposals ready to accept; these are weaker name hints to draft). Sits at the
+ * top of the cast page and on the People init. */
+.wv2-root .chr-cand {
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--terra) 6%, var(--surface));
+  border: 1px solid var(--line-2);
+  box-shadow: 0 1px 2px rgba(60, 45, 38, .04);
+  padding: 13px 15px 14px;
+  margin-bottom: 16px;
+}
+.wv2-root .chr-cand-head { display: flex; align-items: baseline; gap: 9px; margin-bottom: 10px; flex-wrap: wrap; }
+.wv2-root .chr-cand-ttl {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.wv2-root .chr-cand-meta { margin-left: auto; font-family: var(--ui); font-size: 10.5px; color: var(--ink-3); }
+.wv2-root .chr-cand-meta b { color: var(--ink-1); font-weight: 700; }
+
+.wv2-root .chr-cand-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.wv2-root .chr-cand-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  padding: 5px 6px 5px 12px;
+  box-shadow: 0 1px 2px rgba(60, 45, 38, .04);
+}
+.wv2-root .chr-cand-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--surface) 70%, transparent);
+}
+.wv2-root .chr-cand-name {
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-1);
+  white-space: nowrap;
+}
+.wv2-root .chr-cand-draft {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 12%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--terra) 30%, var(--line-2));
+  border-radius: 999px;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: filter .12s ease, transform .06s ease;
+}
+.wv2-root .chr-cand-draft:hover { filter: brightness(1.04); }
+.wv2-root .chr-cand-draft:active { transform: translateY(1px); }
+.wv2-root .chr-cand-draft.is-pending { opacity: .6; cursor: default; }
+
+.wv2-root .chr-cand-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.wv2-root .chr-cand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: color .12s, border-color .12s, background .12s;
+}
+.wv2-root .chr-cand-chip svg { width: 11px; height: 11px; flex-shrink: 0; }
+.wv2-root .chr-cand-chip:hover { color: var(--ink); border-color: var(--ink-3); }
+.wv2-root .chr-cand-chip-ai { color: var(--terra-deep); }
+.wv2-root .chr-cand-chip-ai:hover { color: var(--terra); border-color: var(--terra); }
+.wv2-root .chr-cand-chip-ai .wv2-spark { font-size: 10px; }
+
+.wv2-root .chr-suggest-foot { margin-top: 11px; display: flex; align-items: center; gap: 8px; }
+.wv2-root .chr-suggest-all {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sug-deep);
+  background: color-mix(in srgb, var(--sage) 12%, var(--surface));
+  border: 1px solid var(--sug-line);
+  padding: 5px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .wv2-root .chr-sug { flex-wrap: wrap; }
+  .wv2-root .chr-sug-acts { margin-left: auto; }
+}
