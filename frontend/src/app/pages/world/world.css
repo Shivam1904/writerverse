@@ -1,0 +1,2734 @@
+/* ==============================================================
+ * World — page styles. Scoped under .wv2-root so they stay inside
+ * the app shell. Colour tokens come from the theme; static
+ * tokens (radius, shadow, type) from app.css.
+ *
+ * Calm v2 design: synopsis hero, special rules list, picture cards
+ * for places & things, generic bullets for everything else.
+ * ============================================================== */
+
+/* Page centering + reading-column cap come from the shared .wv2-page grid
+   (app.css) — the reading column sits centered between the rails. */
+/* --wm-gutter / --wm-gap size the gutter column; the block grid + sticky + the
+   off-screen overlay shell now live in the reusable margin library
+   (modules/margin/margin.css). This file only sizes the column and styles the
+   World entry's own look (.wm and friends, below). */
+.wv2-root .world-page {
+  --wm-gutter: 170px;
+  --wm-gap: clamp(18px, 2.6vw, 36px);
+}
+
+/* ---- world margin entry (per-block gutter heading) ----
+   No longer sticky — the margin overlay parks a ghost copy at the edge when this
+   scrolls off (modules/margin). */
+.wv2-root .wm {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 8px;
+  border-radius: var(--r-md);
+  user-select: none;
+  font: inherit;
+}
+
+/* leading accent line */
+.wv2-root .wm-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--line-2);
+  transition: height .18s, background .18s;
+}
+
+.wv2-root .wm-mark {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+}
+
+.wv2-root .wm-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.wv2-root .wm-label {
+  font-family: var(--ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  color: var(--ink-2);
+  white-space: nowrap;
+  flex-grow: 1;
+  width: 100%
+}
+
+.wv2-root .wm-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-4);
+}
+
+/* count pill — tinted by the group's colour */
+.wv2-root .wm-pill {
+  flex: 0 0 auto;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--wm-c, var(--ink-3)) 75%, var(--ink-2));
+  background: color-mix(in srgb, var(--wm-c, var(--ink-3)) 10%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--wm-c, var(--ink-3)) 22%, var(--line-2));
+  border-radius: 999px;
+}
+
+/* (the off-screen overlay shell — .wmo / .wmo-stack / .wmo-bottom — moved to the
+   reusable margin library, modules/margin/margin.css) */
+
+.wv2-root .wm-clickable {
+  cursor: pointer;
+}
+
+.wv2-root .wm-clickable:hover {
+  background: color-mix(in srgb, var(--wm-c, var(--ink-3)) 8%, transparent);
+}
+
+/* ---- editable margin entry (rename / hint / glyph+color, in the gutter) ----
+   The per-block gutter mark, made editable in place. Only these are editable;
+   the off-screen MarginOverlay entries stay read-only navigation. (No longer
+   sticky — the overlay parks a ghost copy at the edge instead.) */
+
+/* the mark becomes a button that opens the glyph/colour picker */
+.wv2-root .wm-mark-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: filter .12s, transform .1s;
+}
+
+.wv2-root .wm-mark-btn:hover {
+  filter: brightness(1.06);
+}
+
+.wv2-root .wm-mark-btn:active {
+  transform: translateY(1px);
+}
+
+/* click-to-edit label + hint share a quiet hover affordance */
+.wv2-root .wm-label-edit,
+.wv2-root .wm-sub-edit {
+  cursor: text;
+  border-radius: var(--r-xs);
+  padding: 0 3px;
+  margin: 0 -3px;
+  transition: background .12s;
+}
+
+.wv2-root .wm-label-edit:hover,
+.wv2-root .wm-sub-edit:hover {
+  background: color-mix(in srgb, var(--terra) 8%, transparent);
+}
+
+.wv2-root .wm-label-input {
+  font-family: var(--ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  color: var(--ink-2);
+  border: 0;
+  border-bottom: 1.5px solid var(--terra);
+  background: transparent;
+  outline: none;
+  padding: 0 2px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.wv2-root .wm-sub-input {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-4);
+  border: 0;
+  border-bottom: 1px solid var(--terra-soft);
+  background: transparent;
+  outline: none;
+  padding: 0 2px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.wv2-root .wm-hint-add {
+  align-self: flex-start;
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-4);
+  background: transparent;
+  border: 1px dashed var(--terra-soft);
+  border-radius: 99px;
+  padding: 0 8px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .12s, color .12s, border-color .12s;
+}
+
+.wv2-root .wm-edit:hover .wm-hint-add {
+  opacity: 1;
+}
+
+.wv2-root .wm-hint-add:hover {
+  color: var(--terra);
+  border-color: var(--terra);
+}
+
+/* the glyph/colour picker popover, anchored under the gutter entry. Pickers
+   stack so the popover stays narrow in the gutter (it may overhang the gap). */
+.wv2-root .wm-picker {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  margin-top: 8px;
+  background: var(--surface);
+  border: 1px solid var(--terra-soft);
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
+  box-shadow: 0 12px 32px -14px rgba(40, 30, 20, .45);
+}
+
+.wv2-root .wm-picker .w2-addsec-pickers {
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 0;
+}
+
+.wv2-root .wm-picker .w2-addsec-glyphs {
+  max-width: 220px;
+}
+
+/* ---- synopsis hero ---- */
+.wv2-root .w2-syn {
+  margin: 0 0 22px;
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.wv2-root .w2-syn p {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  margin: 0 0 10px;
+  max-width: 62ch;
+}
+
+.wv2-root .w2-syn p:last-of-type {
+  margin-bottom: 14px;
+}
+
+.wv2-root .w2-syn-placeholder {
+  font-style: italic;
+  color: var(--ink-3);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md, 8px);
+  padding: 14px 18px;
+  background: var(--surface-2);
+  cursor: text;
+}
+
+.wv2-root .w2-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 10px;
+  cursor: text;
+  letter-spacing: -.012em;
+}
+
+.wv2-root .w2-title-empty {
+  font-style: italic;
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+.wv2-root .w2-title-input {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.01em;
+  margin: 0 0 10px;
+  padding: 4px 8px;
+  border: 1px solid var(--terra-soft);
+  border-radius: var(--r-sm, 4px);
+  background: color-mix(in srgb, var(--terra) 4%, var(--surface));
+  outline: none;
+  width: 100%;
+  max-width: 62ch;
+  box-sizing: border-box;
+}
+
+.wv2-root .w2-syn-text {
+  cursor: text;
+  max-width: 62ch;
+}
+
+.wv2-root .w2-syn-text:hover {
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  border-radius: 4px;
+}
+
+.wv2-root .w2-syn-textarea {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  width: 100%;
+  max-width: 62ch;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--terra-soft);
+  border-radius: var(--r-sm, 4px);
+  background: color-mix(in srgb, var(--terra) 4%, var(--surface));
+  outline: none;
+  resize: vertical;
+  margin: 0 0 14px;
+  min-height: 80px;
+}
+
+.wv2-root .w2-theme {
+  cursor: pointer;
+}
+
+.wv2-root .w2-theme-x {
+  font-style: normal;
+  font-size: 14px;
+  opacity: 0;
+  margin-left: 2px;
+  transition: opacity .12s;
+}
+
+.wv2-root .w2-theme:hover .w2-theme-x {
+  opacity: .7;
+}
+
+.wv2-root .w2-theme-input {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  padding: 3px 12px;
+  border: 1px solid var(--terra-soft);
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--terra) 4%, var(--surface));
+  outline: none;
+  width: 120px;
+}
+
+.wv2-root .w2-drop {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 48px;
+  line-height: .82;
+  float: left;
+  margin: 5px 8px 0 0;
+  color: var(--terra-deep);
+  letter-spacing: -.025em;
+}
+
+/* themes */
+.wv2-root .w2-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.wv2-root .w2-theme {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 99px;
+  padding: 3px 12px;
+  letter-spacing: -.003em;
+  box-shadow: var(--sh-1);
+}
+
+.wv2-root .w2-theme-add {
+  background: transparent;
+  border: 1px dashed var(--line-3);
+  color: var(--ink-3);
+  cursor: pointer;
+  font-style: normal;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 500;
+  box-shadow: none;
+}
+
+.wv2-root .w2-theme-add:hover {
+  color: var(--terra-deep);
+  border-color: var(--terra-soft);
+}
+
+/* +more metadata */
+.wv2-root .w2-more {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-3);
+  padding: 0;
+}
+
+.wv2-root .w2-more span {
+  font-style: italic;
+  color: var(--ink-4);
+  font-family: var(--serif);
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.wv2-root .w2-more:hover {
+  color: var(--terra-deep);
+}
+
+/* ---- metadata read view (present fields shown on the page) ---- */
+/* Logline — the one-sentence hook, rendered as a tagline under the title. */
+.wv2-root .w2-syn-logline {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  max-width: 62ch;
+  margin: 0 0 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background .12s;
+}
+
+.wv2-root .w2-syn-logline:hover {
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+}
+
+/* All present values on ONE line; no labels. Variants differ by SHAPE / FILL /
+   WEIGHT (not hue) so each kind reads distinctly. One affordance — click to edit. */
+.wv2-root .w2-metaview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 14px;
+  max-width: 62ch;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 5px 6px;
+  margin-left: -6px;
+  transition: background .12s;
+}
+
+.wv2-root .w2-metaview:hover {
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+}
+
+.wv2-root .w2-mvchip {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  line-height: 1.5;
+  border-radius: 99px;
+  padding: 2px 11px;
+  color: var(--ink);
+}
+
+/* Genre — filled & solid: the primary category, most prominent. */
+.wv2-root .w2-mvchip-genre {
+  background: color-mix(in srgb, var(--ink) 8%, var(--surface));
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+
+/* Theme — outlined: what the story is about. */
+.wv2-root .w2-mvchip-theme {
+  background: transparent;
+  border: 1px solid var(--line-3);
+}
+
+/* Tone — soft italic text, no chrome: the mood. */
+.wv2-root .w2-mvchip-tone {
+  background: transparent;
+  border: 0;
+  padding: 2px 4px;
+  font-style: italic;
+  color: var(--ink-2);
+}
+
+/* Narrative settings (POV / tense / audience) — small squared tag, quiet. */
+.wv2-root .w2-mvchip-fact {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--ink) 4%, var(--surface));
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-xs);
+  padding: 2px 8px;
+  color: var(--ink-3);
+}
+
+/* ---- characters peek (rail into People) ---- */
+.wv2-root .w2-cast {
+  margin: 0 0 26px;
+}
+
+.wv2-root .w2-cast-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.wv2-root .w2-cast-title {
+  text-decoration: none;
+}
+
+.wv2-root .w2-cast-head h2 {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  margin: 0;
+  white-space: nowrap;
+  transition: color .12s;
+}
+
+.wv2-root .w2-cast-title:hover h2 {
+  color: var(--terra-deep);
+}
+
+.wv2-root .w2-cast-hint {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  letter-spacing: -.003em;
+}
+
+.wv2-root .w2-cast-all {
+  margin-left: auto;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wv2-root .w2-cast-all:hover {
+  color: var(--terra-deep);
+}
+
+.wv2-root .w2-cast-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  align-items: flex-start;
+}
+
+.wv2-root .w2-cast-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 64px;
+  background: transparent;
+  border: 0;
+  padding: 2px 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* Cast portraits — small bust frame (circular bottom + head above).
+   Placeholder, discs, and bust all share 48px circle at the bottom
+   of a 62px-tall visual slot. */
+.wv2-root .w2-cast-tile .chr-bust-sm {
+  width: 48px;
+  height: 62px;
+}
+
+.wv2-root .w2-cast-tile .chr-bust-ring {
+  border-width: 1.5px;
+}
+
+/* placeholder (no portrait): circular, same size/alignment as the bust ring */
+.wv2-root .w2-cast-tile .chr-port-sm {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  margin-top: 14px;
+}
+
+.wv2-root .w2-cast-tile .chr-port-sm::after {
+  border-radius: 0 0 48px 48px;
+  font-size: 7px;
+  padding: 3px 6px;
+}
+
+.wv2-root .w2-cast-name {
+  font-family: var(--serif);
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--ink);
+  text-align: center;
+  letter-spacing: -.003em;
+  max-width: 64px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wv2-root .w2-cast-tile:hover .w2-cast-name {
+  color: var(--terra-deep);
+}
+
+/* dashed disc shared by the +N overflow and the add tile —
+   14px top margin aligns with the bust frame's circle bottom */
+.wv2-root .w2-cast-disc {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1.5px dashed var(--line-3);
+  color: var(--ink-3);
+  font-family: var(--serif);
+  font-weight: 300;
+  line-height: 1;
+  margin-top: 14px;
+}
+
+.wv2-root .w2-cast-more .w2-cast-disc {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.wv2-root .w2-cast-add .w2-cast-disc {
+  font-size: 26px;
+}
+
+.wv2-root .w2-cast-tile:hover .w2-cast-disc {
+  border-color: var(--terra-soft);
+  color: var(--terra-deep);
+}
+
+.wv2-root .w2-cast-add .w2-cast-name {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* ---- outline legend ---- */
+.wv2-root .w2-arc-legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  margin: 0 0 18px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.wv2-root .w2-arc-legend-lbl {
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.wv2-root .w2-arc-legend-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+}
+
+.wv2-root .w2-arc-legend-end {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .02em;
+}
+
+.wv2-root .w2-arc-legend-end b {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* ---- arc strip (per-item) ---- */
+.wv2-root .w2-arc {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  padding: 1px 0;
+  cursor: default;
+}
+
+.wv2-root .w2-arc-cell {
+  width: 10px;
+  height: 4.5px;
+  border-radius: 1.5px;
+  background: var(--line-2);
+  box-shadow: inset 0 0 0 0.5px rgba(60, 40, 15, .05);
+  transition: background .12s;
+}
+
+.wv2-root .w2-arc-cell.drafted {
+  background: var(--line-2);
+}
+
+.wv2-root .w2-arc-cell.planned {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line-3);
+}
+
+.wv2-root .w2-arc-cell.hit.drafted {
+  background: var(--terra);
+  box-shadow: inset 0 0 0 0.5px rgba(120, 55, 5, .3);
+}
+
+.wv2-root .w2-arc-cell.hit.planned {
+  background: var(--terra-soft);
+  box-shadow: inset 0 0 0 1px var(--terra);
+}
+
+.wv2-root .w2-arc-divider {
+  width: 0;
+  height: 8px;
+  border-left: 1px solid var(--line-3);
+  margin: 0 2px;
+}
+
+/* ---- inbox banner ---- */
+.wv2-root .w2-inbox {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 14px;
+  margin-bottom: 24px;
+  background:
+    radial-gradient(140% 100% at 0% 0%, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 60%),
+    var(--surface-2);
+  border: 1px solid rgba(120, 110, 90, .20);
+  border-radius: 9px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55);
+}
+
+.wv2-root .w2-inbox-glyph {
+  color: var(--terra-deep);
+  font-size: 13px;
+  line-height: 1;
+  flex: 0 0 13px;
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, .45));
+}
+
+.wv2-root .w2-inbox-body {
+  flex: 1;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -.003em;
+}
+
+.wv2-root .w2-inbox-body b {
+  font-weight: 600;
+}
+
+.wv2-root .w2-inbox-cta {
+  background: transparent;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-xs);
+  padding: 4px 11px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.wv2-root .w2-inbox-cta:hover {
+  background: var(--surface);
+  border-color: var(--line-3);
+}
+
+.wv2-root .w2-inbox-x {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--ink-4);
+  font-size: 17px;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.wv2-root .w2-inbox-x:hover {
+  color: var(--ink-2);
+  background: rgba(60, 40, 15, .06);
+}
+
+/* ---- section heading ---- */
+.wv2-root .w2-section {
+  margin-bottom: 26px;
+}
+
+.wv2-root .w2-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.wv2-root .w2-head h2 {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.wv2-root .w2-hint {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  letter-spacing: -.003em;
+}
+
+/* ---- rules — special list ---- */
+.wv2-root .w2-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-left: 1.5px solid var(--terra-soft);
+  padding-left: 16px;
+}
+
+.wv2-root .w2-rule {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 9px;
+  padding: 7px 0;
+  border-bottom: 1px dotted var(--line);
+}
+
+.wv2-root .w2-rule:last-child {
+  border-bottom: 0;
+}
+
+.wv2-root .w2-rule-mark {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--terra-deep);
+  margin-top: 8px;
+}
+
+.wv2-root .w2-rule-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wv2-root .w2-rule-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+  letter-spacing: -.005em;
+}
+
+.wv2-root .w2-rule-from {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  letter-spacing: .01em;
+}
+
+.wv2-root .w2-rule-note {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--ink-3);
+  letter-spacing: -.003em;
+  margin-top: 2px;
+}
+
+.wv2-root .w2-rule-cta {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--terra-deep);
+  padding: 0;
+  margin-left: 2px;
+  font-style: normal;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: rgba(142, 63, 0, .25);
+}
+
+.wv2-root .w2-rule-cta:hover {
+  text-decoration-color: var(--terra-deep);
+}
+
+.wv2-root .w2-rule-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 1px;
+}
+
+/* ---- picture cards: places (top image) ---- */
+.wv2-root .w2-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 13px;
+}
+
+.wv2-root .w2-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+  box-shadow: var(--sh-1);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.wv2-root .w2-card:hover {
+  border-color: var(--line-3);
+}
+
+.wv2-root .w2-card-image {
+  aspect-ratio: 4/3;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.wv2-root .w2-card-image.has-image {
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(120, 90, 40, .10) 0 2px,
+      rgba(120, 90, 40, 0) 2px 10px),
+    linear-gradient(165deg, #dccba0 0%, #b09a6a 100%);
+}
+
+.wv2-root .w2-card-image.no-image {
+  background:
+    radial-gradient(90% 80% at 30% 25%, rgba(255, 255, 255, .55), transparent 60%),
+    linear-gradient(165deg, #ece5d6 0%, #ddd4be 100%);
+  display: grid;
+  place-items: center;
+  padding: 14px 18px;
+}
+
+.wv2-root .w2-card-image.no-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(-45deg,
+      rgba(120, 90, 40, .06) 0 1px,
+      transparent 1px 7px);
+}
+
+.wv2-root .w2-nameplate {
+  position: relative;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.15;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -.012em;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, .7);
+}
+
+.wv2-root .w2-card-body {
+  display: flex;
+  flex-direction: column;
+  padding: 9px 12px 10px;
+  gap: 2px;
+  flex: 1;
+}
+
+.wv2-root .w2-card-name {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  line-height: 1.25;
+}
+
+.wv2-root .w2-card-line {
+  font-family: var(--serif);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--ink-2);
+  letter-spacing: -.003em;
+  margin-bottom: 1px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wv2-root .w2-card-from {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: .01em;
+}
+
+.wv2-root .w2-card-foot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 5px;
+}
+
+/* add card */
+.wv2-root .w2-card-add {
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+}
+
+.wv2-root .w2-card-add:hover {
+  background: var(--surface-2);
+  border-color: var(--terra-soft);
+}
+
+.wv2-root .w2-card-image-add {
+  aspect-ratio: 4/3;
+  background: repeating-linear-gradient(45deg,
+      rgba(120, 90, 40, .05) 0 2px, rgba(120, 90, 40, 0) 2px 8px);
+  display: grid;
+  place-items: center;
+  border-bottom: 1px dashed var(--line-3);
+}
+
+.wv2-root .w2-plus {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--ink-3);
+  line-height: 1;
+}
+
+.wv2-root .w2-card-name-add {
+  color: var(--ink-3);
+  font-weight: 500;
+  font-family: var(--ui);
+  font-size: 11.5px;
+}
+
+/* ---- side-layout cards (things) ---- */
+.wv2-root .w2-cards-side {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.wv2-root .w2-card-side {
+  flex-direction: row;
+  padding: 10px 12px;
+  gap: 12px;
+  border-radius: 9px;
+}
+
+.wv2-root .w2-card-thumb {
+  flex: 0 0 90px;
+  width: 90px;
+  aspect-ratio: 1.05/1.15;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--line-2);
+  align-self: flex-start;
+}
+
+.wv2-root .w2-card-thumb.has-image {
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(120, 90, 40, .10) 0 2px,
+      rgba(120, 90, 40, 0) 2px 8px),
+    linear-gradient(165deg, #e8dec5 0%, #d5c9a5 100%);
+}
+
+.wv2-root .w2-card-thumb.no-image {
+  background:
+    radial-gradient(90% 80% at 30% 25%, rgba(255, 255, 255, .55), transparent 60%),
+    linear-gradient(165deg, #ece5d6 0%, #ddd4be 100%);
+  display: grid;
+  place-items: center;
+}
+
+.wv2-root .w2-card-thumb.no-image::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(-45deg,
+      rgba(120, 90, 40, .06) 0 1px,
+      transparent 1px 7px);
+}
+
+.wv2-root .w2-thumb-initial {
+  position: relative;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ink-2);
+  letter-spacing: -.02em;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, .7);
+}
+
+.wv2-root .w2-card-side .w2-card-body {
+  padding: 0;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+
+.wv2-root .w2-card-add-side {
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+}
+
+.wv2-root .w2-card-add-side:hover {
+  background: var(--surface-2);
+  border-color: var(--terra-soft);
+}
+
+.wv2-root .w2-card-thumb-add {
+  background: repeating-linear-gradient(45deg,
+      rgba(120, 90, 40, .05) 0 2px, rgba(120, 90, 40, 0) 2px 8px);
+  border: 1px dashed var(--line-3);
+  display: grid;
+  place-items: center;
+}
+
+.wv2-root .w2-plus-sm {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--ink-3);
+  line-height: 1;
+}
+
+/* ---- generic bullets ---- */
+.wv2-root .w2-bullets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wv2-root .w2-bullet {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  gap: 9px;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px dotted var(--line);
+}
+
+.wv2-root .w2-bullet:last-child {
+  border-bottom: 0;
+}
+
+.wv2-root .w2-bullet-mark {
+  color: var(--ink-4);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.wv2-root .w2-bullet-body {
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  min-width: 0;
+}
+
+.wv2-root .w2-bullet-name {
+  font-weight: 600;
+}
+
+.wv2-root .w2-bullet-sep {
+  color: var(--ink-3);
+}
+
+.wv2-root .w2-bullet-text {
+  color: var(--ink-2);
+}
+
+.wv2-root .w2-bullet-from {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  font-style: normal;
+  letter-spacing: .01em;
+}
+
+/* ---- add buttons ---- */
+.wv2-root .w2-add {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  padding: 10px 0 0;
+  text-align: left;
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+.wv2-root .w2-add:hover {
+  color: var(--terra-deep);
+}
+
+.wv2-root .w2-section-add {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: transparent;
+  border: 1px dashed var(--line-3);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  width: 100%;
+  margin-top: 6px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.wv2-root .w2-section-add:hover {
+  background: var(--surface-2);
+  border-color: var(--terra-soft);
+  color: var(--ink);
+}
+
+.wv2-root .w2-section-add span {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* ---- reader / ask bar ---- */
+.wv2-root .w2-reader {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 12px 14px;
+  width: 100%;
+  border-top: 1px solid var(--line);
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-2);
+  text-align: left;
+}
+
+.wv2-root .w2-reader em {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-3);
+  font-size: 12.5px;
+}
+
+.wv2-root .w2-reader:hover {
+  color: var(--ink);
+}
+
+.wv2-root .w2-reader:hover em {
+  color: var(--ink-2);
+}
+
+.wv2-root .w2-reader-glyph {
+  color: var(--terra-deep);
+  font-size: 12.5px;
+  line-height: 1;
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, .4));
+}
+
+/* ---- inline editing ---- */
+.wv2-root .w2-editable {
+  cursor: text;
+  border-radius: 3px;
+  transition: background .12s;
+}
+
+.wv2-root .w2-editable:hover {
+  background: rgba(120, 90, 40, .04);
+}
+
+.wv2-root .w2-inline-input {
+  font-family: var(--serif);
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--terra-soft);
+  border-radius: 4px;
+  padding: 3px 7px;
+  width: 100%;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(142, 63, 0, .08);
+}
+
+.wv2-root .w2-inline-input:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px rgba(142, 63, 0, .14);
+}
+
+.wv2-root .w2-inline-input::placeholder {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
+.wv2-root .w2-add-form {
+  padding: 8px 0 0;
+}
+
+.wv2-root .w2-bullet-edit-row {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.wv2-root .w2-inline-sm {
+  flex: 0 0 120px;
+  max-width: 120px;
+}
+
+.wv2-root .w2-inline-grow {
+  flex: 1;
+}
+
+/* ---- delete button (hover-revealed) ---- */
+.wv2-root .w2-item-delete {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  background: rgba(255, 255, 255, .85);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--ink-3);
+  cursor: pointer;
+  display: none;
+  place-items: center;
+  z-index: 2;
+}
+
+.wv2-root .w2-item-delete:hover {
+  color: #c33;
+  border-color: #daa;
+  background: rgba(255, 240, 240, .9);
+}
+
+.wv2-root .w2-rule {
+  position: relative;
+}
+
+.wv2-root .w2-rule:hover>.w2-item-delete {
+  display: grid;
+}
+
+.wv2-root .w2-bullet {
+  position: relative;
+}
+
+.wv2-root .w2-bullet:hover>.w2-item-delete {
+  display: grid;
+}
+
+.wv2-root .w2-card {
+  position: relative;
+}
+
+.wv2-root .w2-card:hover>.w2-card-delete {
+  display: grid;
+}
+
+.wv2-root .w2-card-delete {
+  right: 6px;
+  top: 6px;
+}
+
+/* adding card state */
+.wv2-root .w2-card-adding {
+  border-color: var(--terra-soft);
+  box-shadow: 0 0 0 2px rgba(142, 63, 0, .08);
+}
+
+/* ===========================================================================
+   Add-section panel — .w2-addsec-*
+
+   The inline "+ new section" affordance, expanded. Built in the world rail's
+   language: known sections are a SHELF of glossy marks, each on a spot-lit
+   plinth (luminous light pad + crisp contact shadow), the icons the hero. One
+   accent (terra) marks only what you've picked. Borrows the section card frame.
+   =========================================================================== */
+.wv2-root .w2-addsec {
+  position: relative;
+  margin-top: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  padding: 18px 20px 16px;
+  box-shadow: var(--sh-2);
+  overflow: hidden;
+}
+
+/* the terra spine — a quiet "you're composing" marker down the left edge */
+.wv2-root .w2-addsec::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(var(--terra), var(--terra-deep));
+}
+
+.wv2-root .w2-addsec-kicker {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+  margin-bottom: 13px;
+}
+
+.wv2-root .w2-addsec-shelflabel,
+.wv2-root .w2-addsec-pl {
+  font-family: var(--ui);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 9px;
+}
+
+/* ── the suggestion shelf ── */
+.wv2-root .w2-addsec-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wv2-root .w2-addsec-sug {
+  width: 86px;
+  padding: 12px 6px 9px;
+  border-radius: var(--r-lg);
+  border: 1.5px solid var(--line);
+  background: var(--surface-2, #fff);
+  cursor: pointer;
+  text-align: center;
+  font: inherit;
+  transition: border-color .12s, box-shadow .12s, transform .12s;
+}
+
+.wv2-root .w2-addsec-sug:hover {
+  border-color: var(--line-3);
+  box-shadow: var(--sh-1);
+  transform: translateY(-1px);
+}
+
+.wv2-root .w2-addsec-sug.is-on {
+  border-color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 5%, var(--surface));
+}
+
+.wv2-root .w2-addsec-sug.is-added {
+  opacity: .55;
+}
+
+.wv2-root .w2-addsec-sug.is-added.is-on {
+  opacity: 1;
+}
+
+/* the plinth — luminous light pad + crisp contact shadow (cf. the world rail) */
+.wv2-root .w2-addsec-plinth,
+.wv2-root .w2-addsec-preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.wv2-root .w2-addsec-plinth {
+  height: 40px;
+}
+
+.wv2-root .w2-addsec-plinth::before,
+.wv2-root .w2-addsec-preview::before {
+  content: '';
+  position: absolute;
+  inset: 2px 14px;
+  border-radius: var(--r-md);
+  background:
+    radial-gradient(66% 56% at 40% 26%, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0) 62%),
+    radial-gradient(96% 90% at 50% 64%, color-mix(in srgb, var(--sec-c, var(--ink-3)) 13%, transparent), transparent 80%);
+}
+
+.wv2-root .w2-addsec-plinth::after,
+.wv2-root .w2-addsec-preview::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 4px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(20, 25, 35, .26), transparent);
+}
+
+.wv2-root .w2-addsec-plinth svg,
+.wv2-root .w2-addsec-preview svg {
+  position: relative;
+  z-index: 1;
+}
+
+.wv2-root .w2-addsec-sug-nm {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ── "or name your own" divider ── */
+.wv2-root .w2-addsec-or {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 18px 0 13px;
+}
+
+.wv2-root .w2-addsec-or::before,
+.wv2-root .w2-addsec-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.wv2-root .w2-addsec-or span {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* ── name field with live mark preview ── */
+.wv2-root .w2-addsec-nameline {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  background: var(--surface);
+  border: 1.5px solid var(--terra-soft);
+  border-radius: var(--r-md);
+  padding: 9px 11px 9px 9px;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.wv2-root .w2-addsec-nameline:focus-within {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px rgba(142, 63, 0, .12);
+}
+
+.wv2-root .w2-addsec-preview {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--r-md);
+  background: var(--surface-2, #faf7fd);
+}
+
+.wv2-root .w2-addsec-name {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: none;
+  font-family: var(--serif);
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.wv2-root .w2-addsec-name::placeholder {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
+/* ── glyph + colour pickers ── */
+.wv2-root .w2-addsec-pickers {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.wv2-root .w2-addsec-glyphs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  max-width: 320px;
+}
+
+.wv2-root .w2-addsec-gcell {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color .1s;
+}
+
+.wv2-root .w2-addsec-gcell:hover {
+  border-color: var(--line-3);
+}
+
+.wv2-root .w2-addsec-gcell.is-on {
+  border-color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 5%, var(--surface));
+}
+
+.wv2-root .w2-addsec-cols {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.wv2-root .w2-addsec-dot {
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, .5), 0 0 0 1px rgba(0, 0, 0, .06);
+}
+
+.wv2-root .w2-addsec-dot.is-on {
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, .5), 0 0 0 2px var(--ink);
+}
+
+/* ── footer ── */
+.wv2-root .w2-addsec-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.wv2-root .w2-addsec-note {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 11.5px;
+  color: var(--ink-4);
+}
+
+.wv2-root .w2-addsec-btns {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* section heading mark — the glossy section mark beside the <h2> title */
+.wv2-root .w2-head-mark {
+  display: inline-grid;
+  place-items: center;
+  vertical-align: -3px;
+  margin-right: 9px;
+}
+
+/* ---- editable section heading (rename / hint / glyph+color) ---- */
+.wv2-root .w2-head-edit {
+  position: relative;
+}
+
+/* the mark becomes a button that opens the glyph/colour picker */
+.wv2-root .w2-head-mark-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: filter .12s, transform .1s;
+}
+
+.wv2-root .w2-head-mark-btn:hover {
+  filter: brightness(1.06);
+}
+
+.wv2-root .w2-head-mark-btn:active {
+  transform: translateY(1px);
+}
+
+/* click-to-rename title + click-to-edit hint share a quiet hover affordance */
+.wv2-root .w2-head-title,
+.wv2-root .w2-hint-edit {
+  cursor: text;
+  border-radius: var(--r-xs);
+  padding: 0 3px;
+  transition: background .12s;
+}
+
+.wv2-root .w2-head-title:hover,
+.wv2-root .w2-hint-edit:hover {
+  background: color-mix(in srgb, var(--terra) 8%, transparent);
+}
+
+.wv2-root .w2-head-title-input {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 1.5px solid var(--terra);
+  background: transparent;
+  outline: none;
+  padding: 0 2px;
+  min-width: 140px;
+}
+
+.wv2-root .w2-head-hint-input {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  border: 0;
+  border-bottom: 1px solid var(--terra-soft);
+  background: transparent;
+  outline: none;
+  padding: 0 2px;
+  min-width: 120px;
+}
+
+.wv2-root .w2-hint-add {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-4);
+  background: transparent;
+  border: 1px dashed var(--terra-soft);
+  border-radius: 99px;
+  padding: 1px 9px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .12s, color .12s, border-color .12s;
+}
+
+.wv2-root .w2-head-edit:hover .w2-hint-add {
+  opacity: 1;
+}
+
+.wv2-root .w2-hint-add:hover {
+  color: var(--terra);
+  border-color: var(--terra);
+}
+
+/* the glyph/colour picker popover under the heading */
+.wv2-root .w2-head-picker {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  margin-top: 8px;
+  background: var(--surface);
+  border: 1px solid var(--terra-soft);
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
+  box-shadow: 0 12px 32px -14px rgba(40, 30, 20, .45);
+}
+
+/* ---- empty state ---- */
+.wv2-root .w2-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--ink-3);
+}
+
+.wv2-root .w2-empty-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink-2);
+  margin-bottom: 8px;
+}
+
+.wv2-root .w2-empty-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 42ch;
+  margin: 0 auto;
+}
+
+/* ===========================================================================
+   More-metadata panel — .w2-meta-*
+
+   The inline "+ more metadata" form, expanded. Same frame as the add-section
+   panel (terra spine, surface card). Deliberately TIERED so fields don't read
+   as equals: ① a HERO block (logline + genre + tone — the story's identity),
+   then ② quieter SECONDARY rows (perspective / tense / audience) set off by a
+   divider and rendered as small single-select pills.
+   =========================================================================== */
+.wv2-root .w2-meta {
+  position: relative;
+  margin-top: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  padding: 18px 20px 16px;
+  box-shadow: var(--sh-2);
+  overflow: hidden;
+}
+
+.wv2-root .w2-meta::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(var(--terra), var(--terra-deep));
+}
+
+.wv2-root .w2-meta-kicker {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+  margin-bottom: 14px;
+}
+
+/* ── ① HERO block — the prominent tier ── */
+/* Hero fields stack with a little air between them. */
+.wv2-root .w2-meta-hero>.w2-meta-field+.w2-meta-field {
+  margin-top: 14px;
+}
+
+/* Synopsis — the LARGEST field: the full summary gets the most room. */
+.wv2-root .w2-meta-synopsis {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 132px;
+  border: 1.5px solid var(--terra-soft);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--terra) 3%, var(--surface));
+  padding: 13px 15px;
+  font-family: var(--serif);
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.wv2-root .w2-meta-synopsis:focus,
+.wv2-root .w2-meta-logline:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px rgba(142, 63, 0, .12);
+}
+
+.wv2-root .w2-meta-synopsis::placeholder,
+.wv2-root .w2-meta-logline::placeholder {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
+/* Logline — secondary to the synopsis: a single line, a touch smaller. */
+.wv2-root .w2-meta-logline {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid var(--terra-soft);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--terra) 3%, var(--surface));
+  padding: 10px 14px;
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.wv2-root .w2-meta-lbl-hint {
+  font-weight: 500;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-4);
+  margin-left: 6px;
+  font-family: var(--serif);
+  font-size: 11px;
+}
+
+.wv2-root .w2-meta-herogrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 28px;
+  margin-top: 15px;
+}
+
+@media (max-width: 720px) {
+  .wv2-root .w2-meta-herogrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wv2-root .w2-meta-lbl {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+
+.wv2-root .w2-meta-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.wv2-root .w2-meta-chip {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink);
+  border: 1px solid var(--terra-soft);
+  background: color-mix(in srgb, var(--terra) 7%, var(--surface));
+  border-radius: 99px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: border-color .12s;
+}
+
+.wv2-root .w2-meta-chip:hover {
+  border-color: var(--terra);
+}
+
+.wv2-root .w2-meta-chip-x {
+  font-style: normal;
+  opacity: .5;
+  margin-left: 1px;
+}
+
+.wv2-root .w2-meta-chipin {
+  flex: 1;
+  min-width: 96px;
+  border: 0;
+  outline: 0;
+  background: none;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink);
+  padding: 4px 2px;
+}
+
+.wv2-root .w2-meta-chipin::placeholder {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
+.wv2-root .w2-meta-sugs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.wv2-root .w2-meta-sug {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  cursor: pointer;
+  background: transparent;
+  border: 1px dashed var(--line-3);
+  border-radius: 99px;
+  padding: 2px 9px;
+  transition: color .12s, border-color .12s;
+}
+
+.wv2-root .w2-meta-sug:hover {
+  color: var(--terra-deep);
+  border-color: var(--terra-soft);
+}
+
+/* ── ② SECONDARY block — quieter tier, set off by a divider ── */
+.wv2-root .w2-meta-rows {
+  margin-top: 18px;
+  padding-top: 15px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.wv2-root .w2-meta-prow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wv2-root .w2-meta-plabel {
+  flex: 0 0 84px;
+  font-family: var(--ui);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.wv2-root .w2-meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wv2-root .w2-meta-pill {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 99px;
+  padding: 3px 11px;
+  cursor: pointer;
+  transition: border-color .12s, background .12s, color .12s;
+}
+
+.wv2-root .w2-meta-pill:hover {
+  border-color: var(--line-3);
+}
+
+.wv2-root .w2-meta-pill.is-on {
+  border-color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 6%, var(--surface));
+  color: var(--terra-deep);
+  font-weight: 600;
+}
+
+/* ── footer ── */
+.wv2-root .w2-meta-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.wv2-root .w2-meta-note {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 11.5px;
+  color: var(--ink-4);
+}
+
+.wv2-root .w2-meta-btns {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* ── Proposal skin ──────────────────────────────────────────────────────────
+   When an AI `update_project_meta` suggestion is pending, the SAME form opens
+   as the World page surface. The terra "your draft" spine/tint swaps to a sage
+   GREEN "this is a suggestion to accept" skin (the shared green
+   suggestion-surface treatment): green spine, faint green wash, ✦ kicker,
+   a pager when several are queued, and Accept / Reject in the footer. */
+.wv2-root .w2-meta.is-proposal {
+  background: color-mix(in srgb, var(--sage) 7%, var(--surface));
+  border-color: color-mix(in srgb, var(--sage) 30%, var(--line-2));
+}
+
+.wv2-root .w2-meta.is-proposal::before {
+  background: linear-gradient(var(--sage), color-mix(in srgb, var(--sage) 65%, #000));
+}
+
+.wv2-root .w2-meta-kicker.is-proposal {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--sage);
+}
+
+/* Pager — flip between several pending suggestions. ← N of M → */
+.wv2-root .w2-meta-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 5px 10px;
+  margin-bottom: 12px;
+  background: color-mix(in srgb, var(--sage) 6%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--sage) 22%, var(--line-2));
+  border-radius: var(--r-sm);
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+.wv2-root .w2-meta-pager-btn {
+  padding: 2px 8px;
+  min-width: 28px;
+  background: transparent;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.wv2-root .w2-meta-pager-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+.wv2-root .w2-meta-pager-btn:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.wv2-root .w2-meta-pager-label {
+  flex: 1;
+  text-align: center;
+  font-weight: 500;
+  color: var(--sage);
+}
+
+/* Accept / Reject (proposal footer). Primary = sage green accept. */
+.wv2-root .w2-meta-btn {
+  padding: 6px 14px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-family: var(--ui);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+
+.wv2-root .w2-meta-btn:hover {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  border-color: var(--ink-3);
+}
+
+.wv2-root .w2-meta-btn--primary {
+  background: var(--sage);
+  color: var(--canvas);
+  border-color: color-mix(in srgb, var(--sage) 70%, #000);
+}
+
+.wv2-root .w2-meta-btn--primary:hover {
+  background: color-mix(in srgb, var(--sage) 85%, #000);
+  border-color: color-mix(in srgb, var(--sage) 60%, #000);
+}
+
+/* Per-field highlight — ONLY the fields the suggestion changes glow green;
+   every other field keeps its real current value, unstyled. A green dot + sage
+   label marks the changed field; its control gets a sage border/wash/ring. */
+.wv2-root .w2-meta-field.is-proposed>.w2-meta-lbl,
+.wv2-root .w2-meta-prow.is-proposed>.w2-meta-plabel {
+  color: var(--sage);
+}
+
+.wv2-root .w2-meta-field.is-proposed>.w2-meta-lbl::before,
+.wv2-root .w2-meta-prow.is-proposed>.w2-meta-plabel::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sage);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.wv2-root .w2-meta-field.is-proposed .w2-meta-synopsis,
+.wv2-root .w2-meta-field.is-proposed .w2-meta-logline {
+  border-color: var(--sage);
+  background: color-mix(in srgb, var(--sage) 9%, var(--surface));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sage) 15%, transparent);
+}
+
+.wv2-root .w2-meta-field.is-proposed .w2-meta-synopsis:focus,
+.wv2-root .w2-meta-field.is-proposed .w2-meta-logline:focus {
+  border-color: var(--sage);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sage) 24%, transparent);
+}
+
+.wv2-root .w2-meta-field.is-proposed .w2-meta-chip {
+  border-color: color-mix(in srgb, var(--sage) 55%, var(--line-2));
+  background: color-mix(in srgb, var(--sage) 12%, var(--surface));
+}
+
+.wv2-root .w2-meta-field.is-proposed .w2-meta-chip:hover {
+  border-color: var(--sage);
+}
+
+.wv2-root .w2-meta-prow.is-proposed .w2-meta-pill.is-on {
+  border-color: var(--sage);
+  background: color-mix(in srgb, var(--sage) 10%, var(--surface));
+  color: var(--sage);
+}
+
+/* ── World page surface — pending "add to world" suggestions ────────────────
+   Pending add_worldbuilding + extracted item/rule proposals render IN CONTEXT
+   inside their target section (a ghosted rule row / card / bullet), not as a
+   separate lump — see <PendingSectionEntries>. A sage "suggested, not yet
+   accepted" accent + accept/dismiss; the right-rail suppresses these on the
+   World page so they never double up. */
+.wv2-root .w2-pending {
+  --pend: var(--sage);
+  --pend-line: color-mix(in srgb, var(--pend) 42%, var(--line-2));
+  --pend-bg: color-mix(in srgb, var(--pend) 8%, var(--surface));
+  --pend-deep: color-mix(in srgb, var(--pend) 72%, #14241b);
+  position: relative;
+}
+
+/* rule + bullet rows: sage dashed band, action cluster at the trailing edge */
+.wv2-root li.w2-rule.w2-pending,
+.wv2-root li.w2-bullet.w2-pending {
+  border-bottom: 0;
+  background: var(--pend-bg);
+  border: 1px dashed var(--pend-line);
+  border-radius: 9px;
+  padding: 8px 11px;
+  margin-top: 6px;
+}
+
+.wv2-root li.w2-rule.w2-pending {
+  grid-template-columns: 12px 1fr auto;
+  align-items: center;
+}
+
+.wv2-root .w2-rule.w2-pending .w2-rule-mark {
+  background: var(--pend-deep);
+}
+
+/* cards: dashed sage frame; the foot carries the actions */
+.wv2-root article.w2-card.w2-pending {
+  border: 1px dashed var(--pend-line);
+  background: var(--pend-bg);
+}
+
+.wv2-root .w2-card.w2-pending .w2-card-foot {
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.wv2-root .w2-pend-spark {
+  color: var(--pend-deep);
+  font-size: 13px;
+}
+
+/* accept / dismiss — the same pair the toast/rail use, sage-keyed */
+.wv2-root .w2-pend-acts {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wv2-root .w2-pend-dismiss {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-md);
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid var(--line-2);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color .14s, border-color .14s, background .14s;
+}
+
+.wv2-root .w2-pend-dismiss svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.wv2-root .w2-pend-dismiss:hover {
+  color: var(--clay);
+  border-color: var(--clay);
+  background: color-mix(in srgb, var(--clay) 8%, transparent);
+}
+
+.wv2-root .w2-pend-accept {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, var(--pend), var(--pend-deep));
+  border: 1px solid var(--pend-deep);
+  padding: 6px 11px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18) inset, 0 4px 12px -5px rgba(40, 70, 48, .5);
+  transition: transform .1s, filter .14s;
+}
+
+.wv2-root .w2-pend-accept svg {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.wv2-root .w2-pend-accept:hover {
+  filter: brightness(1.05);
+}
+
+.wv2-root .w2-pend-accept:active {
+  transform: translateY(1px);
+}
+
+/* ===========================================================================
+ * MetaSection — the studio-style project-metadata surface (synopsis essence +
+ * metadata chips). Reuses the character studio's cst-* facet/proposal classes
+ * (studio.css is imported by MetaSection); these rules add the World skin.
+ * ========================================================================= */
+.wv2-root .w2-meta2 {
+  margin-top: 6px;
+}
+
+/* Synopsis = the essence line. The FieldEdit display (or its green cst-prop
+ * wrapper when proposed) is the first child → takes the row; the ideas toggle
+ * sits to its right. */
+.wv2-root .w2-meta2-essence-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 4px 0 2px;
+}
+
+.wv2-root .w2-meta2-essence-row> :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.wv2-root .w2-meta2-essence-row .cst-prop {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+}
+
+.wv2-root .w2-meta2-essence-row .cst-prop> :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.wv2-root .w2-meta2-essence {
+  display: block;
+  white-space: pre-wrap;
+  max-width: 62ch;
+  cursor: text;
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.62;
+  color: var(--ink);
+  border-radius: var(--r-md);
+  transition: background .12s;
+}
+
+.wv2-root .w2-meta2-essence:hover {
+  background: color-mix(in srgb, var(--terra) 4%, transparent);
+}
+
+.wv2-root .w2-meta2-essence.is-empty {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
+/* Editing the synopsis — a full-width serif textarea. */
+.wv2-root textarea.w2-meta2-syn-edit {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 120px;
+  border: 1.5px solid var(--terra-soft);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--terra) 3%, var(--surface));
+  padding: 12px 15px;
+  font-family: var(--serif);
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.wv2-root textarea.w2-meta2-syn-edit:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px rgba(142, 63, 0, .12);
+}
+
+/* Show/hide-ideas toggle — a quiet ghost button. */
+.wv2-root .w2-meta2-ideatoggle {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: transparent;
+  border: 1px solid var(--line-soft, var(--terra-soft));
+  border-radius: 99px;
+  padding: 4px 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color .12s, border-color .12s, background .12s;
+}
+
+.wv2-root .w2-meta2-ideatoggle:hover {
+  color: var(--terra);
+  border-color: var(--terra-soft);
+}
+
+.wv2-root .w2-meta2-ideatoggle.is-on {
+  color: var(--terra);
+  border-color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 7%, transparent);
+}
+
+.wv2-root .w2-meta2-ideatoggle .cst-ask-mk {
+  margin-right: 3px;
+}
+
+/* World-page global "ideas" toggle bar — one button reveals every section's
+   "from your ideas" strip at once. */
+.wv2-root .w2-ideasbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 2px 0 -2px;
+}
+
+/* "Make real" candidates — braindump-tagged entities not yet added to a section.
+   Each chip promotes the entity (creates the row + queues an AI description). */
+.wv2-root .w2-cands {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  margin: 8px 0 2px;
+}
+
+.wv2-root .w2-cands-lbl {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.wv2-root .w2-cands-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.wv2-root .w2-cand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink-2, var(--ink));
+  border: 1px dashed var(--terra-soft);
+  background: color-mix(in srgb, var(--terra) 4%, var(--surface));
+  border-radius: 99px;
+  padding: 3px 4px 3px 11px;
+  cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+
+.wv2-root .w2-cand:hover {
+  border-style: solid;
+  border-color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 9%, var(--surface));
+}
+
+.wv2-root .w2-cand-name {
+  font-style: italic;
+}
+
+.wv2-root .w2-cand-make {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 12%, var(--surface));
+  border-radius: 99px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.wv2-root .w2-cand-make .cst-ask-mk {
+  margin-right: 2px;
+}
+
+/* World entity edit view — the roomy FieldEdit body (name + description) shown
+   when an entity is clicked, replacing the old cramped inline inputs. The green
+   proposal overlay (is-proposed / cst-prop ✓✗) comes from studio.css. */
+.wv2-root .w2-ent-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.wv2-root .w2-ent-name {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: text;
+  border-radius: var(--r-xs);
+  padding: 0 2px;
+  transition: background .12s;
+}
+
+.wv2-root .w2-ent-name:hover {
+  background: color-mix(in srgb, var(--terra) 7%, transparent);
+}
+
+.wv2-root .w2-ent-name.is-empty {
+  color: var(--ink-4);
+  font-weight: 500;
+  font-style: italic;
+}
+
+.wv2-root input.w2-ent-name-input {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 1.5px solid var(--terra);
+  background: transparent;
+  outline: none;
+  padding: 0 2px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.wv2-root .w2-ent-desc {
+  display: block;
+  white-space: pre-wrap;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-2, var(--ink));
+  cursor: text;
+  border-radius: var(--r-xs);
+  padding: 1px 2px;
+  margin: 0;
+  transition: background .12s;
+}
+
+.wv2-root .w2-ent-desc:hover {
+  background: color-mix(in srgb, var(--terra) 6%, transparent);
+}
+
+.wv2-root .w2-ent-desc.is-empty {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
+.wv2-root textarea.w2-ent-desc-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 56px;
+  border: 1.5px solid var(--terra-soft);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--terra) 3%, var(--surface));
+  padding: 8px 11px;
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .12s, box-shadow .12s;
+}
+
+.wv2-root textarea.w2-ent-desc-input:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px rgba(142, 63, 0, .1);
+}
+
+/* the green "a description was drafted, click to review" dot in view mode */
+.wv2-root .w2-ent-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--asp-proposals, var(--sage));
+  margin-left: 6px;
+  vertical-align: middle;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--asp-proposals, var(--sage)) 25%, transparent);
+}
+
+/* A card (Places / Things) in edit mode spans the full grid row, so its name +
+   description fields get full width instead of a squeezed 1/3-column cell. */
+.wv2-root .w2-card.is-editing {
+  grid-column: 1 / -1;
+}
+
+/* Genre/themes/tone grid + narration rows inside an open chip. */
+.wv2-root .w2-meta2-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 28px;
+}
+
+@media (max-width: 720px) {
+  .wv2-root .w2-meta2-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.wv2-root .w2-meta2-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* A proposed list/enum field: the (green-highlighted) widget + ✓/✗ beside it. */
+.wv2-root .w2-meta2-prop {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.wv2-root .w2-meta2-prop-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.wv2-root .w2-meta2-prop-actions {
+  margin-top: 2px;
+}
