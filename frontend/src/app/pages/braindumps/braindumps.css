@@ -1,0 +1,453 @@
+/* ============================================================
+ * INIT — the empty-state "blank notebook opening" (handoff: 00-init.html).
+ * Onboarding-calm, not app-dense: one prompt, one quiet field, two ways the
+ * surface opens (stream / canvas), and the off-hand organize promise. Owns the
+ * whole content area until the first braindump lands. All colour from tokens.
+ * ============================================================ */
+
+/* the takeover layout (.wv2-init-stage) and the centred column + hero
+   (.wv2-init / .wv2-init-head / -eyebrow / -title / -sub) are the SHARED init
+   standard from app.css. .bdi-shell is just a positioning context. */
+.wv2-root .bdi-shell {
+  position: relative;
+}
+
+/* the centred field reuses the shared .wv2-init column; .bdi-field only
+   needs the stacking context for the grainless surface. */
+.wv2-root .bdi-field {
+  position: relative;
+  z-index: 1;
+}
+
+/* a touch more air under the hero before the writing box */
+.wv2-root .bdi-field .wv2-init-head {
+  margin-bottom: 40px;
+}
+
+/* ---- the one box ---- */
+.wv2-root .bdi-paper {
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .55) inset,
+    0 1px 2px rgba(60, 40, 15, .04),
+    0 18px 44px -22px rgba(40, 28, 8, .30);
+  padding: 22px 24px 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* tiny tab label naming the surface — the lexicon's word, via data-label (wrt-116), so the page word-marks
+   itself the moment you land. */
+.wv2-root .bdi-paper::before {
+  content: attr(data-label);
+  position: absolute;
+  top: -9px;
+  left: 20px;
+  padding: 2px 9px 3px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.wv2-root .bdi-input {
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  border: 0;
+  background: transparent;
+  outline: none;
+  resize: none;
+  width: 100%;
+  min-height: 84px;
+  padding: 0;
+  margin: 0;
+}
+
+.wv2-root .bdi-input::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* the foot of the box: example seeds + a quiet keyhint */
+.wv2-root .bdi-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+}
+
+.wv2-root .bdi-seeds {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.wv2-root .bdi-seed {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .12s, border-color .12s, color .12s;
+}
+
+/* starter chips are buttons (they fill the box) */
+.wv2-root .bdi-seed:hover,
+.wv2-root .bdi-seed:focus-visible {
+  background: var(--terra-soft);
+  border-color: var(--terra);
+  color: var(--terra-deep);
+}
+
+.wv2-root .bdi-seed:focus-visible {
+  outline: 2px solid var(--terra);
+  outline-offset: 2px;
+}
+
+.wv2-root .bdi-seed:disabled {
+  cursor: default;
+  opacity: .6;
+}
+
+.wv2-root .bdi-keyhint {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.wv2-root .bdi-keyhint-w {
+  margin-left: 2px;
+}
+
+/* tiny, single-line caption — replaces the heavyweight modes block. Same
+   information ("you'll read them as a stream or pin them on a canvas") in
+   one quiet line so it stops competing with the action. */
+.wv2-root .bdi-becomes {
+  margin: 24px auto 0;
+  text-align: center;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: var(--ink-3);
+  letter-spacing: -.003em;
+}
+
+.wv2-root .bdi-becomes b {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+/* ---- the off-hand promise — pearl-glass, said in passing ---- */
+.wv2-root .bdi-organize {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 26px auto 0;
+  padding: 8px 14px 9px;
+  border-radius: var(--r-md);
+  background:
+    radial-gradient(140% 100% at 0% 0%, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(165deg, var(--ai-bg) 0%, var(--ai-bg-2) 100%);
+  border: 1px solid rgba(120, 110, 90, .22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .6),
+    0 1px 2px rgba(80, 65, 40, .05);
+}
+
+.wv2-root .bdi-organize::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14%;
+  right: 14%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .85) 50%, transparent);
+}
+
+.wv2-root .bdi-organize .sp {
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px rgba(180, 140, 20, .5));
+}
+
+.wv2-root .bdi-organize .txt {
+  font-family: var(--serif);
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-2);
+  letter-spacing: -.003em;
+}
+
+.wv2-root .bdi-organize .txt b {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ============================================================
+ * Page head — eyebrow · serif title · italic sub · actions
+ * ============================================================ */
+.wv2-root .braindumps-head {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.wv2-root .braindumps-head h1 {
+  display: flex;
+  align-items: center;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  color: var(--ink);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.wv2-root .braindumps-head .actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+/* ============================================================
+ * SPINE SHELL — collapsed minimap + expanded push-out pane
+ * ============================================================ */
+.wv2-root .spine-shell {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.wv2-root .spine-mini {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 0 12px;
+  border-right: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--paper) 70%, var(--surface));
+  transition: opacity .16s;
+}
+
+.wv2-root .spine-mini.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wv2-root .spine-tab {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--paper) 75%, transparent);
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.wv2-root .spine-tab:hover {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 28%, var(--line));
+}
+
+.wv2-root .spine-track {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+.wv2-root .spine-mark {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 4px;
+  border-radius: 3px;
+  border: 0;
+  padding: 0;
+  opacity: .5;
+  cursor: pointer;
+  transition: opacity .14s, width .14s, height .14s;
+}
+
+.wv2-root .spine-mark:hover {
+  opacity: 1;
+  width: 24px;
+}
+
+.wv2-root .spine-foot {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-4);
+}
+
+/* ---- expanded pane ---- */
+.wv2-root .spine-pane {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--paper) 90%, var(--surface));
+  box-shadow: 18px 0 44px -30px rgba(40, 25, 70, .4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+
+.wv2-root .spine-pane.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wv2-root .spine-pane-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px 12px 12px 16px;
+  cursor: pointer;
+}
+
+.wv2-root .spine-pane-head:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--teal) 10%, transparent);
+}
+.wv2-root .spine-pane-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.wv2-root .spine-pane-mark {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: 9px;
+  color: var(--teal-deep);
+  background: color-mix(in srgb, var(--paper) 80%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+}
+
+.wv2-root .spine-pane-titles b {
+  display: block;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.wv2-root .spine-pane-titles em {
+  font-style: normal;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.wv2-root .spine-pane-collapse {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.wv2-root .spine-pane-collapse:hover {
+  color: var(--ink);
+  border-color: var(--line-2);
+}
+
+.wv2-root .spine-pane-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0px 0px 30px 0px;
+  scrollbar-width: thin;
+  width: 100%;
+  border-left: 0;
+  box-sizing: border-box;
+}
+
+.wv2-root .spine-pane-resize {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 7px;
+  cursor: col-resize;
+  z-index: 25;
+}
+
+.wv2-root .spine-pane-resize::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 2px;
+  background: transparent;
+  transition: background .12s ease;
+}
+
+.wv2-root .spine-pane-resize:hover::after {
+  background: var(--terra);
+}

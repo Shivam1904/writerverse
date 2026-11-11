@@ -1,0 +1,12 @@
+/* Focused-idea pulse. ?focus=<id> (set by the idea-tree rail or a link from
+   another page) scrolls that idea into view, and StreamView pulses its card
+   with Tailwind `animate-[bd-focus-pulse_…]`, which uses this keyframe. */
+@keyframes bd-focus-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold) 55%, transparent);
+  }
+
+  100% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
