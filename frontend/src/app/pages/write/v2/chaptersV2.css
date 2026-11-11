@@ -1,0 +1,2225 @@
+/* ============================================================================
+   Chapters v2 — manuscript redesign (forked from the handoff cm2 mockup).
+
+   Scoped entirely under `.cm2v2` so it can never collide with the v1
+   ChaptersMockupPage's global `.wmock-*` / `.cm-*` rules (that page is imported
+   by ProjectShell, so its stylesheet is always loaded).
+
+   Tokens translated from the handoff to our theme's semantic roles:
+     handoff --teal*  (brand purple)        -> our  --terra* (lilac primary)
+     handoff --terra* (warm "current/here") -> our  --primary (semantic role; + --cm-current-deep)
+     handoff --gold   (AI)                  -> our  --gold
+     handoff --sage   (good / 4th thread)   -> our  --sage
+     handoff --sans                         -> our  --ui
+   The handoff assumed the lilac theme; lilac is our default, so this reads true.
+   ========================================================================== */
+
+.cm2v2 {
+  --cm-current: var(--primary);
+  --cm-current-deep: color-mix(in srgb, var(--primary) 82%, var(--ink));
+  --cm-gap: 0px;
+  --cm-gutter: var(--wm-gutter);
+  --wmock-drawer: 300px;
+  container-type: inline-size;
+
+  /* Fixed-height 3-zone editor frame: row 1 the standard PageHeader, row 2 the
+     workspace (editor + drawer; the editor scrolls internally via
+     .wmock-paper-wrap), row 3 the full-width StoryRail spanning below BOTH the
+     editor and the drawer. NOT routed through PageShell — its centered,
+     single-.wv2-content-scroll model doesn't fit this editor (it detached the
+     drawer and squeezed StoryRail into the reading column). `.cm2v2` also scopes
+     the `is-focus` descendant rules and the `--cm-*` tokens. */
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  /* gap: 11px; */
+  /* padding: 28px 28px 14px; */
+  color: var(--ink);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* ---------- workspace ---------- */
+.cm2v2 .wmock-workspace {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  transition: grid-template-columns .22s ease;
+}
+
+.cm2v2.has-drawer .wmock-workspace {
+  grid-template-columns: minmax(0, 1fr) var(--wmock-drawer);
+}
+
+.cm2v2.is-focus .wmock-workspace {
+  grid-template-columns: minmax(0, 880px);
+  justify-content: center;
+}
+
+.cm2v2 .wmock-editor,
+.cm2v2 .wmock-drawer {
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
+  background: color-mix(in srgb, var(--paper) 84%, transparent);
+  box-shadow: var(--bevel-up), 0 16px 38px rgba(24, 40, 33, .06);
+}
+
+/* ---------- editor shell ---------- */
+.cm2v2 .wmock-editor {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, .18), transparent),
+    color-mix(in srgb, var(--surface) 86%, var(--paper));
+}
+
+.cm2v2.is-focus .wmock-editor {
+  box-shadow: 0 22px 60px rgba(24, 40, 33, .10), var(--bevel-up);
+}
+
+/* scroll lives on a wrapper so the page can drive active-scene from scroll */
+.cm2v2 .wmock-paper-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.cm2v2 .wmock-paper-wrap::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cm2v2 .wmock-paper-wrap::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 4px;
+}
+
+.cm2v2 .wmock-paper-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cm2v2 .wmock-paper {
+  flex: none;
+  overflow: visible;
+  padding: clamp(18px, 2.6vw, 32px) clamp(16px, 3vw, 36px) 120px;
+  font-family: var(--serif);
+  color: var(--ink);
+  font-size: 18.5px;
+  line-height: 1.9;
+}
+
+.cm2v2 .wmock-doc {
+  width: 100%;
+  max-width: var(--read-max, 1200px);
+  margin: 0 auto;
+}
+
+.cm2v2 .wmock-header-wrap {
+  width: 100%;
+  max-width: var(--read-max, 1200px);
+  margin: 0 auto;
+  padding-left: var(--cm-gutter, 220px);
+  box-sizing: border-box;
+}
+
+/* ---------- chapter head ---------- */
+.cm2v2 .wmock-chapter-head {
+  display: grid;
+  grid-template-columns: var(--cm-gutter) minmax(0, 1fr);
+  column-gap: var(--cm-gap);
+  align-items: end;
+  padding-bottom: 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+}
+
+.cm2v2 .wmock-chapter-head-text {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.cm2v2 .wmock-marker-col {
+  grid-column: 1;
+  grid-row: 1;
+  overflow: hidden;
+}
+
+.cm2v2 .wmock-eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.cm2v2 .kicker {
+  display: block;
+  margin: 0;
+  color: var(--cm-current-deep);
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.cm2v2 .wmock-eyebrow-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cm2v2 .wmock-chapter-head h1 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.4vw, 42px);
+  line-height: 1.03;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cm2v2 .wmock-chapter-title-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.4vw, 42px);
+  line-height: 1.03;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.01em;
+}
+
+.cm2v2 .wmock-chapter-title-input:focus {
+  outline: none;
+}
+
+.cm2v2 .wmock-chapter-title-input::placeholder {
+  color: var(--ink-4);
+}
+
+/* tiny gold "ask Night Eyes" diamond */
+.cm2v2 .wmock-ask-mini {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--gold) 50%, var(--line));
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--gold) 15%, var(--paper));
+  transform: rotate(45deg);
+  cursor: pointer;
+  transition: background .15s, box-shadow .15s, border-color .15s;
+}
+
+.cm2v2 .wmock-ask-mini:hover {
+  background: color-mix(in srgb, var(--gold) 28%, var(--paper));
+  border-color: var(--gold);
+  box-shadow: 0 2px 9px color-mix(in srgb, var(--gold) 26%, transparent);
+}
+
+.cm2v2 .wmock-ask-mini-glyph {
+  display: grid;
+  place-items: center;
+  transform: rotate(-45deg);
+  color: var(--gold);
+}
+
+/* tiny focus toggle */
+.cm2v2 .wmock-focus-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  transition: color .15s, border-color .15s, background .15s;
+}
+
+.cm2v2 .wmock-focus-mini:hover {
+  color: var(--ink-2);
+  border-color: color-mix(in srgb, var(--ink) 26%, var(--line));
+}
+
+.cm2v2 .wmock-focus-mini.is-on {
+  color: var(--cm-current-deep);
+  border-color: color-mix(in srgb, var(--cm-current) 45%, var(--line));
+  background: color-mix(in srgb, var(--cm-current) 9%, var(--paper));
+}
+
+/* ---------- scene block (prose + left margin) ---------- */
+.cm2v2 .wmock-scene-block {
+  display: grid;
+  grid-template-columns: var(--cm-gutter) minmax(0, 1fr);
+  column-gap: var(--cm-gap);
+  align-items: start;
+}
+
+.cm2v2 .wmock-scene-prose {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.cm2v2 .scm {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.cm2v2 .wmock-scene-block:first-of-type .wmock-scene-prose {
+  padding-top: clamp(22px, 2.6vw, 32px);
+}
+
+/* scene break ornament */
+.cm2v2 .wmock-scene-break {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 26px;
+  color: var(--ink-4);
+}
+
+.cm2v2 .wmock-scene-break span {
+  font-size: 13px;
+  letter-spacing: .45em;
+}
+
+/* ---------- the real TipTap editor inside the prose column ---------- */
+.cm2v2 .wmock-scene-prose .ProseMirror {
+  outline: none;
+  font-family: var(--serif);
+  font-size: 18.5px;
+  line-height: 1.9;
+  color: var(--ink);
+}
+
+.cm2v2 .wmock-scene-prose .ProseMirror p {
+  position: relative;
+  margin: 0 0 1.2em;
+}
+
+.cm2v2 .wmock-scene-prose .ProseMirror p.is-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--ink-4);
+}
+
+.cm2v2 .wmock-scene-prose .ProseMirror p.is-active::before {
+  content: '';
+  position: absolute;
+  left: -18px;
+  top: .62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cm-current);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--cm-current) 12%, transparent);
+}
+
+/* ---------- contextual scene margin (left gutter) ---------- */
+.cm2v2 .scm {
+  position: sticky;
+  top: 10px;
+  align-self: start;
+  padding-top: clamp(22px, 2.6vw, 34px);
+  font-family: var(--ui);
+  user-select: none;
+  padding-right: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.cm2v2 .scm-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cm2v2 .scm-head::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--line-2);
+  margin-bottom: 8px;
+  transition: width .18s, background .18s;
+}
+
+.cm2v2 .scm.is-active .scm-head::before {
+  width: 30px;
+  background: color-mix(in srgb, var(--cm-current) 55%, var(--line-2));
+}
+
+.cm2v2 .scm-n {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.cm2v2 .scm-title {
+  font-style: normal;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink-3);
+  text-wrap: balance;
+}
+
+.cm2v2 .scm.is-active .scm-n {
+  color: var(--cm-current-deep);
+}
+
+.cm2v2 .scm.is-active .scm-title {
+  color: var(--ink-2);
+}
+
+.cm2v2 .scm:not(.is-active) .scm-head:hover .scm-title {
+  color: var(--ink-2);
+}
+
+/* active scene -> terse beat list */
+.cm2v2 .scm-beats {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 11px;
+  align-items: stretch;
+  animation: scm-in .22s ease both;
+}
+
+@keyframes scm-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm2v2 .scm-beats {
+    animation: none;
+  }
+}
+
+.cm2v2 .scm-beat {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  width: 100%;
+  text-align: left;
+  padding: 4px 6px 4px 0;
+  border: 0;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cm2v2 .scm-beat:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.cm2v2 .scm-tick {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  display: grid;
+  place-items: center;
+  border: 1.4px solid color-mix(in srgb, var(--tc, var(--line-2)) 40%, var(--line-2));
+  border-radius: var(--r-xs);
+  background: var(--paper);
+  color: transparent;
+  transition: background .14s, border-color .14s, color .14s;
+}
+
+.cm2v2 .scm-beat-label {
+  min-width: 0;
+  flex: 0 1 auto;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--ink-2);
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm2v2 .scm-beat.is-done .scm-tick {
+  background: var(--tc, var(--terra));
+  border-color: var(--tc, var(--terra));
+  color: #fff;
+}
+
+.cm2v2 .scm-beat.is-done .scm-beat-label {
+  color: var(--ink-4);
+}
+
+.cm2v2 .scm-beat.is-suggested .scm-tick {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--tc, var(--gold)) 65%, var(--line));
+  color: color-mix(in srgb, var(--tc, var(--gold)) 80%, transparent);
+  background: color-mix(in srgb, var(--tc, var(--gold)) 9%, var(--paper));
+}
+
+/* inactive scene -> thread dashes */
+.cm2v2 .scm-prog {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 11px;
+  justify-content: flex-start;
+}
+
+.cm2v2 .scm-prog-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.cm2v2 .scm-prog b {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+/* shared thread mark */
+.cm2v2 .thread-dash {
+  width: 13px;
+  height: 3px;
+  border-radius: 2px;
+  flex: 0 0 auto;
+  display: inline-block;
+  background: color-mix(in srgb, var(--dot) 24%, transparent);
+  transition: background .15s;
+}
+
+.cm2v2 .thread-dash.is-on {
+  background: var(--dot);
+}
+
+.cm2v2 .thread-dash.is-ghost {
+  background: color-mix(in srgb, var(--ink) 11%, transparent);
+}
+
+/* "add beat" blank — only on hover of the active scene margin */
+.cm2v2 .scm-addbeat {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 4px 6px 4px 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity .16s, transform .16s;
+}
+
+.cm2v2 .scm.is-active:hover .scm-addbeat {
+  opacity: .5;
+  transform: none;
+}
+
+.cm2v2 .scm-addbeat:hover {
+  opacity: .9 !important;
+}
+
+.cm2v2 .scm-tick.is-add {
+  border-style: dashed;
+  color: var(--ink-3);
+  background: transparent;
+}
+
+.cm2v2 .scm-addbeat .scm-beat-label {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* add-scene button at the end of the chapter, aligned under the prose */
+.cm2v2 .wmock-addscene-row {
+  padding-left: calc(var(--cm-gutter) + var(--cm-gap));
+  margin-top: 14px;
+}
+
+/* focus mode hides the scene margin + the gutter column */
+.cm2v2.is-focus {
+  grid-template-rows: auto minmax(0, 1fr);
+  padding-bottom: 28px;
+}
+
+.cm2v2.is-focus .wmock-scene-block,
+.cm2v2.is-focus .wmock-chapter-head {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.cm2v2.is-focus .wmock-chapter-head-text,
+.cm2v2.is-focus .wmock-scene-prose {
+  grid-column: 1;
+}
+
+.cm2v2.is-focus .scm {
+  display: none;
+}
+
+.cm2v2.is-focus .wmock-addscene-row {
+  padding-left: 0;
+}
+
+.cm2v2.is-focus .wmock-drawer {
+  display: none;
+}
+
+.cm2v2.is-focus .wmock-paper {
+  font-size: 19.5px;
+}
+
+.cm2v2.is-focus .wmock-doc {
+  max-width: 800px;
+}
+
+/* floating tab to reopen the margin when collapsed */
+.cm2v2 .wmock-margin-reopen {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 27px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-right: 0;
+  border-radius: var(--r-md) 0 0 var(--r-md);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  color: var(--ink-3);
+  box-shadow: -5px 0 16px rgba(24, 40, 33, .07);
+  backdrop-filter: blur(3px);
+  transition: color .15s, background .15s;
+  z-index: 3;
+}
+
+.cm2v2 .wmock-margin-reopen:hover {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* ====================== drawer ====================== */
+.cm2v2 .wmock-drawer {
+  overflow: hidden;
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.cm2v2 .dv2-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 9px 9px 11px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cm2v2 .dv2-modes {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  box-shadow: var(--bevel-up);
+}
+
+.cm2v2 .dv2-modes button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .16s, color .16s;
+}
+
+.cm2v2 .dv2-modes button:hover {
+  color: var(--ink-2);
+}
+
+.cm2v2 .dv2-modes button.is-on {
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgba(44, 64, 50, .14), var(--bevel-up);
+}
+
+.cm2v2 .dv2-modes button.is-on svg {
+  color: var(--terra-deep);
+}
+
+.cm2v2 .dv2-close {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.cm2v2 .dv2-close:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.cm2v2 .dv2-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.cm2v2 .dv2-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.cm2v2 .dv2-body::-webkit-scrollbar-thumb {
+  background: var(--line-2);
+  border-radius: 4px;
+}
+
+.cm2v2 .dv2-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cm2v2 .dv2-stack {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* analysis-tab watching badge */
+.cm2v2 .dv2-watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 5px;
+  padding: 1px 6px 1px 5px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--terra) 18%, var(--paper));
+  color: var(--terra-deep);
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.cm2v2 .dv2-watch svg {
+  display: block;
+}
+
+/* collapsible section */
+.cm2v2 .dv2-sec {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--paper) 82%, var(--surface));
+}
+
+.cm2v2 .dv2-sec-head {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 12px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.cm2v2 .dv2-sec-head:hover {
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+}
+
+.cm2v2 .dv2-sec-head>svg {
+  color: var(--terra-deep);
+}
+
+.cm2v2 .dv2-caret {
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+  transition: transform .16s;
+}
+
+.cm2v2 .dv2-caret.is-open {
+  transform: rotate(90deg);
+}
+
+.cm2v2 .dv2-sec-title {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.cm2v2 .dv2-sec-meta {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+.cm2v2 .dv2-sec-body {
+  padding: 2px 11px 13px;
+}
+
+/* ---- outline tree (handoff pattern) ---- */
+.cm2v2 .cm-outline {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.cm2v2 .cm-outline-empty {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-4);
+  margin: 0;
+  padding: 4px 2px;
+}
+
+.cm2v2 .cm-expand-all {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: none;
+  border: 1px dashed var(--line-2);
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  transition: color .15s, border-color .15s;
+}
+
+.cm2v2 .cm-expand-all:hover {
+  color: var(--terra);
+  border-color: var(--terra);
+}
+
+/* act row */
+.cm2v2 .cm-act {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cm2v2 .cm-act-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--ui);
+  color: var(--ink-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.cm2v2 .cm-act:not(.is-current) .cm-act-row {
+  color: var(--ink-4);
+}
+
+.cm2v2 .cm-act-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--terra);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--terra) 16%, transparent);
+}
+
+.cm2v2 .cm-act:not(.is-current) .cm-act-dot {
+  background: var(--ink-4);
+  box-shadow: none;
+}
+
+.cm2v2 .cm-act-row b {
+  color: var(--ink-4);
+  font-weight: 600;
+}
+
+/* chapter list */
+.cm2v2 .cm-chapters {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* non-current chapter = simple link row */
+.cm2v2 .cm-chapter-link {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  text-align: left;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.cm2v2 .cm-chapter-link:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.cm2v2 .cm-chapter-link .cm-chapter-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+/* current chapter = expanded card */
+.cm2v2 .cm-chapter.is-current {
+  margin: 3px 0;
+  padding: 11px;
+  border: 1px solid color-mix(in srgb, var(--terra) 30%, var(--line));
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+.cm2v2 .cm-chapter-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 9px;
+  align-items: center;
+}
+
+.cm2v2 .cm-chapter-num {
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--terra-deep);
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.cm2v2 .cm-chapter-num.is-ghost {
+  color: var(--ink-3);
+  background: transparent;
+  border-color: transparent;
+}
+
+.cm2v2 .cm-chapter-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* scenes inside current chapter */
+.cm2v2 .cm-scenes {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 10px;
+}
+
+.cm2v2 .cm-osc {
+  border-radius: var(--r-md);
+}
+
+.cm2v2 .cm-osc.is-current {
+  background: color-mix(in srgb, var(--terra) 7%, transparent);
+}
+
+.cm2v2 .cm-osc-head {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  text-align: left;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.cm2v2 .cm-osc-head:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.cm2v2 .cm-osc-caret {
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+  transition: transform .16s;
+}
+
+.cm2v2 .cm-osc-caret.is-open {
+  transform: rotate(90deg);
+}
+
+.cm2v2 .cm-osc-num {
+  min-width: 16px;
+  height: 16px;
+  padding: 0 5px;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.cm2v2 .cm-osc.is-current .cm-osc-num {
+  background: var(--terra);
+  color: #fff;
+}
+
+.cm2v2 .cm-osc-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.cm2v2 .cm-osc-count {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+}
+
+/* beats checklist */
+.cm2v2 .cm-beats {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px 4px 8px 12px;
+}
+
+.cm2v2 .cm-beat {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 7px;
+  text-align: left;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.cm2v2 .cm-beat:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.cm2v2 .cm-beat-box {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--r-xs);
+  background: var(--paper);
+  color: transparent;
+  transition: background .14s, border-color .14s, color .14s;
+}
+
+.cm2v2 .cm-beat-text {
+  font-family: var(--serif);
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.cm2v2 .cm-beat-tag {
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 1px 6px;
+  border-radius: 99px;
+  font-family: var(--ui);
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 16%, var(--paper));
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+}
+
+.cm2v2 .cm-beat.is-done .cm-beat-box {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+
+.cm2v2 .cm-beat.is-done .cm-beat-text {
+  color: var(--ink-3);
+}
+
+.cm2v2 .cm-beat.is-suggested .cm-beat-box {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--gold) 65%, var(--line));
+  color: color-mix(in srgb, var(--gold) 80%, transparent);
+  background: color-mix(in srgb, var(--gold) 9%, var(--paper));
+}
+
+.cm2v2 .cm-beat.is-todo .cm-beat-text {
+  color: var(--ink-2);
+}
+
+.cm2v2 .cm-beat-text.is-clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* signal chart — audio-signal style, bars mirrored around center axis */
+.cm2v2 .cm-signal,
+.cm2v2 .rail-signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.cm2v2 .cm-signal i,
+.cm2v2 .rail-signal i {
+  display: block;
+  width: 3px;
+  min-height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--terra) 50%, var(--line-2));
+}
+
+.cm2v2 .cm-chapter.is-current .cm-signal i {
+  background: color-mix(in srgb, var(--terra) 70%, var(--line));
+}
+
+.cm2v2 .cm-chapter-link .cm-signal i {
+  background: var(--line-2);
+}
+
+.cm2v2 .rail-signal i {
+  background: color-mix(in srgb, var(--ink) 18%, var(--line-2));
+}
+
+.cm2v2 .rail-chapter.is-current .rail-signal i {
+  background: color-mix(in srgb, var(--terra) 55%, var(--line));
+}
+
+/* ---- analysis lenses ---- */
+.cm2v2 .cm-stale-bar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 12px;
+  text-align: left;
+  border: 1px dashed color-mix(in srgb, var(--terra) 50%, var(--line));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--terra) 6%, var(--surface));
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.cm2v2 .cm-stale-bar:hover {
+  border-color: var(--terra);
+  background: color-mix(in srgb, var(--terra) 10%, var(--surface));
+}
+
+.cm2v2 .cm-stale-bar:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+.cm2v2 .cm-stale-bar svg {
+  color: var(--terra-deep);
+  flex: 0 0 auto;
+}
+
+.cm2v2 .cm-stale-bar b {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cm2v2 .cm-stale-bar .is-spinning {
+  animation: cm-spin .8s linear infinite;
+}
+
+@keyframes cm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cm2v2 .cm-lens-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 11px;
+  border: 1px solid color-mix(in srgb, var(--gold) 38%, var(--line));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--gold) 10%, var(--surface));
+}
+
+.cm2v2 .cm-lens-summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cm2v2 .cm-lens-summary span svg {
+  flex: 0 0 auto;
+  color: var(--gold);
+}
+
+.cm2v2 .cm-lens-summary b {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  color: var(--ink-2);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.cm2v2 .cm-lens-summary.is-paused {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+}
+
+.cm2v2 .cm-lens-summary.is-paused span,
+.cm2v2 .cm-lens-summary.is-paused span svg {
+  color: var(--ink-3);
+}
+
+.cm2v2 .cm-lens {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 11px;
+  background: color-mix(in srgb, var(--surface) 74%, transparent);
+}
+
+.cm2v2 .cm-lens.is-paused {
+  background: color-mix(in srgb, var(--surface) 58%, transparent);
+  border-style: dashed;
+}
+
+.cm2v2 .cm-lens-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.cm2v2 .cm-lens-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.cm2v2 .cm-lens.is-clean .cm-lens-dot {
+  background: var(--sage);
+}
+
+.cm2v2 .cm-lens.is-watch .cm-lens-dot {
+  background: var(--gold);
+}
+
+.cm2v2 .cm-lens.is-none .cm-lens-dot {
+  background: var(--ink-4);
+}
+
+.cm2v2 .cm-lens.is-paused .cm-lens-dot {
+  background: var(--ink-4);
+  opacity: .4;
+}
+
+.cm2v2 .cm-lens-head b {
+  min-width: 0;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cm2v2 .cm-lens.is-paused .cm-lens-head b {
+  color: var(--ink-3);
+}
+
+.cm2v2 .cm-lens-cost {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cm2v2 .cm-lens-detail {
+  margin: 7px 0 0;
+  font-family: var(--serif);
+  font-size: 12px;
+  line-height: 1.46;
+  color: var(--ink-2);
+}
+
+.cm2v2 .cm-lens.is-paused .cm-lens-detail {
+  color: var(--ink-4);
+}
+
+.cm2v2 .cm-eye {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--paper);
+  color: var(--ink-4);
+  cursor: pointer;
+  transition: color .16s, background .16s, border-color .16s;
+}
+
+.cm2v2 .cm-eye:hover {
+  border-color: color-mix(in srgb, var(--ink) 26%, var(--line));
+}
+
+.cm2v2 .cm-eye.is-on {
+  color: #fff;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+/* mini charts */
+.cm2v2 .cm-chart {
+  margin-top: 10px;
+}
+
+.cm2v2 .cm-chart-stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.cm2v2 .cm-chart-stat b {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-family: var(--ui);
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.cm2v2 .cm-chart-stat span {
+  font-family: var(--serif);
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--ink-3);
+}
+
+.cm2v2 .cm-meter {
+  height: 5px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  overflow: hidden;
+}
+
+.cm2v2 .cm-meter i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+}
+
+/* chart tones */
+.cm2v2 .tone-good {
+  color: var(--sage);
+  background: var(--sage);
+}
+
+.cm2v2 .cm-chart-stat .tone-good {
+  background: none;
+}
+
+.cm2v2 .tone-warn {
+  color: var(--gold);
+  background: var(--gold);
+}
+
+.cm2v2 .cm-chart-stat .tone-warn {
+  background: none;
+}
+
+.cm2v2 .tone-mute {
+  color: var(--ink-4);
+  background: var(--ink-4);
+}
+
+.cm2v2 .cm-lens-foot {
+  margin: 2px 1px 0;
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+/* ---- chapter notes (scene word-count list) ---- */
+.cm2v2 .dv2-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cm2v2 .dv2-notes-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+.cm2v2 .dv2-notes-label {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-4);
+}
+
+.cm2v2 .dv2-note-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cm2v2 .dv2-note-n {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--ink-4);
+  width: 18px;
+  text-align: right;
+}
+
+.cm2v2 .dv2-note-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cm2v2 .dv2-note-title {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm2v2 .dv2-note-bar-wrap {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line-2);
+  overflow: hidden;
+}
+
+.cm2v2 .dv2-note-bar {
+  height: 100%;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--terra) 55%, var(--line-2));
+  min-width: 2px;
+  transition: width .3s ease;
+}
+
+.cm2v2 .dv2-note-words {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-4);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+}
+
+/* ---------- scene notes (entity cards matching handoff) ---------- */
+.cm2v2 .dv2-scene-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* section sub-headers ("In this scene", "Linked notes") */
+.cm2v2 .dv2-ctx-h4 {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin: 0 0 6px;
+  padding: 0 2px;
+}
+
+/* entity card list */
+.cm2v2 .dv2-entlist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cm2v2 .dv2-ent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: var(--r-md);
+  transition: background .1s;
+  cursor: default;
+}
+
+.cm2v2 .dv2-ent:hover {
+  background: color-mix(in srgb, var(--ink) 3.5%, transparent);
+}
+
+/* glyph square — matches handoff .ent .glyph (26px rounded) */
+.cm2v2 .dv2-ent-glyph {
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-2, var(--surface));
+  border: 1px solid var(--line);
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.cm2v2 .dv2-ent--braindump .dv2-ent-glyph {
+  background: color-mix(in srgb, var(--gold) 14%, var(--surface));
+  border-color: color-mix(in srgb, var(--gold) 28%, var(--line));
+  color: var(--gold-deep);
+}
+
+.cm2v2 .dv2-ent--character .dv2-ent-glyph {
+  background: linear-gradient(135deg, #cc7a3a, #a8541d);
+  border-color: transparent;
+  color: #fff;
+}
+
+/* info area */
+.cm2v2 .dv2-ent-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cm2v2 .dv2-ent-nm {
+  font-family: var(--ui);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  line-height: 1.2;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm2v2 .dv2-ent-marker {
+  font-size: 9px;
+  letter-spacing: .04em;
+  background: var(--surface-2, var(--surface));
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 500;
+  text-transform: lowercase;
+  flex-shrink: 0;
+}
+
+.cm2v2 .dv2-ent-marker.is-attached {
+  background: color-mix(in srgb, var(--terra) 10%, transparent);
+  color: var(--terra-deep);
+  border-color: color-mix(in srgb, var(--terra) 22%, var(--line));
+}
+
+.cm2v2 .dv2-ent-role {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.cm2v2 .dv2-ent-role b {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+/* empty state */
+.cm2v2 .dv2-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 12px 14px;
+  text-align: center;
+}
+
+.cm2v2 .dv2-empty-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-md);
+  background: var(--surface-2, var(--surface));
+  border: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+}
+
+.cm2v2 .dv2-empty-text {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-4);
+  line-height: 1.45;
+}
+
+.cm2v2 .dv2-empty-text b {
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+/* attach picker */
+.cm2v2 .dv2-attach {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.cm2v2 .dv2-attach-btns {
+  display: flex;
+  gap: 5px;
+}
+
+.cm2v2 .dv2-attach-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-3);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 5px 0;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.cm2v2 .dv2-attach-btn:hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--ink-2);
+}
+
+.cm2v2 .dv2-attach-btn.is-on {
+  border-color: var(--terra);
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 8%, transparent);
+}
+
+.cm2v2 .dv2-attach-btn:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.cm2v2 .dv2-attach-drop {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+.cm2v2 .dv2-attach-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink);
+  background: transparent;
+  outline: none;
+}
+
+.cm2v2 .dv2-attach-list {
+  max-height: 140px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.cm2v2 .dv2-attach-opt {
+  text-align: left;
+  padding: 7px 10px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background .1s;
+}
+
+.cm2v2 .dv2-attach-opt:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--terra) 8%, transparent);
+}
+
+.cm2v2 .dv2-attach-empty {
+  padding: 7px 10px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-4);
+}
+
+/* stub-drawer placeholder note */
+.cm2v2 .dv2-stub {
+  padding: 14px 12px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+.cm2v2 .dv2-stub b {
+  color: var(--ink-2);
+}
+
+/* ====================== story-thread rail (footer) ====================== */
+.cm2v2 .rail {
+  min-height: 0;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
+  background: color-mix(in srgb, var(--paper) 84%, transparent);
+  box-shadow: var(--bevel-up), 0 16px 38px rgba(24, 40, 33, .06);
+  border-radius: 13px;
+  padding: 8px 13px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: clamp(116px, 26vh, 232px);
+}
+
+.cm2v2 .rail-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cm2v2 .rail-collapse {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 2px 4px;
+  border: 0;
+  background: transparent;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.cm2v2 .rail-collapse:hover {
+  color: var(--ink-2);
+}
+
+.cm2v2 .rail-collapse svg {
+  color: var(--terra-deep);
+}
+
+.cm2v2 .rail-collapse-caret {
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+  transition: transform .16s;
+}
+
+.cm2v2 .rail-collapse-caret.is-open {
+  transform: rotate(180deg);
+}
+
+.cm2v2 .rail-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 13px;
+}
+
+.cm2v2 .rail-leg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.cm2v2 .rail-leg i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.cm2v2 .rail-track {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 3px 2px 4px;
+}
+
+.cm2v2 .rail-act {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cm2v2 .rail-act-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.cm2v2 .rail-act.is-current .rail-act-label {
+  color: var(--cm-current-deep);
+}
+
+.cm2v2 .rail-act-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-4);
+}
+
+.cm2v2 .rail-act.is-current .rail-act-dot {
+  background: var(--cm-current);
+}
+
+.cm2v2 .rail-act-chapters {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.cm2v2 .rail-act-chapters::before {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 15px;
+  border-top: 2px dotted var(--line-2);
+  z-index: 0;
+}
+
+.cm2v2 .rail-chapter {
+  background: var(--surface);
+  border-radius: var(--r-md);
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 5px;
+}
+
+.cm2v2 .rail-chapter-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 8px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  box-shadow: var(--bevel-up);
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+
+.cm2v2 .rail-chapter-head:hover {
+  border-color: color-mix(in srgb, var(--ink) 26%, var(--line));
+}
+
+.cm2v2 .rail-chapter.is-current .rail-chapter-head {
+  border-color: color-mix(in srgb, var(--cm-current) 45%, var(--line));
+  background: color-mix(in srgb, var(--cm-current) 7%, var(--paper));
+}
+
+.cm2v2 .rail-ch-num {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-xs);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.cm2v2 .rail-chapter.is-current .rail-ch-num {
+  background: var(--cm-current);
+  color: #fff;
+}
+
+.cm2v2 .rail-ch-title {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cm2v2 .rail-chapter:not(.is-current) .rail-ch-title {
+  color: var(--ink-3);
+}
+
+.cm2v2 .rail-ch-caret {
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+  transition: transform .16s;
+}
+
+.cm2v2 .rail-ch-caret.is-open {
+  transform: rotate(180deg);
+}
+
+.cm2v2 .rail-scenes {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding-top: 1px;
+  animation: scm-in .2s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm2v2 .rail-scenes {
+    animation: none;
+  }
+}
+
+.cm2v2 .rail-scene {
+  flex: 0 0 auto;
+  min-width: 96px;
+  max-width: 200px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  padding: 6px 8px;
+  transition: border-color .15s, background .15s;
+}
+
+.cm2v2 .rail-scene.is-active {
+  border-color: color-mix(in srgb, var(--cm-current) 50%, var(--line));
+  background: color-mix(in srgb, var(--cm-current) 6%, var(--surface));
+}
+
+.cm2v2 .rail-scene.is-ghost {
+  background: transparent;
+  border-style: dashed;
+}
+
+.cm2v2 .rail-scene-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+
+.cm2v2 .rail-scene.is-ghost .rail-scene-head {
+  cursor: default;
+}
+
+.cm2v2 .rail-scene-n {
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.cm2v2 .rail-scene-title {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.cm2v2 .rail-scene-title.is-faint {
+  color: var(--ink-4);
+  font-style: italic;
+}
+
+.cm2v2 .rail-scene-caret {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--ink-4);
+  transition: transform .16s;
+}
+
+.cm2v2 .rail-scene-caret.is-open {
+  transform: rotate(180deg);
+}
+
+.cm2v2 .rail-dotstrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+  align-items: center;
+}
+
+.cm2v2 .rail-dotstrip .thread-dash {
+  width: 14px;
+  height: 3px;
+}
+
+.cm2v2 .rail-beatlist {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 6px;
+}
+
+.cm2v2 .rail-beat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 2px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cm2v2 .rail-beat:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.cm2v2 .rail-beat .thread-dash {
+  width: 14px;
+  height: 3px;
+}
+
+.cm2v2 .rail-beat-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.cm2v2 .rail-beat.is-todo .rail-beat-label {
+  color: var(--ink-3);
+}
+
+@media (max-width: 600px) {
+
+  .cm2v2 .wmock-chapter-head,
+  .cm2v2 .wmock-scene-block {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cm2v2 .wmock-chapter-head-text,
+  .cm2v2 .wmock-scene-prose,
+  .cm2v2 .scm {
+    grid-column: 1;
+  }
+
+  .cm2v2 .scm {
+    position: static;
+    padding-top: 14px;
+  }
+
+  .cm2v2 .wmock-addscene-row {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 1120px) {
+  .cm2v2 {
+    --wmock-drawer: 264px;
+    padding-inline: 12px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .cm2v2.has-drawer .wmock-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cm2v2 .wmock-drawer,
+  .cm2v2 .wmock-margin-reopen {
+    display: none !important;
+    z-index: 100;
+  }
+}

@@ -1,0 +1,837 @@
+/* Static manuscript redesign mockup. Scoped to the chapters/mockup route. */
+
+.wv2-content:has(.wmock) {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 16%, color-mix(in srgb, var(--teal) 10%, transparent), transparent 32%),
+    linear-gradient(180deg, var(--surface), color-mix(in srgb, var(--paper) 70%, var(--surface)));
+}
+
+.wmock {
+  --wmock-rail: 246px;
+  --wmock-context: 278px;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  padding: 14px 18px 12px;
+  color: var(--ink);
+}
+
+.wmock-top {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) auto minmax(220px, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 38px;
+}
+
+.wmock-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 10px;
+}
+
+.wmock-title-mark {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: 7px;
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  box-shadow: var(--bevel-up);
+}
+
+.wmock-title span:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.wmock-title b {
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.wmock-title em {
+  margin-top: 2px;
+  font-style: normal;
+  font-size: 10.5px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.wmock-modes {
+  justify-self: center;
+}
+
+.wmock-toggles {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.wmock-toggles .wv2-btn.is-on {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--teal) 10%, transparent);
+}
+
+.wmock-workspace {
+  min-height: 0;
+  display: grid;
+  gap: 5px;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.wmock.has-outline.has-context .wmock-workspace {
+  grid-template-columns: var(--wmock-rail) minmax(520px, 1fr) var(--wmock-context);
+}
+
+.wmock.has-outline.no-context .wmock-workspace {
+  grid-template-columns: var(--wmock-rail) minmax(0, 1fr);
+}
+
+.wmock.no-outline.has-context .wmock-workspace {
+  grid-template-columns: minmax(0, 1fr) var(--wmock-context);
+}
+
+.wmock--focus .wmock-workspace {
+  grid-template-columns: minmax(0, 1200px);
+  justify-content: center;
+}
+
+.wmock-outline,
+.wmock-context,
+.wmock-editor-shell,
+.wmock-strip {
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  box-shadow: var(--bevel-up), 0 14px 34px rgba(21, 35, 34, .06);
+}
+
+.wmock-outline,
+.wmock-context {
+  overflow: hidden;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.wmock-drawer-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+}
+
+.wmock-drawer-head>span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wmock-drawer-head button {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 5px;
+  color: var(--ink-3);
+  background: transparent;
+  cursor: pointer;
+}
+
+.wmock-drawer-head button:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.wmock-outline-tree {
+  padding: 12px 10px 8px;
+  overflow: auto;
+}
+
+.wmock-act {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 8px;
+  color: var(--ink-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wmock-act-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--teal) 15%, transparent);
+}
+
+.wmock-act b {
+  color: var(--ink-4);
+  font-weight: 600;
+}
+
+.wmock-chapter {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+}
+
+.wmock-chapter.is-active {
+  border-color: color-mix(in srgb, var(--terra) 36%, var(--line));
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--terra) 80%, transparent);
+}
+
+.wmock-chapter-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 9px;
+  align-items: center;
+}
+
+.wmock-chapter-num {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--terra-deep);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.wmock-chapter-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.wmock-scene-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 10px;
+  padding-left: 17px;
+}
+
+.wmock-scene-link {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-3);
+  text-align: left;
+  cursor: pointer;
+}
+
+.wmock-scene-link.is-active {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--teal) 8%, transparent);
+}
+
+.wmock-scene-link span {
+  font-size: 10px;
+  color: var(--ink-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.wmock-scene-link em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--serif);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.wmock-outline-notes {
+  margin-top: auto;
+  padding: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+}
+
+.wmock-mini-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-3);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wmock-editor-shell {
+  overflow: hidden;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, .22), transparent),
+    color-mix(in srgb, var(--surface) 88%, var(--paper));
+}
+
+.wmock-editor-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px clamp(26px, 4vw, 56px) 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+}
+
+.wmock-editor-head span {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--terra-deep);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wmock-editor-head h1 {
+  margin: 0;
+  max-width: 720px;
+  font-family: var(--serif);
+  font-size: clamp(22px, 3vw, 34px);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.wmock-editor-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wmock-paper {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: clamp(28px, 4vw, 56px) clamp(32px, 8vw, 112px) 90px;
+  font-family: var(--serif);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.9;
+  letter-spacing: 0;
+}
+
+.wmock-paper p {
+  position: relative;
+  margin: 0 auto 1.35em;
+}
+
+.wmock-paper p.is-active::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: .55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--terra);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--terra) 12%, transparent);
+}
+
+.wmock-context {
+  padding-bottom: 10px;
+}
+
+.wmock-panel-stack {
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wmock-focus-card,
+.wmock-note,
+.wmock-beat-card,
+.wmock-check,
+.wmock-link,
+.wmock-settings {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+}
+
+.wmock-focus-card {
+  padding: 12px;
+  border-color: color-mix(in srgb, var(--teal) 34%, var(--line));
+}
+
+.wmock-focus-card.is-soft {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--gold) 8%, var(--surface));
+}
+
+.wmock-kicker {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--ink-3);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wmock-focus-card p,
+.wmock-note p,
+.wmock-beat-card p,
+.wmock-check p {
+  margin: 0;
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-size: 12.5px;
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+
+.wmock-note {
+  padding: 9px 10px 10px;
+  border-left-width: 3px;
+}
+
+.wmock-note[data-tone="terra"] {
+  border-left-color: var(--terra);
+}
+
+.wmock-note[data-tone="teal"] {
+  border-left-color: var(--teal);
+}
+
+.wmock-note[data-tone="gold"] {
+  border-left-color: var(--gold);
+}
+
+.wmock-note span,
+.wmock-beat-card span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink-3);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wmock-add {
+  margin-top: 2px;
+  min-height: 34px;
+}
+
+.wmock-beat-card {
+  padding: 11px 12px;
+}
+
+.wmock-beat-card.is-current {
+  border-color: color-mix(in srgb, var(--terra) 42%, var(--line));
+  background: color-mix(in srgb, var(--terra) 6%, var(--surface));
+}
+
+.wmock-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink-3);
+}
+
+.wmock-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.wmock-search input::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.wmock-link-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 7px;
+}
+
+.wmock-link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 9px 10px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.wmock-link:hover {
+  border-color: color-mix(in srgb, var(--ink) 18%, var(--line));
+}
+
+.wmock-link span {
+  color: var(--ink-3);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wmock-link b {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.wmock-link[data-tone="gold"] {
+  border-left: 3px solid var(--gold);
+}
+
+.wmock-link[data-tone="sage"] {
+  border-left: 3px solid var(--sage);
+}
+
+.wmock-link[data-tone="teal"] {
+  border-left: 3px solid var(--teal);
+}
+
+.wmock-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.wmock-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 7px 8px;
+  padding: 9px 10px;
+}
+
+.wmock-check svg {
+  margin-top: 2px;
+}
+
+.wmock-check span {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wmock-check p {
+  grid-column: 2;
+}
+
+.wmock-check.is-clean svg {
+  color: var(--sage);
+}
+
+.wmock-check.is-watch svg {
+  color: var(--gold);
+}
+
+.wmock-settings {
+  padding: 0;
+  overflow: hidden;
+}
+
+.wmock-settings summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px;
+  color: var(--ink-2);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.wmock-settings summary::-webkit-details-marker {
+  display: none;
+}
+
+.wmock-switch-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: 12px;
+}
+
+.wmock-switch-row input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wmock-switch-row i {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.wmock-switch-row i::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .18);
+  transition: transform .16s ease;
+}
+
+.wmock-switch-row input:checked+i {
+  border-color: color-mix(in srgb, var(--teal) 60%, var(--line));
+  background: color-mix(in srgb, var(--teal) 30%, var(--surface));
+}
+
+.wmock-switch-row input:checked+i::after {
+  transform: translateX(14px);
+}
+
+.wmock-strip {
+  min-height: 54px;
+  border-radius: 10px;
+  padding: 8px 11px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.wmock-strip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-3);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.wmock-strip-track {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 2px 1px;
+}
+
+.wmock-strip-track::-webkit-scrollbar {
+  height: 0;
+}
+
+.wmock-strip-scene,
+.wmock-strip-add {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.wmock-strip-scene {
+  display: inline-grid;
+  grid-template-columns: auto minmax(0, 92px);
+  align-items: center;
+  gap: 6px;
+  min-width: 118px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 7px;
+}
+
+.wmock-strip.is-compact .wmock-strip-scene {
+  grid-template-columns: auto minmax(0, 68px);
+  min-width: 94px;
+}
+
+.wmock-strip-scene span {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--ink-3);
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.wmock-strip-scene em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-2);
+  font-family: var(--serif);
+  font-size: 11.5px;
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+.wmock-strip-scene.is-active {
+  border-color: color-mix(in srgb, var(--terra) 54%, var(--line));
+  background: color-mix(in srgb, var(--terra) 7%, var(--surface));
+}
+
+.wmock-strip-scene.is-active span {
+  color: #fff;
+  background: var(--terra);
+}
+
+.wmock-strip-scene.is-sketch {
+  border-style: dashed;
+}
+
+.wmock-strip-add {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-style: dashed;
+  border-radius: 7px;
+}
+
+.wmock--focus .wmock-top {
+  grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr);
+}
+
+.wmock--focus .wmock-editor-shell {
+  box-shadow: none;
+}
+
+.wmock--focus .wmock-paper {
+  padding-left: clamp(40px, 10vw, 140px);
+  padding-right: clamp(40px, 10vw, 140px);
+}
+
+@media (max-width: 1220px) {
+  .wmock {
+    --wmock-rail: 224px;
+    --wmock-context: 252px;
+    padding-inline: 12px;
+  }
+
+  .wmock-top {
+    grid-template-columns: 1fr;
+  }
+
+  .wmock-title,
+  .wmock-modes,
+  .wmock-toggles {
+    justify-self: stretch;
+  }
+
+  .wmock-modes,
+  .wmock-toggles {
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 980px) {
+
+  .wmock.has-outline.has-context .wmock-workspace,
+  .wmock.has-outline.no-context .wmock-workspace,
+  .wmock.no-outline.has-context .wmock-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wmock-outline,
+  .wmock-context {
+    min-height: 180px;
+  }
+
+  .wmock-paper {
+    padding-inline: 28px;
+    font-size: 16.5px;
+  }
+}

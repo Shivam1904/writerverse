@@ -1,0 +1,196 @@
+/* ==============================================================
+ * ChaptersStart — the blank-book landing (chapters route, no chapter yet).
+ *
+ * Night Eyes metallic theme: gold sparkle, beveled gradient cards, bold
+ * display type. All colour resolves through the app theme tokens
+ * (theme/themes.ts), so it tracks every palette.
+ * ============================================================== */
+
+/* Stop the shell from double-scrolling — the .wv2-init-stage owns the scroll. */
+.wv2-content:has(.cs-page) { overflow: hidden; }
+
+@keyframes cs-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Layout + hero are the SHARED init standard (.wv2-init-stage / .wv2-init +
+   .wv2-init-head/-eyebrow/-title/-sub) in app.css. Chapters only widens
+   the column so the two-card fork can sit side by side, and rises in. */
+.cs-stage {
+  max-width: 880px;
+  animation: cs-rise .4s ease-out;
+}
+
+/* ===================== the fork ===================== */
+.cs-fork {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.cs-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0;
+  padding: 26px 24px 22px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-xl);
+  background: linear-gradient(165deg, var(--paper) 0%, var(--paper-2) 100%);
+  box-shadow:
+    var(--sh-3),
+    inset 0 1px 0 rgba(255, 255, 255, .6);
+  cursor: pointer;
+  overflow: hidden;
+  font-family: var(--ui);
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+.cs-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-3);
+  box-shadow:
+    var(--sh-4),
+    inset 0 1px 0 rgba(255, 255, 255, .6);
+}
+.cs-card:active { transform: translateY(-1px); }
+.cs-card:focus-visible {
+  outline: none;
+  border-color: var(--terra);
+  box-shadow: var(--sh-4), 0 0 0 3px rgba(180, 140, 20, .14);
+}
+
+/* top shimmer accent — the Night Eyes panel signature, revealed on hover */
+.cs-card-shimmer {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity .18s ease;
+}
+.cs-card--write .cs-card-shimmer {
+  background: linear-gradient(90deg, var(--terra) 0%, var(--gold) 50%, var(--terra) 100%);
+}
+.cs-card--plan .cs-card-shimmer {
+  background: linear-gradient(90deg, var(--gold) 0%, var(--terra) 50%, var(--gold) 100%);
+}
+.cs-card:hover .cs-card-shimmer { opacity: 1; }
+
+/* bare 3D metallic glyph — no tile, no border. Embossed like the thread-rail
+ * icons (.wv2-thr-icon): lit from above with a crisp white echo on the top
+ * edge, a darker tinted echo at the base, and a soft cast shadow lifting the
+ * whole stroke off the card. The glyph itself reads as polished metal. */
+.cs-card--write { --cs-c: var(--terra); }
+.cs-card--plan  { --cs-c: var(--gold); }
+.cs-card-icon {
+  display: block;
+  line-height: 0;
+  margin-bottom: 18px;
+  color: color-mix(in srgb, var(--cs-c) 82%, #fff);
+  transition: transform .16s ease;
+}
+.cs-card-icon svg {
+  display: block;
+  filter:
+    drop-shadow(0 -0.6px 0 rgba(255, 255, 255, .85))
+    drop-shadow(0 1px 0 color-mix(in srgb, var(--cs-c) 45%, #000))
+    drop-shadow(0 2.5px 2px rgba(0, 0, 0, .24));
+}
+.cs-card:hover .cs-card-icon { transform: scale(1.05) rotate(-2deg); }
+
+.cs-card-q {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 7px;
+}
+.cs-card-h {
+  margin: 0 0 9px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.18;
+  letter-spacing: -.012em;
+  color: var(--ink);
+}
+.cs-card-body {
+  margin: 0 0 20px;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  letter-spacing: -.003em;
+}
+
+/* CTA sits at the bottom of the card */
+.cs-card-cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .005em;
+}
+.cs-card--write .cs-card-cta { color: var(--terra-deep); }
+.cs-card--plan  .cs-card-cta { color: var(--gold); }
+.cs-card-cta svg {
+  transition: transform .16s ease;
+}
+.cs-card:hover .cs-card-cta svg { transform: translateX(4px); }
+
+/* ===================== "or" divider ===================== */
+.cs-or {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px;
+  align-self: stretch;
+}
+.cs-or-line {
+  flex: 1;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--line-2) 50%, transparent);
+}
+.cs-or-word {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-3);
+  padding: 4px 0;
+}
+
+/* ===================== footnote ===================== */
+.cs-foot {
+  margin: 30px 0 0;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  text-align: center;
+  letter-spacing: .01em;
+}
+
+/* ===================== responsive ===================== */
+@media (max-width: 720px) {
+  .cs-fork {
+    grid-template-columns: 1fr;
+  }
+  .cs-or {
+    flex-direction: row;
+    padding: 4px 0;
+  }
+  .cs-or-line {
+    width: auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line-2) 50%, transparent);
+  }
+}
