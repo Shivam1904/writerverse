@@ -1,0 +1,1907 @@
+/* ============================================================
+ * Plot threads page — prose-style storyline directory
+ * Scoped under .wv2-root. Tokens from theme; static tokens from
+ * app.css. Ported from design handoff 06-threads.html.
+ * ============================================================ */
+
+/* ---- page shell — margin-gutter layout (mirrors World / Character Studio) ----
+   One reading column; each block carries a sticky heading in its own gutter
+   (.wm-block, styled in world.css), and <MarginOverlay> stacks off-screen
+   headings above/below. No separate left rail anymore. */
+/* (dead .thr-page layout overrides removed; now uses standard PageShell geometry) */
+
+/* (left rail removed — the threads page now uses the World-style margin gutter,
+   so the per-thread headings live in the .wm gutter, not a separate nav rail) */
+
+/* The grand outline still owns a horizontal scroll box (threads = columns)
+   with the left-axis labels frozen as the user scrolls sideways. Vertical
+   height is natural — the page scrolls. */
+.wv2-root .thr-page .thr-map {
+  overflow-x: auto;
+  margin-bottom: 0;
+}
+.wv2-root .thr-page .thr-map .thr-map-head-t {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: var(--surface);
+}
+.wv2-root .thr-page .thr-map .thr-map-lbl {
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: var(--surface);
+}
+/* An unlabelled chapter/scene must not paint a blank surface rectangle — only
+   labels with real text need the frozen background. (Stops empty rows stacking
+   into one tall grey box on rough outlines whose chapters/scenes are unnamed.) */
+.wv2-root .thr-page .thr-map .thr-map-lbl:empty { background: transparent; }
+.wv2-root .thr-page .thr-map .thr-map-corner {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  background: var(--surface);
+  border-bottom: 1px dashed var(--line);
+}
+/* act labels ride along the frozen left edge during horizontal scroll */
+.wv2-root .thr-page .thr-map .thr-map-act b {
+  position: sticky;
+  left: 0;
+}
+
+/* Quiet the scrollbars — both panes scroll without visible chrome. */
+.wv2-root .thr-page .wv2-page-main,
+.wv2-root .thr-page .thr-map {
+  scrollbar-width: none;
+}
+.wv2-root .thr-page .wv2-page-main::-webkit-scrollbar,
+.wv2-root .thr-page .thr-map::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* ---- page header ---- */
+.thr-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 12px;
+}
+.thr-head .thr-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.012em;
+  line-height: 1.2;
+  margin: 0 0 12px;
+}
+.thr-head .thr-head-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 0 16px;
+}
+
+/* thread head row */
+.thr-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+.thr-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 8px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6), 0 0 0 3px rgba(120, 90, 40, 0.12);
+}
+.thr-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.thr-bar {
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+.thr-bar-fill {
+  height: 100%;
+  background: var(--terra);
+  border-radius: 2px;
+}
+
+/* ---- beats: an ordered list of plot sentences ---- */
+.thr-beats {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: beat;
+  border-left: 1.5px solid var(--line);
+  padding-left: 14px;
+  margin-left: 2px;
+}
+.thr-beat-wrapper {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.thr-beat {
+  counter-increment: beat;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  position: relative;
+}
+/* idle beats are draggable (drag to place in the outline); a single click
+   swaps them into an editable textarea (.editing) */
+.thr-beat.draggable { cursor: grab; }
+.thr-beat.draggable:active { cursor: grabbing; }
+.thr-beat.editing { cursor: auto; }
+.thr-beat.dragging { opacity: 0.4; }
+.thr-beat::before {
+  content: counter(beat);
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  min-width: 14px;
+  line-height: 1.5;
+}
+
+/* marker overlaid on the rail */
+.thr-beat-mk {
+  position: absolute;
+  left: -18px;
+  top: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sage);
+  box-shadow: 0 0 0 3px var(--surface);
+  flex: 0 0 7px;
+}
+.thr-beat.placeholder .thr-beat-mk {
+  background: var(--surface);
+  left: -20px;
+  border: 1.5px dashed var(--terra);
+  width: 9px;
+  height: 9px;
+}
+
+/* beat text */
+.thr-beat-text {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.5;
+  letter-spacing: -0.003em;
+  min-width: 0;
+}
+.thr-beat-text b { font-weight: 600; }
+.thr-beat-text em { font-style: italic; color: var(--ink-2); }
+.thr-beat.placeholder .thr-beat-text {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* Heading beats — bold section labels (Setup / Progress / Payoff…). Editable
+   like any beat, but no dot, no number, slightly bold, and nudged a little left
+   so they read as a header above the beats they group. */
+.thr-beat.heading {
+  counter-increment: none;          /* don't advance the beat number */
+  grid-template-columns: 1fr auto;  /* drop the (now empty) counter column */
+  margin-left: -6px;                /* a little left — outdent toward the rail */
+  margin-top: 9px;
+}
+.thr-beat.heading::before { content: none; }   /* no beat number */
+.thr-beat-wrapper:first-child .thr-beat.heading { margin-top: 0; }
+.thr-beat.heading .thr-beat-text,
+.thr-beat.heading .thr-beat-input {
+  font-weight: 600;
+  font-style: normal;
+  color: var(--ink);
+}
+
+/* editable beat — borderless auto-growing textarea that reads as plain text */
+.thr-beat-input {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.5;
+  letter-spacing: -0.003em;
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  resize: none;
+  overflow: hidden;
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.thr-beat-input:focus { outline: none; }
+.thr-beat-input::placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+.thr-beat.placeholder .thr-beat-input {
+  color: var(--ink-3);
+  font-style: italic;
+}
+.thr-beat:focus-within { background: rgba(80, 55, 15, 0.035); border-radius: var(--r-xs); }
+/* a saved beat cleared to empty still needs a clickable target */
+.thr-beat-text:empty::before {
+  content: 'Empty beat';
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* trailing "add a beat" affordance under the beat list */
+.thr-beat-add {
+  margin: 4px 0 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--ui);
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--r-xs);
+  transition: color 0.12s, background 0.12s;
+}
+.thr-beat-add:hover { color: var(--terra); background: rgba(180, 90, 30, 0.04); }
+.thr-beat-add-plus { font-size: 14px; line-height: 1; font-weight: 600; }
+
+.thr-beat-idx { color: var(--ink-4, var(--ink-3)); opacity: 0.7; font-weight: 500; }
+
+/* per-beat delete — appears on row hover, sits at the far right edge */
+.thr-beat-del {
+  position: absolute;
+  right: -4px;
+  top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink-3);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s, color 0.12s, background 0.12s;
+}
+.thr-beat:hover .thr-beat-del { opacity: 1; }
+.thr-beat-del:hover { color: #c0392b; background: rgba(192, 57, 43, 0.08); }
+
+.wv2-root .wtch-head-actions {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin: 0 0 16px;
+}
+
+.wv2-root .wtch-sub {
+  font-size: 12.5px; color: var(--ink-2);
+  line-height: 1.5;
+  font-family: var(--ui);
+}
+.wv2-root .wtch-sub b { color: var(--ink); font-weight: 600; }
+.wv2-root .wtch-sub .wtch-sl { color: var(--ink-4); margin: 0 7px; }
+
+.thr-linkbtn {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink-3);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.thr-linkbtn:hover {
+  background: rgba(80, 55, 15, 0.05);
+  color: var(--ink-2);
+}
+.thr-linkbtn.primary {
+  color: var(--terra-deep);
+  font-weight: 600;
+}
+.thr-linkbtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* AI buttons use shared .wv2-btn .wv2-btn-ai from app.css */
+
+/* add-new-thread button → shared .wv2-add (app.css) */
+
+/* ============================================================
+ * Right column: thread map (vertical grid)
+ * Threads = columns · chapters = rows · grows downward
+ * ============================================================ */
+.thr-map {
+  display: grid;
+  gap: 0;
+  margin-bottom: 14px;
+}
+
+/* header row: thread names */
+.thr-map-head { display: contents; }
+.thr-map-head-t {
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  text-align: center;
+  padding: 0 2px 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  border-bottom: 1px dashed var(--line);
+}
+.thr-map-sw {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.6);
+}
+
+/* act divider */
+.thr-map-act {
+  grid-column: 1 / -1;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  font-family: var(--ui);
+  padding: 8px 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.thr-map-act b {
+  color: var(--ink-2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.thr-map-act::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 3px, transparent 3px 6px);
+}
+
+/* chapter row */
+.thr-map-ch { display: contents; }
+.thr-map-lbl {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-2);
+  font-weight: 500;
+  text-align: right;
+  padding: 0 10px 0 0;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 22px;
+}
+.thr-map-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+}
+/* vertical rail per thread column */
+.thr-map-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1.5px;
+  opacity: 0.18;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+.thr-map-dot {
+  position: relative;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--surface);
+}
+.thr-map-dot.gap {
+  background: transparent !important;
+  width: 9px;
+  height: 9px;
+}
+
+/* expandable chapter label */
+.thr-map-lbl.expandable {
+  cursor: pointer;
+  user-select: none;
+}
+.thr-map-lbl.expandable:hover {
+  color: var(--ink);
+}
+.thr-map-chevron {
+  display: inline-block;
+  font-size: 8px;
+  margin-right: 3px;
+  transition: transform 0.15s;
+  color: var(--ink-3);
+}
+.thr-map-chevron.open {
+  transform: rotate(90deg);
+}
+
+/* scene sub-rows (expanded chapter) */
+.thr-map-sc-lbl {
+  font-size: 9px !important;
+  color: var(--ink-3) !important;
+  font-style: italic;
+  font-weight: 400 !important;
+  padding-left: 6px !important;
+  min-height: 20px !important;
+  letter-spacing: 0;
+}
+.thr-map-sc-cell {
+  min-height: 20px !important;
+}
+.thr-map-dot.sc-dot {
+  width: 6px;
+  height: 6px;
+}
+.thr-map-dot.sc-dot.gap {
+  width: 7px;
+  height: 7px;
+}
+
+/* beat rows inside expanded scenes */
+.thr-map-beat-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 4px 3px 16px;
+  min-height: 24px;
+  border-radius: 3px;
+}
+/* small thread-coloured marker tying a merged beat to its column */
+.thr-map-beat-mk {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.thr-map-beat-mk.placeholder {
+  width: 6px;
+  height: 6px;
+  background: transparent;
+  border-width: 1.5px;
+  border-style: solid;
+  box-shadow: none;
+}
+.thr-map-beat-num {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  min-width: 13px;
+  flex: 0 0 auto;
+}
+.thr-map-beat-num.placeholder { color: var(--terra); }
+.thr-map-beat-text {
+  font-family: var(--serif);
+  font-size: 11px;
+  color: var(--ink-2);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.thr-map-beat-text.placeholder {
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+/* Drop slot between / after beats. Collapsed to a thin seam at rest so the map
+   stays compact; "armed" (a beat is being dragged anywhere) it grows into a clear
+   dashed target between every beat; "drop-active" (hovered) it lights up terra. */
+.thr-map-drop-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4px;
+  margin: 0 4px 0 16px;
+  border: 1px dashed transparent;
+  border-radius: 4px;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--ink-4);
+  transition: min-height 0.12s ease, border-color 0.12s, background 0.12s, color 0.12s;
+  cursor: default;
+}
+/* a standing "drop a beat here" prompt in an empty scene is always visible */
+.thr-map-drop-slot.has-label {
+  min-height: 22px;
+  border-color: var(--line);
+  color: var(--ink-3);
+}
+.thr-map-drop-slot.armed {
+  min-height: 18px;
+  border-color: rgba(180, 90, 30, 0.4);
+  background: rgba(180, 144, 48, 0.04);
+  color: var(--terra-deep);
+}
+.thr-map-drop-slot.drop-active {
+  min-height: 22px;
+  border-color: var(--terra);
+  box-shadow: 0 0 0 1px rgba(180, 90, 30, 0.15);
+  background: rgba(180, 144, 48, 0.14);
+  color: var(--terra-deep);
+}
+
+/* ============================================================
+ * Proposal mode — merge review in the right rail
+ * ============================================================ */
+
+/* rail border glow when proposal is active */
+.thr-rail--proposal {
+  border: 1.5px solid rgba(52, 160, 100, 0.35);
+  border-radius: var(--r-md);
+  padding: 10px 8px;
+  background: rgba(52, 160, 100, 0.02);
+}
+
+/* proposal header bar */
+.thr-proposal-bar {
+  margin-bottom: 10px;
+}
+.thr-proposal-bar-head {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.thr-proposal-bar-head .spark {
+  color: var(--gold);
+  font-size: 13px;
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, 0.4));
+}
+.thr-proposal-bar-hint {
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-3);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.thr-proposal-bar-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.thr-proposal-accept {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(52, 140, 90, 0.85);
+  border: 1px solid rgba(52, 140, 90, 0.5);
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.thr-proposal-accept:hover:not(:disabled) {
+  background: rgba(52, 140, 90, 1);
+}
+.thr-proposal-accept:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.thr-proposal-cancel {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.thr-proposal-cancel:hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--ink-2);
+}
+.thr-proposal-cancel:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* highlighted proposed beat row in the thread map */
+.thr-map-beat-row.thr-map-beat-proposed {
+  background: rgba(52, 160, 100, 0.08);
+  border-left: 2px solid rgba(52, 160, 100, 0.6);
+  padding-left: 14px;
+  border-radius: 0 3px 3px 0;
+}
+.thr-map-beat-proposed .thr-map-beat-text {
+  color: var(--ink) !important;
+  font-weight: 500;
+}
+.thr-map-beat-new {
+  font-family: var(--ui);
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(52, 140, 90, 0.8);
+  flex: 0 0 auto;
+}
+
+/* see-outline link */
+.thr-see-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  text-decoration: none;
+  padding: 2px 0;
+  margin-bottom: 14px;
+  transition: color 0.12s;
+}
+.thr-see-outline:hover { color: var(--terra-deep); }
+.thr-see-outline::after {
+  content: '→';
+  margin-left: auto;
+  color: var(--ink-4);
+}
+
+/* ============================================================
+ * Threads-start — the empty-state init surface (handoff: threads-start.html).
+ * Three scope lanes (story / character / idea) encourage MANY threads; a helper
+ * row mines existing scenes; a cross-door hands off to the grand outline.
+ * The hero head (.wv2-init-head/-eyebrow/-title/-sub) and centred column
+ * (.wv2-init) are the SHARED init standard from app.css; .thr-start only
+ * widens the column so the 3-up lane grid fits.
+ * ============================================================ */
+.thr-start { max-width: 960px; }
+.wv2-root .thr-start.wv2-init { max-width: 960px; }
+.thr-start .wv2-init-sub i { font-style: italic; color: var(--ink); }
+
+/* ---- describe → suggest — plain card, same format as the People page's
+   describe → generate (.pi-describe / .pi-dfoot / .pi-generate). ---- */
+.thr-suggest {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, .55) inset,
+    0 1px 2px rgba(60, 40, 15, .04),
+    0 14px 38px -24px rgba(40, 28, 8, .24);
+  padding: 16px 18px 14px;
+  margin: 14px 0 16px;
+  display: flex;
+  flex-direction: column;
+}
+.thr-suggest-input {
+  width: 100%;
+  font-family: var(--serif);
+  font-size: 16.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: -.003em;
+  background: transparent;
+  border: 0;
+  outline: none;
+  padding: 0;
+}
+.thr-suggest-input::placeholder { color: var(--ink-3); font-style: italic; }
+.thr-suggest-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.thr-suggest-hint {
+  flex: 1;
+  min-width: 150px;
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.thr-suggest-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--terra);
+  border: 1px solid var(--terra-deep);
+  padding: 8px 15px;
+  border-radius: 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .12s, transform .08s;
+}
+.thr-suggest-btn:hover { background: var(--terra-deep); }
+.thr-suggest-btn:active { transform: translateY(1px); }
+.thr-suggest-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.thr-start-reassure {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin: 16px 0 22px;
+  font-family: var(--ui);
+}
+.thr-start-reassure svg {
+  width: 13px; height: 13px; flex: 0 0 13px;
+  fill: none; stroke: var(--sage); stroke-width: 1.7;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.thr-start-reassure b { color: var(--ink-2); font-weight: 600; }
+
+/* ---- three scope lanes ---- */
+.thr-lanes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.thr-lane {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
+  padding: 16px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-top: 2px solid var(--c, var(--terra));
+}
+.thr-lane-head { display: flex; align-items: center; gap: 9px; margin-bottom: 10px; }
+.thr-lane-ic {
+  width: 28px; height: 28px; border-radius: var(--r-md); flex: 0 0 28px;
+  display: grid; place-items: center;
+  background: var(--c-soft, var(--terra-soft));
+  color: var(--c, var(--terra));
+}
+.thr-lane-ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.thr-lane-nm {
+  font-family: var(--serif);
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: -.008em;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.thr-lane-kick {
+  font-size: 8.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin-top: 2px;
+}
+.thr-lane-desc {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+.thr-lane-desc b { color: var(--ink); font-weight: 600; }
+.thr-lane-sub {
+  font-size: 9px;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin: 0 0 7px;
+}
+
+/* quick-start type chips */
+.thr-tchips { display: flex; flex-direction: column; gap: 5px; margin-bottom: 11px; }
+.thr-tchip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 7px 10px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition: background .12s, border-color .12s, transform .08s;
+}
+.thr-tchip:hover { background: var(--surface); border-color: var(--c, var(--line-3)); transform: translateX(2px); }
+.thr-tchip .sw {
+  width: 7px; height: 7px; border-radius: 50%; flex: 0 0 7px;
+  background: var(--c, var(--terra));
+  opacity: .7;
+}
+.thr-tchip .desc { color: var(--ink-3); font-weight: 400; font-size: 11px; margin-left: 1px; }
+.thr-tchip .plus {
+  margin-left: auto;
+  color: var(--ink-3);
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity .12s;
+}
+.thr-tchip:hover .plus { opacity: 1; color: var(--c, var(--terra)); }
+
+/* character chips carry an avatar */
+.thr-tchip.person .av {
+  width: 18px; height: 18px; border-radius: 50%; flex: 0 0 18px;
+  display: grid; place-items: center;
+  color: #fff; font-weight: 700; font-size: 9px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .05) inset;
+}
+
+.thr-lane-add {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1.5px dashed var(--line-3);
+  border-radius: var(--r-md);
+  background: transparent;
+  cursor: pointer;
+  padding: 9px;
+  width: 100%;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--c, var(--terra));
+  transition: border-color .12s, background .12s;
+}
+.thr-lane-add:hover { border-color: var(--c, var(--terra)); background: var(--c-soft, var(--terra-soft)); }
+.thr-lane-add svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* the empty-characters note (shown only when no people exist) */
+.thr-lane-empty {
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  font-style: italic;
+  font-family: var(--serif);
+  background: var(--surface-2);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-sm);
+  padding: 9px 11px;
+  margin-bottom: 11px;
+}
+.thr-lane-empty a {
+  color: var(--mauve);
+  font-weight: 600;
+  font-style: normal;
+  cursor: pointer;
+  border-bottom: 1px dashed currentColor;
+}
+
+/* ---- already-written helper row ---- */
+.thr-helper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(165deg, var(--ai-bg) 0%, var(--ai-bg-2) 120%);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+.thr-helper .h-txt { flex: 1; min-width: 180px; }
+.thr-helper .h-h {
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+.thr-helper .h-h .gl { filter: drop-shadow(0 0 3px rgba(180, 140, 20, .4)); }
+.thr-helper .h-body {
+  font-family: var(--serif);
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.45;
+  letter-spacing: -.003em;
+}
+.thr-helper .h-acts { display: flex; gap: 7px; flex-shrink: 0; }
+.thr-hbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  padding: 8px 13px;
+  border: 1px solid #d6c79e;
+  background: var(--surface);
+  color: var(--gold);
+  transition: background .12s, filter .12s, opacity .12s;
+}
+.thr-hbtn:hover:not(:disabled) { background: var(--gold-soft); }
+.thr-hbtn.solid {
+  background: #a47a00;
+  color: #fff;
+  border-color: #7a5b00;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .16) inset;
+}
+.thr-hbtn.solid:hover:not(:disabled) { filter: brightness(.95); background: #a47a00; }
+.thr-hbtn:disabled { opacity: .5; cursor: not-allowed; }
+.thr-hbtn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- the other door: outline ---- */
+.thr-start-door {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+}
+.thr-start-door .od-ic {
+  width: 36px; height: 36px; border-radius: 9px; flex: 0 0 36px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  display: grid;
+  place-items: center;
+  color: var(--terra);
+  box-shadow: var(--sh-1);
+}
+.thr-start-door .od-ic svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.thr-start-door .od-body { flex: 1; min-width: 0; }
+.thr-start-door .od-h {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  line-height: 1.25;
+}
+.thr-start-door .od-body p {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.45;
+  margin: 2px 0 0;
+}
+.thr-start-door .od-go {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--terra);
+  border: 1px solid var(--terra-deep);
+  border-radius: var(--r-sm);
+  padding: 9px 15px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .16) inset, 0 1px 2px rgba(40, 55, 90, .18);
+  transition: background .12s, transform .08s;
+}
+.thr-start-door .od-go:hover { background: var(--terra-deep); }
+.thr-start-door .od-go:active { transform: translateY(.5px); }
+.thr-start-door .od-go svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* keep it sane when the lanes get narrow */
+@media (max-width: 1080px) {
+  .thr-lanes { grid-template-columns: 1fr; }
+  .thr-start-door { flex-wrap: wrap; }
+  .thr-start-door .od-body { flex: 1 1 100%; }
+}
+
+/* ============================================================
+ * Generate button anchor (the popover itself is the shared
+ * GenerateIdeasPopover — see components/generate-ideas-popover.css)
+ * ============================================================ */
+.thr-gen-anchor {
+  position: relative;
+}
+
+/* col-head reuse in the right rail */
+.thr-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 6px;
+  font-family: var(--ui);
+}
+.thr-col-head > span { white-space: nowrap; }
+.thr-col-head .ct {
+  color: var(--ink-3);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 10px;
+}
+.thr-col-head .glyph {
+  color: var(--gold);
+  font-size: 11px;
+  margin-right: 5px;
+  letter-spacing: 0;
+  filter: drop-shadow(0 0 3px rgba(180, 140, 20, 0.4));
+}
+
+/* Pager strip above the proposal bar — shown when multiple merge
+   proposals are pending so the user can flip between them on the rail.
+   ← N of M → */
+.wv2-root .thr-proposal-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  background: color-mix(in srgb, var(--terra) 4%, var(--surface-2));
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-sm);
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+.wv2-root .thr-proposal-pager-btn {
+  padding: 2px 8px;
+  background: transparent;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  min-width: 28px;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.wv2-root .thr-proposal-pager-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+.wv2-root .thr-proposal-pager-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.wv2-root .thr-proposal-pager-label {
+  flex: 1;
+  text-align: center;
+  font-weight: 500;
+  color: var(--terra-deep);
+}
+
+/* ============================================================
+ * New storyline modal — a three-step, focus-driven sheet
+ *   ① Who is this thread for?  ② Name it  ③ The beats
+ * Detail-dialog chrome borrowed from the lens/chart config; one accent
+ * (terra) marks only focus + what you picked. Kinds read by silhouette,
+ * not colour. Step ③ reuses the live .thr-beat* styling verbatim.
+ * ============================================================ */
+.wv2-root .thr-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--ink) 40%, transparent);
+  backdrop-filter: blur(3px);
+}
+.wv2-root .thr-modal {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  width: 520px;
+  max-width: 92vw;
+  max-height: 86vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px -16px color-mix(in srgb, var(--ink) 35%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 26px 28px 20px;
+}
+/* Stepped variant: sections own their own padding + dividers, so drop the
+   card padding/gap and let the body scroll between a fixed head + foot. */
+.wv2-root .thr-modal--stepped {
+  width: 600px;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+}
+.wv2-root .thr-modal--stepped .thr-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.wv2-root .thr-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex: 0 0 auto;
+}
+.wv2-root .thr-modal--stepped .thr-modal-head {
+  padding: 20px 24px 15px;
+  border-bottom: 1px solid var(--line);
+}
+.wv2-root .thr-modal-head-main { min-width: 0; }
+.wv2-root .thr-modal-kicker {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+}
+.wv2-root .thr-modal-title {
+  margin: 4px 0 0;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.wv2-root .thr-modal-close {
+  background: var(--surface-2);
+  border: 0;
+  border-radius: var(--r-md);
+  width: 30px;
+  height: 30px;
+  font-size: 19px;
+  color: var(--ink-2);
+  cursor: pointer;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.wv2-root .thr-modal-close:hover { background: var(--line-2); color: var(--ink); }
+
+/* reused inputs (name field, character dropdown, custom-shape name) */
+.wv2-root .thr-field-input {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 9px 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color .12s, box-shadow .12s;
+}
+.wv2-root .thr-field-input:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--terra) 16%, transparent);
+}
+.wv2-root .thr-scope-name { margin-top: 10px; }
+.wv2-root .thr-select { cursor: pointer; }
+.wv2-root .thr-custom-input { margin-top: 8px; }
+
+/* ---- a step block ---- */
+.wv2-root .thr-step {
+  position: relative;
+  padding: 15px 24px 16px;
+  border-bottom: 1px solid var(--line);
+  transition: background .15s;
+}
+.wv2-root .thr-step:last-of-type { border-bottom: 0; }
+/* focused step: faint terra wash + a left accent rail = "you are here" */
+.wv2-root .thr-step.is-active { background: color-mix(in srgb, var(--terra) 4%, var(--surface)); }
+.wv2-root .thr-step.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2.5px;
+  background: var(--terra);
+}
+/* not yet reachable until we know who the thread is for */
+.wv2-root .thr-step.is-locked { opacity: .42; pointer-events: none; }
+/* scope→scaffold picker keeps BOTH steps expanded at once; the un-focused step
+   reads muted but stays fully interactive (nothing is locked). */
+.wv2-root .csm-modal .thr-step:not(.is-active) .thr-step-body { opacity: .5; transition: opacity .15s; }
+
+.wv2-root .thr-step-h {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+.wv2-root .thr-step.is-active .thr-step-h { cursor: default; }
+.wv2-root .thr-step-num {
+  flex: 0 0 21px;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  color: var(--ink-3);
+  transition: background .15s, color .15s, border-color .15s;
+}
+.wv2-root .thr-step.is-active .thr-step-num {
+  background: var(--terra);
+  border-color: var(--terra);
+  color: #fff;
+}
+.wv2-root .thr-step.is-done .thr-step-num {
+  background: color-mix(in srgb, var(--terra) 14%, var(--surface));
+  border-color: color-mix(in srgb, var(--terra) 40%, var(--line));
+  color: var(--terra-deep);
+}
+.wv2-root .thr-step-ttl {
+  font-family: var(--ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.wv2-root .thr-step.is-active .thr-step-ttl { color: var(--ink); }
+.wv2-root .thr-step-sum {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-2);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wv2-root .thr-step-sum--quote { font-family: var(--serif); font-style: italic; }
+.wv2-root .thr-step-edit {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--terra-deep);
+}
+.wv2-root .thr-step-h:hover .thr-step-edit { text-decoration: underline; text-underline-offset: 2px; }
+.wv2-root .thr-step-body { margin-top: 13px; padding-left: 31px; }
+.wv2-root .thr-step-note {
+  margin: 0 0 11px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+.wv2-root .thr-step-note b { color: var(--ink-2); font-weight: 600; }
+/* quiet inline "more / someone else" toggle */
+.wv2-root .thr-step-more {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--terra-deep);
+  background: none;
+  border: 0;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+.wv2-root .thr-step-more:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---- ① scope chips (glossy entity mark + label) ---- */
+.wv2-root .thr-scope-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+.wv2-root .thr-scope-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 6px 11px 6px 8px;
+  cursor: pointer;
+  transition: border-color .12s, background .12s, color .12s, box-shadow .12s;
+}
+.wv2-root .thr-scope-chip:hover { border-color: var(--line-3); }
+.wv2-root .thr-scope-chip.is-on {
+  color: var(--terra-deep);
+  border-color: color-mix(in srgb, var(--terra) 55%, var(--line));
+  background: color-mix(in srgb, var(--terra) 9%, var(--surface));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--terra) 30%, transparent);
+}
+
+/* ---- ① character picker ---- */
+.wv2-root .thr-scope-who {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+/* directive sub-prompt: makes it obvious a character pick is still required
+   once the Character scope is chosen (the scope chips above look identical). */
+.wv2-root .thr-scope-prompt {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--terra-deep);
+}
+.wv2-root .thr-scope-people { display: flex; flex-wrap: wrap; gap: 7px; }
+.wv2-root .thr-person-chip { padding-left: 6px; }
+.wv2-root .thr-scope-more { width: auto; min-width: 200px; align-self: flex-start; }
+
+/* ---- ② "start from a shape?" — a horizontally-scrollable strip of chips.
+   Clicking a chip re-seeds ③'s beats live; the writer can scroll + click
+   through shapes and watch the list below until satisfied. ---- */
+.wv2-root .thr-tpl-head {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--ink-3);
+  margin: 13px 0 7px;
+}
+.wv2-root .thr-tpl-strip {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 7px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 5px;
+  /* fade the right edge so the strip reads as "more — keep scrolling" */
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent);
+  scrollbar-width: thin;
+}
+.wv2-root .thr-tpl-strip::-webkit-scrollbar { height: 5px; }
+.wv2-root .thr-tpl-strip::-webkit-scrollbar-thumb {
+  background: var(--line-3);
+  border-radius: 3px;
+}
+.wv2-root .thr-tpl-chip {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 11px;
+  cursor: pointer;
+  transition: border-color .12s, color .12s, background .12s;
+}
+.wv2-root .thr-tpl-chip:hover { border-color: var(--line-3); color: var(--ink); }
+.wv2-root .thr-tpl-chip.is-on {
+  color: var(--terra-deep);
+  font-weight: 600;
+  border-color: color-mix(in srgb, var(--terra) 55%, var(--line));
+  background: color-mix(in srgb, var(--terra) 9%, var(--surface));
+}
+
+/* ---- ③ draft beats — reuses .thr-beat* verbatim. No own scroll: the marker
+   dots sit at left:-18px on the rail, and any overflow here would clip them,
+   so let the whole modal body scroll instead. ---- */
+.wv2-root .thr-draft-beats { margin-bottom: 2px; }
+
+/* ---- footer ---- */
+.wv2-root .thr-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.wv2-root .thr-modal--stepped .thr-modal-foot {
+  justify-content: space-between;
+  padding: 14px 24px 16px;
+  border-top: 1px solid var(--line);
+}
+.wv2-root .thr-modal-foot-note {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  min-width: 0;
+}
+.wv2-root .thr-modal-foot-btns { display: flex; gap: 8px; flex: 0 0 auto; }
+
+/* ---- edit-storyline modal (rename + re-scope) — a plain (non-stepped)
+   .thr-modal with a couple of labelled fields ---- */
+.wv2-root .thr-modal--edit .thr-modal-foot { justify-content: space-between; }
+.wv2-root .thr-edit-field + .thr-edit-field { margin-top: 18px; }
+.wv2-root .thr-edit-label {
+  display: block;
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 9px;
+}
+/* ---- group sections — mirror the rail's Open gaps / On track / Unplotted
+   order so the page list and rail share a reading order. Header style is a
+   page-sized cousin of .wv2-role-head (the rail's group header). ---- */
+   .thr-group { display: flex; flex-direction: column; }
+   .thr-group + .thr-group { margin-top: 18px; }
+   .thr-group-head {
+     display: flex;
+     align-items: center;
+     gap: 9px;
+     margin: 0 0 8px;
+     font-family: var(--ui);
+     font-size: 9.5px;
+     font-weight: 700;
+     letter-spacing: .15em;
+     text-transform: uppercase;
+     color: var(--ink-3);
+   }
+   .thr-group-dot {
+     flex: 0 0 7px;
+     width: 7px;
+     height: 7px;
+     border-radius: 50%;
+     background: var(--ink-4);
+     box-shadow: 0 0 0 2px color-mix(in srgb, var(--ink-4) 20%, transparent);
+   }
+   .thr-group-title {
+     margin: 0;
+     font: inherit;
+     line-height: 1;
+   }
+   .thr-group-count {
+     font-size: 10px;
+     font-weight: 700;
+     color: var(--ink-3);
+     font-variant-numeric: tabular-nums;
+     letter-spacing: .02em;
+   }
+   .thr-group-rule {
+     flex: 1;
+     height: 1px;
+     background-image: linear-gradient(to right, var(--line-2) 50%, transparent 50%);
+     background-size: 5px 1px;
+     background-repeat: repeat-x;
+   }
+   .thr-group-head--attention .thr-group-dot {
+     background: var(--clay);
+     box-shadow: 0 0 0 2px color-mix(in srgb, var(--clay) 22%, transparent);
+   }
+   .thr-group-head--attention .thr-group-title { color: var(--clay); }
+   .thr-group-head--holding .thr-group-dot {
+     background: var(--sage);
+     box-shadow: 0 0 0 2px color-mix(in srgb, var(--sage) 22%, transparent);
+   }
+   .thr-group-head--holding .thr-group-title { color: var(--sage-deep, var(--sage)); }
+   .thr-group-head--noting .thr-group-dot { background: var(--ink-4); }
+   
+   /* ---- a thread card — prose-style storyline ---- */
+/* ============================================================
+ * Suggested storylines — green-tinted page surface for pending
+ * `generate_thread` proposals. One source: <ThreadSuggestions>
+ * reads useProposalStore, so accepting here also dismisses the
+ * chat + toast surfaces. Visual rhythm mirrors a ThreadCard so
+ * the writer is comparing apples-to-apples before accepting.
+ *
+ * Theme: sage green (mirrors .chr-suggest on the characters page).
+ * ============================================================ */
+.wv2-root .thr-suggest {
+  --sug-bg:    color-mix(in srgb, var(--sage) 13%, var(--surface));
+  --sug-bg-2:  color-mix(in srgb, var(--sage) 7%, var(--surface));
+  --sug-line:  color-mix(in srgb, var(--sage) 34%, var(--line-2));
+  --sug-line-2:color-mix(in srgb, var(--sage) 22%, var(--line-2));
+  --sug-deep:  color-mix(in srgb, var(--sage) 72%, #14241b);
+
+  position: relative;
+  border-radius: 13px;
+  background:
+    radial-gradient(150% 120% at 0% 0%, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0) 50%),
+    linear-gradient(168deg, var(--sug-bg) 0%, var(--sug-bg-2) 100%);
+  border: 1px solid var(--sug-line-2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .5),
+    0 1px 2px rgba(40, 55, 40, .05),
+    0 16px 40px -24px rgba(40, 60, 42, .34);
+  padding: 15px 16px 16px;
+  margin-bottom: 16px;
+}
+
+.wv2-root .thr-suggest-head { display: flex; align-items: center; gap: 9px; margin-bottom: 11px; }
+.wv2-root .thr-suggest-spark {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--sage) 18%, var(--surface));
+  border: 1px solid var(--sug-line);
+  color: var(--sug-deep);
+  font-size: 10px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sage) 9%, transparent);
+}
+.wv2-root .thr-suggest-ttl {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--sug-deep);
+}
+.wv2-root .thr-suggest-meta { margin-left: auto; font-family: var(--ui); font-size: 10.5px; color: var(--ink-3); }
+.wv2-root .thr-suggest-meta b { color: var(--sug-deep); font-weight: 700; }
+
+.wv2-root .thr-suggest-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* Single suggested-storyline card — mirrors .thr-card shape & spacing. */
+.wv2-root .thr-sug-card {
+  background: var(--surface);
+  border: 1px solid var(--sug-line);
+  border-radius: var(--r-md);
+  padding: 12px 16px 12px;
+  box-shadow: 0 1px 2px rgba(40, 55, 40, .05);
+}
+
+.wv2-root .thr-sug-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+.wv2-root .thr-sug-nm {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  line-height: 1.25;
+  min-width: 0;
+}
+.wv2-root .thr-sug-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 8px;
+  background: var(--sage);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .6), 0 0 0 3px color-mix(in srgb, var(--sage) 28%, transparent);
+}
+.wv2-root .thr-sug-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wv2-root .thr-sug-scope {
+  font-family: var(--ui);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--sug-deep);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--sage) 12%, var(--surface));
+  margin-left: 4px;
+}
+
+.wv2-root .thr-sug-acts { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; }
+.wv2-root .thr-sug-dismiss {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid var(--line-2);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color .14s, border-color .14s, background .14s;
+}
+.wv2-root .thr-sug-dismiss svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.wv2-root .thr-sug-dismiss:hover { color: var(--clay); border-color: var(--clay); background: color-mix(in srgb, var(--clay) 8%, transparent); }
+.wv2-root .thr-sug-accept {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, var(--sage), var(--sug-deep));
+  border: 1px solid var(--sug-deep);
+  padding: 6px 12px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18) inset, 0 4px 12px -5px rgba(40, 70, 48, .5);
+  transition: transform .1s, box-shadow .14s, filter .14s;
+}
+.wv2-root .thr-sug-accept svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.wv2-root .thr-sug-accept:hover { filter: brightness(1.05); }
+.wv2-root .thr-sug-accept:active { transform: translateY(1px); }
+
+.wv2-root .thr-sug-body { display: flex; flex-direction: column; gap: 10px; }
+
+/* Preview beats reuse the live .thr-beat* styling verbatim (see ThreadSuggestions)
+   — headings, text, and placeholders all render identically to real ThreadCard
+   beats, so no dedicated .thr-sug-beat / .thr-sug-phase styles are needed. */
+
+.wv2-root .thr-suggest-foot { margin-top: 11px; display: flex; align-items: center; gap: 8px; }
+.wv2-root .thr-suggest-all {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sug-deep);
+  background: color-mix(in srgb, var(--sage) 12%, var(--surface));
+  border: 1px solid var(--sug-line);
+  padding: 5px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+/* Extracted-story summary blurb — used when a thr-sug card came from
+   `run_init_elements` (no SETUP/PROGRESS/PAYOFF items, just a synopsis). */
+.wv2-root .thr-sug-summary {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+/* ============================================================
+ * Story seeds — the GOLD "half proposal" twin of .thr-suggest.
+ * Shows raw `run_init_elements` story ideas (title + summary, no beats yet).
+ * "Explore further" accepts the seed, which chains a full thread draft (the
+ * green .thr-suggest block) the author still approves. Same visual rhythm as
+ * the sage suggestions, recoloured to gold to read as "earlier in the funnel".
+ * ============================================================ */
+.wv2-root .thr-seed { margin-bottom: 18px; }
+.wv2-root .thr-seed-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+.wv2-root .thr-seed-spark {
+  color: var(--gold);
+  filter: drop-shadow(0 0 6px rgba(201, 162, 39, .45));
+  font-size: 15px;
+}
+.wv2-root .thr-seed-ttl {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -.01em;
+}
+.wv2-root .thr-seed-meta {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-left: auto;
+}
+.wv2-root .thr-seed-meta b { color: #8a6d00; font-weight: 700; }
+
+/* a single story-seed card — gold-tinted, lighter than .thr-sug-card */
+.wv2-root .thr-seed-card {
+  background:
+    linear-gradient(170deg, color-mix(in srgb, var(--gold) 9%, var(--surface)), var(--surface) 72%);
+  border: 1px solid color-mix(in srgb, var(--gold) 34%, var(--line));
+  border-radius: var(--r-md);
+  padding: 12px 14px 13px;
+  margin-bottom: 8px;
+}
+.wv2-root .thr-seed-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+}
+.wv2-root .thr-seed-nm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.wv2-root .thr-seed-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), #8a6d00);
+  flex: 0 0 9px;
+}
+.wv2-root .thr-seed-title {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wv2-root .thr-seed-acts {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+}
+.wv2-root .thr-seed-dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.wv2-root .thr-seed-dismiss svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.wv2-root .thr-seed-dismiss:hover { color: var(--clay); border-color: var(--clay); }
+.wv2-root .thr-seed-explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, #c79b1f, #8a6d00);
+  border: 1px solid #7a5b00;
+  padding: 6px 12px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .18) inset, 0 4px 12px -5px rgba(120, 90, 20, .5);
+  transition: transform .1s, box-shadow .14s, filter .14s;
+}
+.wv2-root .thr-seed-explore-spark { filter: drop-shadow(0 0 3px rgba(255, 255, 255, .5)); }
+.wv2-root .thr-seed-explore:hover:not(:disabled) { filter: brightness(1.05); }
+.wv2-root .thr-seed-explore:active:not(:disabled) { transform: translateY(1px); }
+.wv2-root .thr-seed-explore:disabled { opacity: .85; cursor: default; filter: none; }
+
+/* loading ring shown in place of the spark while a seed is being explored */
+.wv2-root .thr-seed-spinner {
+  width: 11px;
+  height: 11px;
+  border: 2px solid rgba(255, 255, 255, .45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: thr-seed-spin .6s linear infinite;
+}
+@keyframes thr-seed-spin { to { transform: rotate(360deg); } }
+
+.wv2-root .thr-seed-summary {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+
+.wv2-root .thr-seed-foot { margin-top: 11px; display: flex; align-items: center; gap: 8px; }
+.wv2-root .thr-seed-all {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: #8a6d00;
+  background: color-mix(in srgb, var(--gold) 14%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--gold) 34%, var(--line));
+  padding: 5px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.wv2-root .thr-seed-all:disabled { opacity: .65; cursor: default; }
+
+/* lens section under the threads list — groups of curated lens suggestions by
+   walk. Reuses the character page's cst-band / cst-lens-* card styling. */
+.wv2-root .thr-lenses { margin-top: 26px; }
+.wv2-root .thr-lenses-head {
+  display: flex; align-items: baseline; gap: 8px; margin: 0 0 4px;
+  font-family: var(--ui); font-size: 13px; font-weight: 700; letter-spacing: .02em; color: var(--ink);
+}
+.wv2-root .thr-lenses-sub { font-size: 11px; font-weight: 500; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+.wv2-root .thr-lenses .cst-lens-card.is-loading { opacity: .55; }
+/* "there's much more in the bank" teaser — frames the curated set as a preview */
+.wv2-root .thr-lens-more {
+  margin-top: 14px; padding: 13px 16px;
+  border: 1px dashed var(--line-2); border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--terra) 2.5%, var(--surface));
+  display: flex; flex-direction: column; gap: 10px;
+}
+.wv2-root .thr-lens-more-txt { margin: 0; font-family: var(--ui); font-size: 12.5px; line-height: 1.5; color: var(--ink-2); }
+.wv2-root .thr-lens-more-txt b { color: var(--ink); font-weight: 650; }
+.wv2-root .thr-lens-more-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* divider between the new ThreadsList and the kept legacy thread view (transition) */
+.wv2-root .thr-legacy-divider {
+  display: flex; align-items: center; gap: 10px; margin: 22px 0 14px;
+  font-family: var(--ui); font-size: 9.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+}
+.wv2-root .thr-legacy-divider::before, .wv2-root .thr-legacy-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
