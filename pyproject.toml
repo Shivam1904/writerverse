@@ -42,7 +42,7 @@ dependencies = [
     "gunicorn>=24.0,<25.0",
     "django-axes>=8.0,<9.0",
     "django-storages[s3]>=1.14.6",
-    "genai-prices>=0.1.13,<0.2",
+    "genai-prices>=0.1.13,<0.3",
 ]
 
 [dependency-groups]
