@@ -1,0 +1,727 @@
+/* ================================================================
+ * Demo Weave — presentation showcase page
+ * Self-contained: defines its own tokens, no app dependency.
+ * ================================================================ */
+
+.dwv-page {
+  --serif: Georgia, 'Lora', 'Times New Roman', serif;
+  --ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --bg: #f8f6f1;
+  --surface: #ffffff;
+  --ink: #1e1a14;
+  --ink-2: #4a4238;
+  --ink-3: #7a7068;
+  --ink-4: #a89e94;
+  --line: #e2dcd4;
+  --line-2: #d0c8be;
+  --terra: #a85d2a;
+  --terra-deep: #7a3e15;
+  --terra-soft: #f5ece3;
+  --teal: #2d7a7a;
+  --teal-soft: #e3f0f0;
+  --sage: #6b9a6b;
+  --gold: #e7c323;
+
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-family: var(--ui);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Hero text ── */
+
+.dwv-hero {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 80px 40px 48px;
+}
+
+.dwv-hero h1 {
+  font-family: var(--serif);
+  font-size: 62px;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0 0 20px;
+}
+
+.dwv-hero p {
+  font-family: var(--ui);
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--ink-3);
+  max-width: 520px;
+  margin: 0 auto;
+  font-weight: 400;
+}
+
+/* ── Browser frame ── */
+
+.dwv-frame {
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow:
+    0 1px 3px rgba(30, 26, 20, .06),
+    0 8px 32px rgba(30, 26, 20, .10),
+    0 24px 60px rgba(30, 26, 20, .08);
+  border: 1px solid rgba(30, 26, 20, .08);
+}
+
+.dwv-frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f0ece6;
+  border-bottom: 1px solid var(--line);
+  user-select: none;
+}
+
+.dwv-frame-dots {
+  display: flex;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.dwv-frame-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.dwv-frame-dot.r {
+  background: #ff5f57;
+}
+
+.dwv-frame-dot.y {
+  background: #febc2e;
+}
+
+.dwv-frame-dot.g {
+  background: #28c840;
+}
+
+.dwv-frame-url {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+  letter-spacing: .02em;
+}
+
+.dwv-frame-body {
+  padding: 0;
+  min-height: 120px;
+}
+
+/* ── Main frame (centred, foreground) ── */
+
+.dwv-main-frame {
+  position: relative;
+  z-index: 3;
+  max-width: 920px;
+  margin: 0 auto 0;
+}
+
+/* ── App header inside the frame ── */
+
+.dwv-app-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--ink-3);
+  background: #faf8f4;
+}
+
+.dwv-app-brand {
+  font-weight: 700;
+  color: var(--terra-deep);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+
+.dwv-app-brand svg {
+  width: 14px;
+  height: 14px;
+}
+
+.dwv-app-sep {
+  width: 1px;
+  height: 14px;
+  background: var(--line);
+}
+
+.dwv-app-proj {
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.dwv-app-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 14px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.dwv-app-nav-item.is-active {
+  color: var(--terra-deep);
+  font-weight: 700;
+}
+
+/* ── Page header inside the frame ── */
+
+.dwv-page-head {
+  padding: 24px 32px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dwv-page-eyebrow {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+
+.dwv-page-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dwv-page-title-suffix {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-4);
+}
+
+.dwv-page-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dwv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: default;
+}
+
+.dwv-btn-ai {
+  border-color: var(--terra);
+  color: var(--terra-deep);
+  background: var(--terra-soft);
+}
+
+.dwv-btn-primary {
+  border-color: var(--terra-deep);
+  background: var(--terra);
+  color: white;
+}
+
+/* ── Story Map ── */
+
+.dwv-map {
+  padding: 20px 32px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dwv-map-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 12px;
+}
+
+.dwv-map-grid {
+  display: grid;
+  gap: 0;
+}
+
+.dwv-map-header {
+  display: contents;
+}
+
+.dwv-map-col-label {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  padding-bottom: 6px;
+}
+
+.dwv-map-col-label .ch-title {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-3);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dwv-map-row {
+  display: contents;
+}
+
+.dwv-map-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  padding-right: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dwv-map-name::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  flex-shrink: 0;
+  background: var(--tc);
+}
+
+.dwv-map-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  position: relative;
+}
+
+.dwv-map-cell.is-intersection {
+  background: rgba(200, 180, 120, .06);
+  border-radius: 6px;
+}
+
+.dwv-map-track-line {
+  position: absolute;
+  top: 50%;
+  height: 2px;
+  background: var(--tc);
+  opacity: 0.18;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.dwv-map-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: relative;
+  z-index: 1;
+  transition: transform .15s;
+}
+
+.dwv-map-dot.filled {
+  background: var(--tc);
+}
+
+.dwv-map-dot.gap {
+  background: transparent;
+  border: 2px dashed var(--tc);
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+}
+
+/* ── Merge banner ── */
+
+.dwv-merge-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 32px 0;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, rgba(200, 170, 80, .08), rgba(200, 170, 80, .04));
+  border: 1px solid rgba(200, 170, 80, .2);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.dwv-merge-banner b {
+  color: var(--ink);
+}
+
+.dwv-merge-banner-btn {
+  margin-left: auto;
+  font-family: var(--ui);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--terra);
+  color: white;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.dwv-merge-banner .spark {
+  color: var(--gold);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Thread cards ── */
+
+.dwv-threads {
+  padding: 0 32px 32px;
+}
+
+.dwv-thread {
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.dwv-thread-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+  transition: background .12s;
+}
+
+.dwv-thread-head:hover {
+  background: rgba(30, 26, 20, .02);
+}
+
+.dwv-thread-glyph {
+  color: var(--tc);
+  flex: 0 0 auto;
+  display: flex;
+}
+
+.dwv-thread-name {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.dwv-thread-tag {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  color: var(--ink-3);
+}
+
+.dwv-thread-meta {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dwv-thread-switch {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dwv-thread-switch-btn {
+  font-family: var(--ui);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-4);
+  cursor: default;
+}
+
+.dwv-thread-switch-btn.is-on {
+  background: var(--terra-soft);
+  color: var(--terra-deep);
+}
+
+.dwv-thread-chev {
+  font-size: 10px;
+  color: var(--ink-4);
+  margin-left: 4px;
+}
+
+/* Thread body (beats) */
+.dwv-thread-body {
+  border-top: 1px solid var(--line);
+  padding: 8px 0 16px;
+}
+
+.dwv-beats {
+  list-style: none;
+  margin: 0;
+  padding: 0 18px;
+}
+
+.dwv-beat {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  font-family: var(--ui);
+}
+
+.dwv-beat.heading {
+  padding-top: 14px;
+  padding-bottom: 4px;
+}
+
+.dwv-beat.heading .dwv-beat-text {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--ink-3);
+}
+
+.dwv-beat-mk {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: 0 0 8px;
+  margin-top: 7px;
+}
+
+.dwv-beat-mk.filled {
+  background: var(--tc);
+}
+
+.dwv-beat-mk.gap {
+  background: transparent;
+  border: 1.5px dashed var(--tc);
+  box-sizing: border-box;
+}
+
+.dwv-beat-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.dwv-beat-note {
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dwv-beat-note.weave {
+  color: var(--teal);
+}
+
+/* Thread footer */
+.dwv-thread-foot {
+  padding: 4px 18px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dwv-add-beat {
+  font-family: var(--ui);
+  font-size: 11px;
+  color: var(--ink-4);
+  border: 1px dashed var(--line-2);
+  background: transparent;
+  padding: 4px 12px;
+  border-radius: 6px;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dwv-thread-action {
+  font-family: var(--ui);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: default;
+}
+
+.dwv-thread-action.ai {
+  border-color: var(--terra);
+  background: var(--terra-soft);
+  color: var(--terra-deep);
+}
+
+/* ── Background frames ── */
+
+.dwv-bg-frame {
+  position: absolute;
+  z-index: 1;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.dwv-bg-frame .dwv-frame {
+  box-shadow:
+    0 4px 20px rgba(30, 26, 20, .06),
+    0 12px 40px rgba(30, 26, 20, .04);
+}
+
+.dwv-bg-1 {
+  top: 60px;
+  right: -80px;
+  width: 380px;
+  transform: rotate(3deg);
+}
+
+.dwv-bg-2 {
+  bottom: 40px;
+  left: -60px;
+  width: 340px;
+  transform: rotate(-2deg);
+}
+
+/* Background frame content stubs */
+.dwv-bg-content {
+  padding: 16px 20px;
+}
+
+.dwv-bg-char-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.dwv-bg-char-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  flex: 0 0 28px;
+}
+
+.dwv-bg-char-name {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.dwv-bg-char-role {
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+.dwv-bg-outline-item {
+  padding: 6px 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.dwv-bg-outline-ch {
+  padding: 4px 0 4px 16px;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-4);
+}
+
+/* ── Tagline ── */
+
+.dwv-tagline {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 56px 40px 80px;
+}
+
+.dwv-tagline h2 {
+  font-family: var(--serif);
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* ── Wrapper for relative positioning of bg frames ── */
+
+.dwv-stage {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}

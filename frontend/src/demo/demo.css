@@ -1,0 +1,332 @@
+/* Demo-specific overrides — keeps demo page self-contained */
+
+/* Force the demo NE panel to dock without the full NightEyes component */
+.demo-root .ne-panel {
+  position: fixed;
+  top: 44px;
+  right: 0;
+  bottom: 0;
+  width: var(--ne-dock-w, 380px);
+  height: auto;
+}
+
+.demo-root .ne-panel::before {
+  display: none;
+}
+
+/* Outline rail for the demo — reuses wv2-rail2 but static */
+.demo-outline-rail {
+  flex: 0 0 228px;
+  width: 228px;
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-3) transparent;
+}
+
+.demo-outline-head {
+  padding: 16px 14px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.demo-outline-eyebrow {
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+
+.demo-outline-title {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.demo-outline-acts {
+  padding: 8px 0;
+}
+
+/* Act group header */
+.demo-act-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px 4px;
+  font-family: var(--ui);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.demo-act-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--terra);
+}
+
+.demo-act-count {
+  margin-left: auto;
+  font-weight: 500;
+  color: var(--ink-4);
+  letter-spacing: .04em;
+}
+
+/* Chapter rows */
+.demo-chap {
+  padding: 0 8px;
+}
+
+.demo-chap-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--ink-2);
+  border: 1px solid transparent;
+  transition: background .12s;
+}
+
+.demo-chap-row:hover {
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
+.demo-chap-row.is-current {
+  background: var(--surface);
+  border-color: var(--line-2);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.demo-chap-num {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 10px;
+  color: var(--ink-3);
+  width: 14px;
+  text-align: center;
+}
+
+.demo-chap-toggle {
+  width: 14px;
+  height: 14px;
+  color: var(--ink-3);
+  display: grid;
+  place-items: center;
+  flex: 0 0 14px;
+}
+
+.demo-chap-toggle svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* Scene items in outline */
+.demo-scene-list {
+  margin: 2px 6px 4px 26px;
+  padding-left: 10px;
+  border-left: 1.5px solid var(--line);
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-scene-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  font-family: var(--ui);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  border-radius: 5px;
+  cursor: pointer;
+  line-height: 1.3;
+  transition: background .12s;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+}
+
+.demo-scene-item:hover {
+  background: rgba(60, 40, 15, .06);
+  color: var(--ink);
+}
+
+.demo-scene-item.is-active {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.demo-scene-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex: 0 0 5px;
+  background: var(--ink-4);
+}
+
+.demo-scene-item.is-active .demo-scene-dot {
+  background: var(--terra);
+}
+
+/* Beat items under scene */
+.demo-beat-list {
+  margin: 2px 0 4px 20px;
+  padding-left: 8px;
+  border-left: 1px dashed var(--line-2);
+}
+
+.demo-beat {
+  font-family: var(--ui);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  padding: 3px 6px;
+  line-height: 1.45;
+}
+
+.demo-beat::before {
+  content: '•';
+  margin-right: 6px;
+  color: var(--ink-4);
+}
+
+.demo-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--ui);
+  font-size: 10px;
+  color: var(--ink-4);
+  padding: 4px 8px;
+  border: 1px dashed var(--line-2);
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  margin: 4px 0 4px 36px;
+}
+
+.demo-add-btn:hover {
+  color: var(--ink-3);
+  border-color: var(--line-3);
+}
+
+/* Fake editor prose */
+.demo-prose {
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--ink);
+  outline: none;
+  min-height: calc(12 * 1.85em);
+  padding: 0;
+}
+
+.demo-prose p {
+  margin: 0 0 1em;
+}
+
+.demo-prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* Proposal card in demo — uses real proposal.css, just some fixes */
+.demo-proposal-card {
+  background: linear-gradient(180deg,
+      color-mix(in srgb, var(--sage) 7%, #fcfefb) 0%,
+      color-mix(in srgb, var(--sage) 15%, #eef4ec) 100%);
+  border: 1px solid color-mix(in srgb, var(--sage) 42%, #d3ddcf);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: var(--ui);
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.demo-proposal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.demo-proposal-spark {
+  font-size: 14px;
+  color: var(--gold);
+  filter: drop-shadow(0 0 4px rgba(180, 140, 20, .5));
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+.demo-proposal-title {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.demo-proposal-em {
+  font-weight: 600;
+  color: var(--terra-deep);
+}
+
+.demo-proposal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.demo-proposal-btn {
+  font-family: var(--ui);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+
+.demo-proposal-btn:hover {
+  background: var(--surface-2);
+}
+
+.demo-proposal-btn--primary {
+  background: var(--terra);
+  border-color: var(--terra-deep);
+  color: white;
+}
+
+.demo-proposal-btn--primary:hover {
+  background: var(--terra-deep);
+}
+
+/* hide proposal on dismiss */
+.demo-proposal-card.is-dismissed {
+  display: none;
+}
+
+/* Override .wr-scene-head uppercase for scene title */
+.demo-root .wr-scene-head .wr-scene-stmeta {
+  text-transform: none;
+}
+
+.demo-root .wr-scene-num {
+  text-transform: uppercase;
+}
