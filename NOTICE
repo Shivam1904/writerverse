@@ -1,0 +1,28 @@
+WriterVerse
+Copyright (C) 2025-2026 The WriterVerse maintainers
+
+The WriterVerse maintainers are Shivam Srivastava and Aakarshika Priydarshi.
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at your
+option) any later version. See the LICENSE file for the full text.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
+for more details.
+
+In short: you may use, change and share WriterVerse. If you run a changed
+version as a network service (for example a hosted website), you must offer
+the source code of your version to its users under the same license.
+
+Commercial licenses: if the AGPL does not fit your use, the maintainers
+offer WriterVerse under a separate commercial license on request. Open an
+issue or a GitHub discussion on the WriterVerse repository to get in touch.
+
+Contributions are accepted under the Contributor License Agreement in
+CLA.md, which lets the maintainers offer both licenses.
+
+Third-party components keep their own licenses. See the package manifests
+(pyproject.toml, uv.lock, frontend/package.json, frontend/package-lock.json).
