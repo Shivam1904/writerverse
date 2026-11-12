@@ -1,0 +1,37 @@
+name: Feature request
+description: Suggest an idea or an improvement for WriterVerse.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        WriterVerse helps authors keep a story consistent. Its AI removes
+        friction the author hates; it never takes a creative decision the
+        author should own. Ideas that fit that rule are the easiest to accept.
+        For open-ended questions, try Discussions first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem do you have?
+      description: Describe the situation, not the solution. Who is it for (an author, a self-hoster, a contributor)?
+      placeholder: When my series reaches book three, I lose track of which characters know a secret...
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: Your idea for a solution. Rough is fine.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What do you do today instead?
+      description: Workarounds, other tools, or other options you considered.
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I would like to work on this myself.

@@ -1,0 +1,61 @@
+# Monthly dependency update PRs: at most one PR per ecosystem (Python, npm,
+# GitHub Actions). Minor, patch and security bumps are grouped together.
+# Major bumps (e.g. Django 5 -> 6) get no automatic PR: a person upgrades
+# those on purpose, with its release notes open.
+version: 2
+updates:
+  - package-ecosystem: "uv" # pyproject.toml + uv.lock at the repo root
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      python:
+        applies-to: version-updates
+        patterns: ["*"]
+      python-security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      npm:
+        applies-to: version-updates
+        patterns: ["*"]
+      npm-security:
+        applies-to: security-updates
+        patterns: ["*"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "ci"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      actions:
+        applies-to: version-updates
+        patterns: ["*"]
+      actions-security:
+        applies-to: security-updates
+        patterns: ["*"]

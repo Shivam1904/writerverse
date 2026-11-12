@@ -1,0 +1,43 @@
+# Checks that the pull request title follows Conventional Commits:
+#   type(scope): subject      e.g.  fix(editor): keep the cursor after save
+# We squash-merge, so the PR title becomes the commit message on main.
+#
+# Safety: `pull_request_target` runs with this repo's token, so this workflow
+# never checks out code from the pull request; it only reads the PR title.
+name: PR title
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  pr-title:
+    name: Check PR title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@2252a14e810aa9b85c2d560bd7070c802206ecf6 # v6.1.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            refactor
+            docs
+            test
+            chore
+            ci
+            perf
+            style
+          # Scope is optional. When present it is lowercase kebab-case,
+          # e.g. editor, ideas, night-eyes, outline.
+          requireScope: false
+          disallowScopes: |
+            .*[^a-z0-9-].*
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" in the title "{title}" should start with a
+            lowercase letter, e.g. "fix(editor): keep the cursor after save".

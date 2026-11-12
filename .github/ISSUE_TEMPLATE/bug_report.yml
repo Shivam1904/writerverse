@@ -1,0 +1,55 @@
+name: Bug report
+description: Something in WriterVerse does not work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. Please do not include
+        private story text, passwords or API keys. Security problems go to
+        the Security tab ("Report a vulnerability"), not here.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see? What did you expect to see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The smallest set of steps that shows the problem.
+      placeholder: |
+        1. Open a book and go to the Write page
+        2. Type a sentence and wait for "Saved"
+        3. Reload the page
+        4. The sentence is gone
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where are you running WriterVerse?
+      options:
+        - The hosted app
+        - Self-hosted / local dev (make local)
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: For self-hosted or local runs, the output of `git rev-parse --short HEAD`.
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and operating system
+      placeholder: e.g. Chrome 131 on macOS 15
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Browser console errors, server logs, or a screenshot. Remove any secrets first.
+      render: shell

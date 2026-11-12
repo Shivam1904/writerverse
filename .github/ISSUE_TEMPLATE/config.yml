@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas (Discussions)
+    url: https://github.com/Shivam1904/writerverse/discussions
+    about: Ask a question, share an idea, or talk with other authors and contributors.
+  - name: Report a security problem
+    url: https://github.com/Shivam1904/writerverse/security/advisories/new
+    about: Please report security problems privately, never in a public issue. See SECURITY.md.
