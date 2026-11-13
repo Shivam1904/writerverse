@@ -86,6 +86,10 @@ class AdminExposureTests(TestCase):
 
     def _reload_urls(self):
         importlib.reload(config.urls)
+        # Another root URLconf that includes config.urls copied its patterns at
+        # import time, so it must be rebuilt too or the reload has no effect.
+        if settings.ROOT_URLCONF != 'config.urls':
+            importlib.reload(importlib.import_module(settings.ROOT_URLCONF))
         clear_url_caches()
 
     def _prod_urls(self, admin_path):
