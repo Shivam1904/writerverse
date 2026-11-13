@@ -35,3 +35,22 @@ class AiNotConfiguredTests(TestCase):
         self.assertEqual(res.http_status, 503)
         self.assertEqual(res.code, "ai_not_configured")
         self.assertIn("AI is not configured on this server", res.error)
+
+    def test_execute_step_that_wraps_it_in_a_502_still_gives_503_and_one_warning(self):
+        # Title generation (like most execute steps) catches every exception
+        # and re-raises a 502 CapabilityError. "No AI key" must still reach the
+        # author as the calm 503, logged as one warning line with no traceback.
+        from projects.capabilities.execute_titles import execute_generate_title
+        registry.register(Capability(
+            name="_wraps_llm", description="t", route=Route.READ,
+            execute=execute_generate_title, uses_ai=True,
+        ))
+        with mock.patch.dict(os.environ, NO_KEYS), \
+                self.assertLogs("writerverse.consistency", level="WARNING") as logs:
+            res = dispatch("_wraps_llm", {"description": "a dragon"}, Actor.USER_BUTTON,
+                           ProjectScope(None))
+        self.assertEqual(res.http_status, 503)
+        self.assertEqual(res.code, "ai_not_configured")
+        failed = [r for r in logs.records if "generate-title FAILED" in r.getMessage()]
+        self.assertEqual([r.levelname for r in failed], ["WARNING"])
+        self.assertIsNone(failed[0].exc_info)

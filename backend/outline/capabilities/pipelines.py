@@ -35,6 +35,7 @@ from actions.capabilities.spec import (
     DispatchContext,
     Route,
 )
+from common.errors import log_exception
 from common.tiptap import node_text
 
 from outline.store import load_scene_pipelines, save_scene_pipelines
@@ -114,7 +115,7 @@ def _run_analyzer(pipeline: ScenePipeline, gathered: dict) -> dict:
     try:
         out = pipeline.analyze(gathered.get("body") or "", context=gathered)
     except Exception as exc:  # noqa: BLE001 — best-effort; never crash dispatch
-        logger.exception("scene pipeline %s failed scene=%s",
+        log_exception(logger, "scene pipeline %s failed scene=%s",
                          pipeline.key, gathered.get("scene_id"))
         return {"status": "failed", "error": str(exc)[:200]}
     if not isinstance(out, dict):
@@ -169,7 +170,7 @@ def _make_commit(pipeline: ScenePipeline):
             try:
                 data = pipeline.enrich(ctx, data) or data
             except Exception:  # noqa: BLE001 — enrichment is best-effort; store raw
-                logger.exception("scene pipeline %s enrich failed scene=%s",
+                log_exception(logger, "scene pipeline %s enrich failed scene=%s",
                                  pipeline.key, result["scene_id"])
         scene.analysis = {**analysis, pipeline.key: data}
         scene.save(update_fields=["analysis"])

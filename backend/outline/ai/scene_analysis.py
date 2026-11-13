@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import logging
 
+from common.errors import log_exception
+
 logger = logging.getLogger("writerverse.consistency")
 
 # Cap the prose we feed an analyzer — a few thousand chars is plenty to
@@ -60,7 +62,7 @@ SCENE:
 
         resp = ask_json(prompt, role="small", tag="scene_summary", expect=dict)
     except Exception as exc:  # noqa: BLE001 — best-effort; the scene is already saved
-        logger.exception("scene_summary failed")
+        log_exception(logger, "scene_summary failed")
         return {"status": "failed", "error": str(exc)[:200]}
 
     if not isinstance(resp, dict):
@@ -141,7 +143,7 @@ Return ONLY this JSON object — no markdown fences, no prose:
 
         resp = ask_json(prompt, role="small", tag="resolve_nouns", expect=dict)
     except Exception as exc:  # noqa: BLE001 — best-effort; the scene is already saved
-        logger.exception("resolve_nouns failed")
+        log_exception(logger, "resolve_nouns failed")
         return {"status": "failed", "error": str(exc)[:200],
                 "mentions": [], "resolved": [], "unresolved": []}
 
@@ -210,7 +212,7 @@ def pov_purity(body: str, *, context: dict | None = None) -> dict:
             "scene_title": title, "pov_character": pov_character,
             "scene_content": text[:_MAX_BODY_CHARS]}, PovPurityResult)
     except Exception as exc:  # noqa: BLE001 — best-effort; the scene is already saved
-        logger.exception("pov_purity failed")
+        log_exception(logger, "pov_purity failed")
         return {"status": "failed", "error": str(exc)[:200], "mode": mode,
                 "pov_character": pov_character, "violations": [], "violations_count": 0,
                 "summary": "Couldn't check POV for this scene."}
@@ -245,7 +247,7 @@ def hook_grade(body: str, *, context: dict | None = None) -> dict:
             "scene_title": title, "opening": opening[:600], "closing": closing[:600]},
             HookGradeResult)
     except Exception as exc:  # noqa: BLE001
-        logger.exception("hook_grade failed")
+        log_exception(logger, "hook_grade failed")
         return {"status": "failed", "error": str(exc)[:200]}
     # Same "OPENING: <grade> — <note>" strings the UI already splits.
     opening_verdict = f"OPENING: {result.opening.grade} — {result.opening.note.strip()}"
@@ -269,7 +271,7 @@ def detect_subtext(body: str, *, context: dict | None = None) -> dict:
         result = _structured(ctx, build_subtext_detector_chain, {
             "scene_title": title, "scene_content": text[:_MAX_BODY_CHARS]}, SubtextResult)
     except Exception as exc:  # noqa: BLE001
-        logger.exception("detect_subtext failed")
+        log_exception(logger, "detect_subtext failed")
         return {"status": "failed", "error": str(exc)[:200], "flags": [], "flags_count": 0,
                 "summary": "Couldn't check dialogue subtext for this scene."}
     flags = [_quoted(f.quote, f.reason) for f in result.flags]
@@ -299,7 +301,7 @@ def voice_consistency(body: str, *, context: dict | None = None) -> dict:
             "scene_title": title, "character_profiles": profiles,
             "scene_content": text[:_MAX_BODY_CHARS]}, VoiceConsistencyResult)
     except Exception as exc:  # noqa: BLE001
-        logger.exception("voice_consistency failed")
+        log_exception(logger, "voice_consistency failed")
         return {"status": "failed", "error": str(exc)[:200], "flags": [], "flags_count": 0,
                 "summary": "Couldn't check character voice for this scene."}
     flags = [
@@ -345,5 +347,5 @@ def scene_properties(body: str, *, context: dict | None = None) -> dict:
                 "characters_present": list(p.characters_present or []),
                 "rationale": p.rationale}
     except Exception as exc:  # noqa: BLE001 — best-effort; the scene is already saved
-        logger.exception("scene_properties failed")
+        log_exception(logger, "scene_properties failed")
         return {"status": "failed", "error": str(exc)[:200]}
