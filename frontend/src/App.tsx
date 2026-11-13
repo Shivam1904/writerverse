@@ -67,8 +67,12 @@ const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }
 };
 
 // Component to redirect authenticated users from auth pages
+// It waits for the auth check too: `isAuthenticated` is persisted, so an old,
+// expired session reads as signed in until checkAuthStatus clears it. Deciding
+// earlier sent /signup to /library, and from there to /login.
 const AuthRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, initialized } = useAuthStore();
+  if (!initialized) return null;
   return isAuthenticated ? <Navigate to="/library" /> : children;
 };
 

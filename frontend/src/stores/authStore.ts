@@ -472,15 +472,15 @@ export const useAuthStore = create<AuthStore>()(
                     tokens: { access: response.data.access, refresh: response.data.refresh ?? tokens.refresh }
                   })
                 } catch {
-                  get().logout()
+                  await get().logout()
                 }
               } else {
-                get().logout()
+                await get().logout()
               }
             }
           } catch (error) {
             console.error('Auth check failed:', error)
-            get().logout()
+            await get().logout()
           } finally {
             // Token is now settled (valid, refreshed, or cleared) — release any
             // route gated on `initialized` so its first fetch carries a good token.
