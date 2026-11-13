@@ -218,6 +218,18 @@ class AnnotateTests(SimpleTestCase):
         self.assertEqual(out["status"], "failed")
         self.assertEqual(out["phrases"], [])
         self.assertIn("error", out)
+        self.assertNotIn("error_code", out)  # a real error: the UI offers Try again
+
+    def test_no_ai_key_records_the_reason_and_logs_one_warning(self):
+        from ai_engine.config import AI_NOT_CONFIGURED_MESSAGE, AINotConfiguredError
+        with patch("ai_engine.llm_utils.ask_json", side_effect=AINotConfiguredError("no key")), \
+                self.assertLogs("writerverse.consistency", level="WARNING") as logs:
+            out = A.annotate("some idea text")
+        self.assertEqual(out["status"], "failed")
+        self.assertEqual(out["error_code"], "ai_not_configured")
+        self.assertEqual(out["error_message"], AI_NOT_CONFIGURED_MESSAGE)
+        self.assertEqual([r.levelname for r in logs.records], ["WARNING"])
+        self.assertIsNone(logs.records[0].exc_info)
 
 
 class ParseFailureTests(SimpleTestCase):

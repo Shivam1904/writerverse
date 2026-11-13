@@ -168,6 +168,27 @@ describe('StreamView: failed tagging', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(onRetryAnnotate).toHaveBeenCalledWith(1);
   });
+
+  it('says AI is not configured, with no Try again, when the server has no AI key', () => {
+    const message = 'AI is not configured on this server. Everything else works.';
+    render(
+      <TooltipProvider>
+        <StreamView
+          visibleItems={[
+            {
+              id: 1, body: 'no key here', tags: [],
+              aiData: { status: 'failed', error_code: 'ai_not_configured', error_message: message },
+            },
+          ]}
+          writeItems={() => {}}
+          onRetryAnnotate={vi.fn()}
+        />
+      </TooltipProvider>,
+    );
+    expect(screen.getByText(message)).toBeTruthy();
+    expect(screen.queryByText(/Couldn't tag this idea/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+  });
 });
 
 // wrt-121: a lone short idea uses the full row instead of half the page.

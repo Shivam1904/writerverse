@@ -4,7 +4,7 @@ import { TagRow } from './TagRow';
 import { PinStar } from './EditableBody';
 import { TagPickerButton } from './TagPickerDropdown';
 import { ideaColorOf } from './colorIdea';
-import { annotationFailed, tagsOutOfDate, tmpId } from '../data';
+import { aiNotConfigured, annotationFailed, tagsOutOfDate, tmpId } from '../data';
 import { Button, DragHandle, Card } from '../../../ui';
 import { cn } from '../../../lib/utils';
 import { aspectColor } from '../../../theme/aspects';
@@ -291,7 +291,14 @@ function StreamItem({
             />
             {/* The AI tagging failed — say so quietly and offer a re-run, so it
                 isn't mistaken for an idea the AI found nothing in (SA-158). */}
-            {onRetryAnnotate && annotationFailed(braindump) && (
+            {/* No AI key on this server: say so in the server's words. A
+                re-run would fail the same way, so no Try again. */}
+            {aiNotConfigured(braindump) && (
+              <span className="mt-[7px] inline-flex items-center gap-1.5 text-xs text-muted-foreground" data-no-drag>
+                {braindump.aiData?.error_message || 'AI is not configured on this server.'}
+              </span>
+            )}
+            {onRetryAnnotate && annotationFailed(braindump) && !aiNotConfigured(braindump) && (
               <span className="mt-[7px] inline-flex items-center gap-1.5 text-xs text-muted-foreground" data-no-drag>
                 Couldn't tag this idea.
                 <Button

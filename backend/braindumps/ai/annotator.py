@@ -19,6 +19,8 @@ import logging
 import re
 from typing import Any
 
+from common.errors import is_expected_failure, log_exception
+
 from . import tags as braindump_tags
 
 logger = logging.getLogger("writerverse.consistency")
@@ -463,7 +465,8 @@ def _drop_unnamed(phrases: list[dict], text: str) -> None:
 
 
 def _payload(status: str, phrases: list[dict], *, role: str, chunk_count: int,
-             error: str | None = None) -> dict:
+             error: str | None = None, error_code: str | None = None,
+             error_message: str | None = None) -> dict:
     out = {
         "version": VERSION,
         "status": status,
@@ -474,6 +477,12 @@ def _payload(status: str, phrases: list[dict], *, role: str, chunk_count: int,
     }
     if error:
         out["error"] = error
+    # A known reason the UI can act on (e.g. "ai_not_configured": no point
+    # offering Try again) and the author-facing words for it.
+    if error_code:
+        out["error_code"] = error_code
+    if error_message:
+        out["error_message"] = error_message
     return out
 
 
@@ -521,8 +530,14 @@ def annotate(text: str, *, role: str = DEFAULT_ROLE, known_entities: list | None
                            expect=(list, dict))
             raw.extend(_coerce_phrases(resp, idx))
     except Exception as exc:  # noqa: BLE001 — best-effort; the idea is already saved
-        logger.exception("braindump annotate failed (chunks=%d)", len(chunks))
-        return _payload("failed", [], role=role, chunk_count=len(chunks), error=str(exc)[:200])
+        log_exception(logger, "braindump annotate failed (chunks=%d)", len(chunks))
+        return _payload(
+            "failed", [], role=role, chunk_count=len(chunks), error=str(exc)[:200],
+            # Duck-typed like common.errors: an exception with its own public
+            # answer (AINotConfiguredError) passes its code and words through.
+            error_code=getattr(exc, "code", None) if is_expected_failure(exc) else None,
+            error_message=getattr(exc, "public_message", None) if is_expected_failure(exc) else None,
+        )
 
     merged = _merge(raw)
     _canonicalize(merged, known_map)
