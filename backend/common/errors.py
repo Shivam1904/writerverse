@@ -10,6 +10,7 @@ Only ids and the operation name are logged here — never user content.
 """
 
 import logging
+import sys
 import uuid
 
 from django.conf import settings
@@ -24,15 +25,43 @@ DEFAULT_MESSAGE = "Something went wrong on our side. Your work is safe — pleas
 logger = logging.getLogger("writerverse.errors")
 
 
+def is_expected_failure(exc) -> bool:
+    """True for an exception that is not a bug and carries its own public
+    answer (`public_status`), e.g. ai_engine's AINotConfiguredError on a server
+    with no AI key. Duck-typed, because `common` may not import `ai_engine`."""
+    return bool(getattr(exc, "public_status", None))
+
+
+def log_exception(log, msg, *args):
+    """Call inside an ``except`` block in place of ``log.exception(msg, *args)``.
+
+    A real error logs ERROR with its traceback, as before. An expected failure
+    (see is_expected_failure) logs one WARNING line with the reason and no
+    traceback, so a server without AI keys doesn't fill the log with stacks.
+    """
+    exc = sys.exc_info()[1]
+    if exc is not None and is_expected_failure(exc):
+        log.warning(msg + ": %s", *args, exc)
+    else:
+        log.exception(msg, *args)
+
+
 def report_exception(exc, *, operation, project_id=None, user_action=None, log=None):
     """Log `exc` with structured context; return a short correlation id.
 
-    The traceback always goes to the ``writerverse.errors`` logger, which
+    An expected failure (see is_expected_failure) is one WARNING line with no
+    traceback. Otherwise the traceback always goes to the ``writerverse.errors`` logger, which
     settings.LOGGING routes to the JSON error.log (SA-260). If the caller passes
     its own module logger as `log`, that logger also gets a one-line pointer
     (same correlation id, no traceback) so its module log shows the failure.
     """
     correlation_id = uuid.uuid4().hex[:12]
+    if is_expected_failure(exc):
+        (log or logger).warning(
+            "operation=%s correlation_id=%s project_id=%s :: %s",
+            operation, correlation_id, project_id, exc,
+        )
+        return correlation_id
     # turn_id (wrt-31) ties the error to the AI turn it happened in.
     logger.error(
         "operation=%s correlation_id=%s turn_id=%s project_id=%s user_action=%s :: %s",

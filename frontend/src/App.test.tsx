@@ -64,3 +64,44 @@ describe('old /projectv2/ links', () => {
     cleanup()
   })
 })
+
+describe('public auth pages, opened directly while signed out', () => {
+  it.each(['/signup', '/forgot-password', '/reset-password', '/verify-email', '/login'])(
+    '%s stays on its own page',
+    async (path) => {
+      window.history.pushState({}, '', path)
+      render(<App />)
+      await new Promise((r) => setTimeout(r, 50))
+      expect(window.location.pathname).toBe(path)
+      cleanup()
+    },
+  )
+
+  // The browser still holds an old session: `isAuthenticated: true` is
+  // persisted, but the tokens have expired and the refresh is refused. The
+  // auth pages must wait for that check instead of bouncing to /library (and
+  // from there to /login) on the stale flag.
+  it.each(['/signup', '/forgot-password', '/login'])(
+    '%s stays put when the saved session turns out to be dead',
+    async (path) => {
+      const expired = `x.${btoa(JSON.stringify({ exp: 1 }))}.y`
+      localStorage.setItem('auth-storage', JSON.stringify({
+        state: { user: { email: 'a@b.c' }, tokens: { access: expired, refresh: 'dead' }, isAuthenticated: true },
+        version: 0,
+      }))
+      vi.resetModules()
+      const { default: axios } = await import('axios')
+      vi.mocked(axios.post).mockRejectedValue(new Error('401'))
+      window.history.pushState({}, '', path)
+      const { default: FreshApp } = await import('./App')
+      render(<FreshApp />)
+      const { useAuthStore } = await import('./stores/authStore')
+      await waitFor(() => expect(useAuthStore.getState().initialized).toBe(true))
+      await new Promise((r) => setTimeout(r, 50))
+      expect(window.location.pathname).toBe(path)
+      vi.mocked(axios.post).mockReset()
+      localStorage.clear()
+      cleanup()
+    },
+  )
+})

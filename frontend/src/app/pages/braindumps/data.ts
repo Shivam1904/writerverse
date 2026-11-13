@@ -120,6 +120,12 @@ export function annotationFailed(item): boolean {
   return item?.aiData?.status === 'failed';
 }
 
+// Tagging failed because this server has no AI key (`ai_data.error_code`).
+// Trying again can't help, so the card shows the server's own words instead.
+export function aiNotConfigured(item): boolean {
+  return annotationFailed(item) && item?.aiData?.error_code === 'ai_not_configured';
+}
+
 // The idea was edited after it was tagged: its text no longer matches the text
 // the tags came from (`ai_data.meta.source_text`). Editing never re-tags on its
 // own, so the card offers Re-tag instead (wrt-28).

@@ -10,6 +10,7 @@ import logging
 from typing import Any
 
 from actions.capabilities.spec import CapabilityError, DispatchContext
+from common.errors import log_exception
 
 import gauges.binding as gb
 import gauges.engine as gengine
@@ -112,7 +113,7 @@ def execute_analyse_gauge(ctx: DispatchContext, g: dict[str, Any]) -> dict[str, 
             thread_ref=g.get("thread_ref", ""),
         )
     except Exception as exc:
-        logger.exception("gauge/analyse FAILED project=%s binding=%s",
+        log_exception(logger, "gauge/analyse FAILED project=%s binding=%s",
                          ctx.project_id, g["binding_id"])
         raise CapabilityError("analyse failed", 502) from exc
     result["_binding_id"] = g["binding_id"]
@@ -134,7 +135,7 @@ def execute_extract_gauge_scale(ctx: DispatchContext, g: dict[str, Any]) -> dict
             g["plot_threads"], g["grand_outline"], g.get("prior_values"),
         )
     except Exception as exc:
-        logger.exception("gauge/extract FAILED project=%s binding=%s",
+        log_exception(logger, "gauge/extract FAILED project=%s binding=%s",
                          ctx.project_id, g["binding_id"])
         raise CapabilityError("extract failed", 502) from exc
     result["_preset_id"] = ref.get("id")
@@ -147,7 +148,7 @@ def _suggest(run_fn, flatten_fn, kind: str):
         try:
             res = run_fn(g["elements"], g.get("synopsis", ""), g.get("braindumps", []))
         except Exception as exc:
-            logger.exception("gauge/%s FAILED project=%s", kind, ctx.project_id)
+            log_exception(logger, "gauge/%s FAILED project=%s", kind, ctx.project_id)
             raise CapabilityError(f"{kind} failed", 502) from exc
         entries = flatten_fn(res)
         new = gb.apply_add_candidates(_cur(ctx), kind=kind, entries=entries)
@@ -169,6 +170,6 @@ def execute_invent_lens_from_ask(ctx: DispatchContext, g: dict[str, Any]) -> dic
         res = gengine.run_invent_lens_from_ask(
             g["ask"], g["elements"], g.get("synopsis", ""), g.get("braindumps", []))
     except Exception as exc:
-        logger.exception("gauge/invent_from_ask FAILED project=%s", ctx.project_id)
+        log_exception(logger, "gauge/invent_from_ask FAILED project=%s", ctx.project_id)
         raise CapabilityError("invent failed", 502) from exc
     return {"lens": res.get("lens"), "ok": bool(res.get("lens"))}

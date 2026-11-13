@@ -14,6 +14,7 @@ from rest_framework import status
 from common.errors import (
     DEFAULT_MESSAGE,
     error_response,
+    log_exception,
     report_exception,
     sse_error_data,
 )
@@ -107,3 +108,46 @@ class SseErrorDataTests(TestCase):
         self.assertNotIn("OperationalError", data["message"])
         self.assertIn("correlation_id", data)
         log.error.assert_called_once()
+
+
+class _Expected(RuntimeError):
+    """Stands in for ai_engine's AINotConfiguredError (common can't import it)."""
+
+    code = "ai_not_configured"
+    public_status = 503
+    public_message = "AI is not configured on this server."
+
+
+class ExpectedFailureLoggingTests(TestCase):
+    """A server with no AI key is not a bug: one WARNING line, no traceback."""
+
+    def test_log_exception_warns_without_traceback_for_expected_failure(self):
+        log = logging.getLogger("tests.expected")
+        with self.assertLogs(log, level="WARNING") as cm:
+            try:
+                raise _Expected("no key")
+            except _Expected:
+                log_exception(log, "thing FAILED project=%s", 7)
+        (record,) = cm.records
+        self.assertEqual(record.levelname, "WARNING")
+        self.assertIsNone(record.exc_info)
+        self.assertEqual(record.getMessage(), "thing FAILED project=7: no key")
+
+    def test_log_exception_keeps_traceback_for_real_errors(self):
+        log = logging.getLogger("tests.expected")
+        with self.assertLogs(log, level="ERROR") as cm:
+            try:
+                raise ValueError("boom")
+            except ValueError:
+                log_exception(log, "thing FAILED")
+        (record,) = cm.records
+        self.assertEqual(record.levelname, "ERROR")
+        self.assertIsNotNone(record.exc_info)
+
+    def test_report_exception_warns_without_traceback_for_expected_failure(self):
+        with self.assertLogs("writerverse.errors", level="WARNING") as cm:
+            cid = report_exception(_Expected("no key"), operation="chat.stream")
+        (record,) = cm.records
+        self.assertEqual(record.levelname, "WARNING")
+        self.assertIsNone(record.exc_info)
+        self.assertIn(cid, record.getMessage())

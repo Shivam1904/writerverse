@@ -33,7 +33,13 @@ describe('subscribeStaleness', () => {
       return next;
     });
     const seen: string[][] = [];
-    await subscribeStaleness('7', (d) => seen.push(d), ctrl.signal);
+    // Fake clock: the reconnect pauses (500 ms each) pass instantly instead of
+    // costing a real second, which a busy machine stretches toward the timeout.
+    vi.useFakeTimers();
+    const done = subscribeStaleness('7', (d) => seen.push(d), ctrl.signal);
+    await vi.advanceTimersByTimeAsync(2000);
+    await done;
+    vi.useRealTimers();
 
     expect(urls[0]).toBe(apiUrl('/consistency/projects/7/staleness/stream/'));
     const since = new URL(urls[1], 'http://x').searchParams.get('since');

@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 from actions.capabilities.spec import CapabilityError, DispatchContext
+from common.errors import log_exception
 
 from outline.engine.generation import run_generate_thread, run_user_wishes_rough
 
@@ -27,7 +28,7 @@ def execute_generate_thread(ctx: DispatchContext, gathered: dict[str, Any]) -> d
             scope_name=gathered.get("scope_name"),
         )
     except Exception as exc:
-        logger.exception("run/generate_thread FAILED project=%s", ctx.project_id)
+        log_exception(logger, "run/generate_thread FAILED project=%s", ctx.project_id)
         raise CapabilityError("generate_thread failed", 502) from exc
     if not result or not result.get("plot_thread"):
         raise CapabilityError("engine returned no thread", 502)
@@ -55,7 +56,7 @@ def execute_user_wishes_rough(ctx: DispatchContext, gathered: dict[str, Any]) ->
             title=gathered["title"],
         )
     except Exception as exc:
-        logger.exception("run/rough_user_wishes FAILED project=%s", ctx.project_id)
+        log_exception(logger, "run/rough_user_wishes FAILED project=%s", ctx.project_id)
         raise CapabilityError("user_wishes failed", 502) from exc
     if not wishes or not wishes.get("rough_outline"):
         raise CapabilityError("engine returned no outline", 502)

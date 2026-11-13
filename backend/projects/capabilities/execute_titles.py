@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 from actions.capabilities.spec import CapabilityError, DispatchContext
+from common.errors import log_exception
 from outline.engine.generation import generate_title
 
 logger = logging.getLogger("writerverse.consistency")
@@ -27,7 +28,7 @@ def execute_generate_title(ctx: DispatchContext, gathered: dict[str, Any]) -> di
     try:
         result = generate_title(description, case=case)
     except Exception as exc:
-        logger.exception("run/generate-title FAILED project=%s", ctx.project_id)
+        log_exception(logger, "run/generate-title FAILED project=%s", ctx.project_id)
         raise CapabilityError("title generation failed", 502) from exc
     return {
         "title": result.get("title", ""),

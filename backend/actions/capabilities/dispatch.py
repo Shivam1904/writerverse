@@ -411,6 +411,14 @@ def _dispatch_new(
             parent[0] += used
 
 
+def _ai_not_configured(cap: Capability) -> DispatchResult:
+    """The server has no API key for this AI call: a calm 503, not a crash."""
+    return DispatchResult(
+        status="error", capability=cap.name, error=AI_NOT_CONFIGURED_MESSAGE,
+        http_status=503, code=AI_NOT_CONFIGURED_CODE,
+    )
+
+
 def _run_capability(
     cap: Capability,
     args: dict[str, Any],
@@ -437,6 +445,10 @@ def _run_capability(
         gathered = cap.gather(ctx, args) if cap.gather else dict(args)
         result = cap.execute(ctx, gathered) if cap.execute else gathered
     except CapabilityError as exc:
+        if isinstance(exc.__cause__, AINotConfiguredError):
+            # An execute step wrapped "no AI key" in its own 502: answer the
+            # calm 503 instead (that step already logged one warning line).
+            return _ai_not_configured(cap)
         logger.info(
             "dispatch ERROR capability=%s actor=%s status=%s msg=%s",
             cap.name, actor.value, exc.status, exc.message,
@@ -448,10 +460,7 @@ def _run_capability(
     except AINotConfiguredError as exc:
         # The server has no API key for this AI call: a calm 503, not a crash.
         logger.warning("dispatch AI-NOT-CONFIGURED capability=%s: %s", cap.name, exc)
-        return DispatchResult(
-            status="error", capability=cap.name, error=AI_NOT_CONFIGURED_MESSAGE,
-            http_status=503, code=AI_NOT_CONFIGURED_CODE,
-        )
+        return _ai_not_configured(cap)
 
     if cap.route is Route.READ:
         staleness: dict[str, str] = {}

@@ -403,32 +403,26 @@ export const useAuthStore = create<AuthStore>()(
         },
 
         logout: async () => {
-          set({ isLoading: true })
+          const refresh = get().tokens?.refresh
 
-          try {
-            const tokens = get().tokens
-            if (tokens?.refresh) {
-              await axios.post('/auth/logout/', {
-                refresh: tokens.refresh
-              })
-            }
-          } catch (error) {
-            console.error('Logout error:', error)
-          } finally {
-            // Clear all authentication state
-            set({
-              user: null,
-              tokens: null,
-              isAuthenticated: false,
-              isLoading: false,
-              error: null
+          // Clear the local session first, so the app never waits on the server
+          // to sign out (a hung API must not leave the page blank).
+          set({
+            user: null,
+            tokens: null,
+            isAuthenticated: false,
+            isLoading: false,
+            error: null
+          })
+          localStorage.removeItem('auth-storage')
+          delete axios.defaults.headers.common['Authorization']
+
+          // Then tell the server to revoke the refresh token, in the background.
+          // The endpoint needs no access token (it handles expired sessions).
+          if (refresh) {
+            axios.post('/auth/logout/', { refresh }).catch((error) => {
+              console.error('Logout error:', error)
             })
-
-            // Clear localStorage
-            localStorage.removeItem('auth-storage')
-
-            // Clear axios default headers
-            delete axios.defaults.headers.common['Authorization']
           }
         },
 
@@ -472,15 +466,15 @@ export const useAuthStore = create<AuthStore>()(
                     tokens: { access: response.data.access, refresh: response.data.refresh ?? tokens.refresh }
                   })
                 } catch {
-                  get().logout()
+                  await get().logout()
                 }
               } else {
-                get().logout()
+                await get().logout()
               }
             }
           } catch (error) {
             console.error('Auth check failed:', error)
-            get().logout()
+            await get().logout()
           } finally {
             // Token is now settled (valid, refreshed, or cleared) — release any
             // route gated on `initialized` so its first fetch carries a good token.

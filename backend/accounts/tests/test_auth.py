@@ -1,5 +1,7 @@
 import importlib
+from unittest import mock
 
+from common.throttling import SharedScopedRateThrottle
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.tokens import default_token_generator
@@ -84,6 +86,10 @@ class AdminExposureTests(TestCase):
 
     def _reload_urls(self):
         importlib.reload(config.urls)
+        # Another root URLconf that includes config.urls copied its patterns at
+        # import time, so it must be rebuilt too or the reload has no effect.
+        if settings.ROOT_URLCONF != 'config.urls':
+            importlib.reload(importlib.import_module(settings.ROOT_URLCONF))
         clear_url_caches()
 
     def _prod_urls(self, admin_path):
@@ -144,6 +150,13 @@ class AuthThrottleTests(TestCase):
     body = {'email': 'nobody@example.com', 'password': 'wrong'}
 
     def test_login_returns_429_after_the_limit(self):
+        # Freeze the throttle's clock. Each failed login runs the slow password
+        # hasher, so on a busy machine 31 logins can take over a minute; the
+        # oldest ones would then fall out of the 1-minute window and the 31st
+        # request would get a 400 instead of a 429.
+        patcher = mock.patch.object(SharedScopedRateThrottle, 'timer', return_value=1_000_000.0)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         for _ in range(30):
             self.assertNotEqual(self.client.post(self.url, self.body).status_code, 429)
 

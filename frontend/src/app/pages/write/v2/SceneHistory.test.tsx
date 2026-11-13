@@ -61,7 +61,10 @@ async function openAndPickOldVersion() {
   expect(preview.textContent).toContain('The hero walked into the storm.');
 }
 
-describe('SceneHistory', () => {
+// Genuinely heavy: each test mounts the real TipTap editor next to the history
+// panel (no timers or network waits). ~0.2 s on an idle machine, but a busy one
+// stretches that past Vitest's 5 s default, so these get more room.
+describe('SceneHistory', { timeout: 20_000 }, () => {
   beforeEach(() => {
     callOp.mockReset().mockImplementation(async (_p: string, op: string, args: any) => {
       if (op === 'list_scene_revisions')

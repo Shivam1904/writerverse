@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 from actions.capabilities.spec import CapabilityError, DispatchContext
+from common.errors import log_exception
 
 logger = logging.getLogger("writerverse.consistency")
 
@@ -21,7 +22,8 @@ def execute_merge(ctx: DispatchContext, gathered: dict[str, Any]) -> dict[str, A
     try:
         result = run_merge_rough_into_grand(rough, grand)
     except Exception as exc:
-        logger.exception(
+        log_exception(
+            logger,
             "run/merge FAILED project=%s rough_id=%s",
             ctx.project_id, gathered["rough_id"],
         )

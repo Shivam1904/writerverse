@@ -5,6 +5,7 @@ import logging
 from typing import Any
 
 from actions.capabilities.spec import CapabilityError, DispatchContext
+from common.errors import log_exception
 
 from braindumps.engine.generation import (
     run_draft_world_entity,
@@ -96,7 +97,7 @@ def execute_init_elements(ctx: DispatchContext, gathered: dict[str, Any]) -> dic
             title=gathered.get("title", ""),
         )
     except Exception as exc:
-        logger.exception("run/init-elements FAILED project=%s", ctx.project_id)
+        log_exception(logger, "run/init-elements FAILED project=%s", ctx.project_id)
         raise CapabilityError("init elements failed", 502) from exc
 
 
@@ -112,7 +113,7 @@ def execute_enrich_character(ctx: DispatchContext, gathered: dict[str, Any]) -> 
             known_entities=gathered.get("known_entities"),
         )
     except Exception as exc:
-        logger.exception("run/enrich-character FAILED project=%s", ctx.project_id)
+        log_exception(logger, "run/enrich-character FAILED project=%s", ctx.project_id)
         raise CapabilityError("enrich character failed", 502) from exc
     res["character_id"] = gathered.get("character_id")
     return res
@@ -129,7 +130,7 @@ def execute_draft_world_entity(ctx: DispatchContext, gathered: dict[str, Any]) -
             gathered["phrases"], gathered["ideas"],
         )
     except Exception as exc:
-        logger.exception("run/draft-world-entity FAILED project=%s", ctx.project_id)
+        log_exception(logger, "run/draft-world-entity FAILED project=%s", ctx.project_id)
         raise CapabilityError("draft world entity failed", 502) from exc
     res["worldbuilding_id"] = gathered.get("worldbuilding_id")
     res["name"] = gathered.get("name")
